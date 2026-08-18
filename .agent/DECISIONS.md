@@ -1,0 +1,253 @@
+# Project Decision Log v0.3
+
+## D-001 — Public Website Positioning
+**Status:** Accepted
+
+Corporate public site; not B2B/e-commerce/repair-shop/vehicle-showroom UI.
+
+## D-002 — Design Direction
+**Status:** Accepted
+
+ABB-inspired restrained Swiss-corporate design language, adapted to Ardaş.
+
+## D-003 — Technology Baseline
+**Status:** Accepted
+
+```text
+Next.js
+TypeScript
+pnpm
+PostgreSQL
+```
+
+Exact versions are selected before scaffold in Milestone 0.
+
+## D-004 — Internationalization From Day One
+**Status:** Accepted
+
+TR/EN is foundational.
+
+## D-005 — Localized Slugs
+**Status:** Accepted
+
+Stable route keys map to localized slugs.
+
+## D-006 — Missing Translation Behavior
+**Status:** Accepted
+
+Direct request to unpublished locale variant returns 404.
+
+Language switch goes to equivalent published route, otherwise target locale homepage.
+
+## D-007 — Admin Language
+**Status:** Accepted
+
+Admin UI Turkish; managed public content bilingual.
+
+## D-008 — Career Model
+**Status:** Accepted
+
+General application first; nullable `job_posting_id` reserved for future vacancy-specific applications.
+
+## D-009 — Contact Form
+**Status:** Accepted
+
+Public contact form is in scope.
+
+## D-010 — Security Before Career
+**Status:** Accepted
+
+Career submission cannot be production-enabled before auth/MFA/RBAC/protected storage/upload scanning/audit/retention gates pass.
+
+## D-011 — Permission-Based RBAC
+**Status:** Accepted
+
+Server-side explicit permissions, not only role names.
+
+## D-012 — Contact Manager Role
+**Status:** Accepted
+
+Contact messages are managed by `contact_manager` and `super_admin`.
+
+Generic `viewer` and `content_editor` do not receive contact-message read access by default.
+
+## D-013 — Dealer Portal
+**Status:** Accepted
+
+Validated site setting → environment fallback → disabled.
+
+Only HTTPS; Super Admin-only update; audited.
+
+## D-014 — Publishing Workflow v1
+**Status:** Accepted
+
+Authorized Content Editor may publish directly.
+
+No mandatory second approver in v1.
+
+Still required:
+
+- preview,
+- revisions,
+- rollback,
+- scheduled publication,
+- locale-aware status,
+- audit.
+
+## D-015 — Environments
+**Status:** Accepted
+
+Local / staging / production are separate.
+
+## D-016 — Career Required Fields
+**Status:** Accepted
+
+Required core fields:
+
+- first name
+- last name
+- phone
+- email
+- department
+- target location
+- expected salary TRY
+- availability/start date
+- self-description
+- CV
+
+Approval-gated fields:
+
+- gender
+- birth date
+- marital status
+- military fields
+
+## D-017 — CV Upload v1
+**Status:** Accepted
+
+```text
+PDF only
+Max 10 MB
+Malware scan mandatory
+Fail closed
+```
+
+Scanner unavailable/failure → file remains quarantined/inaccessible.
+
+## D-018 — Admin MFA
+**Status:** Accepted
+
+MFA is mandatory for production admin access.
+
+## D-019 — Department Model
+**Status:** Accepted
+
+Departments are managed entities:
+
+```text
+Department
+DepartmentLocale
+```
+
+Not a hard-coded permanent enum.
+
+## D-020 — Localized Media Accessibility
+**Status:** Accepted
+
+Use `MediaLocale` for localized alt text/caption.
+
+Usage-specific alt override may be supported where semantic context differs.
+
+## D-021 — Form Privacy Provenance
+**Status:** Accepted
+
+Career/contact records store:
+
+- locale
+- privacy notice version
+- notice shown timestamp
+- acknowledgement timestamp where applicable.
+
+## D-022 — Slug History
+**Status:** Accepted
+
+Changed published slugs create a redirect-history record for permanent redirects.
+
+## D-023 — Public Legal Pages
+**Status:** Accepted
+
+CMS/public routes include:
+
+TR:
+- `/tr/gizlilik`
+- `/tr/cerez-politikasi`
+- `/tr/kvkk`
+
+EN:
+- `/en/privacy`
+- `/en/cookie-policy`
+- `/en/data-protection`
+
+Exact legal copy is approval-gated.
+
+## D-024 — Audit Policy
+**Status:** Accepted
+
+Audit records are append-oriented, integrity-protected operational records.
+
+Ordinary admins cannot edit/delete them.
+
+Exact retention period is approval/operations decision before production.
+
+## D-025 — Providers
+**Status:** TBD During Architecture
+
+Choose during implementation:
+
+- hosting
+- PostgreSQL hosting
+- object storage
+- auth/MFA implementation/provider
+- email
+- monitoring
+
+Provider selection must satisfy security/backup/data-region requirements.
+
+## D-026 — Milestone 0 Toolchain Versions
+**Status:** Accepted
+
+Selected on 2026-08-18:
+
+```text
+Node.js: 24.19.0 LTS
+pnpm: 11.22.0
+Next.js: 16.3.1
+React / React DOM: 19.2.8
+TypeScript: 6.0.3
+ESLint: 9.39.5
+Vitest: 4.1.10
+```
+
+Versions are exact in project configuration and lockfile. Node.js and pnpm are
+also pinned for CI. TypeScript 6 and ESLint 9 are the newest selected versions
+inside the current Next.js lint toolchain's supported peer ranges.
+
+## D-027 — PostgreSQL Data Access and Migrations
+**Status:** Accepted
+
+Use Drizzle ORM `0.45.2` with Drizzle Kit `0.31.10` and PostgreSQL.
+
+Reasons:
+
+- type-safe server-side data access,
+- committed and reviewable SQL migration history,
+- PostgreSQL support without coupling production runtime to a schema CLI,
+- explicit SQL visibility for data and security constraints,
+- small server runtime surface.
+
+Prisma ORM 7.9.1 was evaluated first but rejected because its optional CLI peer
+was resolved into the production dependency graph and carried an unresolved
+high-severity transitive advisory at selection time. A major-version override
+was not accepted as a safe production baseline.
+
+Database schema and initial Drizzle migration are delivered in Milestone 1.

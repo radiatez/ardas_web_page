@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Next.js output
+.next/
+out/
+
+# Production output
+build/
+dist/
+
+# Test output
+coverage/
+
+# Local environment files. Commit examples only.
+.env
+.env.*
+!.env.example
+!config/environments/*.env.example
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Generated files
+*.tsbuildinfo
+src/generated/
+
+# Local tooling and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Deployment providers
+.vercel/
