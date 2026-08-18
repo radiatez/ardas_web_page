@@ -23,6 +23,8 @@
   provisioning and legal/commercial approval remain launch-gated.
 - Extended CI with clean PostgreSQL migration, migration reproducibility,
   database integration tests and production dependency audit.
+- Updated GitHub JavaScript Actions to their current Node-compatible major
+  releases after the first Milestone 1 CI exposed deprecation warnings.
 
 ## v0.3 — Data Model, RBAC, Legal Routes & Security Hardening
 

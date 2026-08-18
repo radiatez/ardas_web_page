@@ -135,7 +135,7 @@ d5f8fdf docs: record milestone 0 local validation
 
 # Milestone 1 — Architecture, Data Model, Providers, TR/EN & Routing
 
-Status: `[~]`
+Status: `[x]`
 
 ## Tasks
 
@@ -169,7 +169,65 @@ Status: `[~]`
 
 ## Validation
 
-Migration tests, locale tests, data-model checks.
+### Validation Record — 2026-08-18
+
+Authoritative remote environment:
+
+```text
+GitHub Actions ubuntu-24.04
+Node.js 24.19.0
+pnpm 11.22.0
+PostgreSQL 18.4 (official service image)
+Drizzle ORM 0.45.2 / Drizzle Kit 0.31.10
+```
+
+Commands / CI gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:migrate
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+```
+
+Results:
+
+- frozen install passed on the pinned runtime,
+- initial migration applied to a newly initialized PostgreSQL 18.4 database,
+- migration journal was recorded and the schema created 27 application tables,
+- Drizzle migration metadata check passed,
+- regeneration produced no schema/migration Git diff,
+- ESLint passed with zero warnings,
+- TypeScript and Next.js route type generation passed,
+- Vitest: 6 files / 32 tests passed, including 3 real PostgreSQL migration
+  tests, 13 localized-route tests and 9 data-model contract tests,
+- production build passed; `/tr` and `/en` were statically generated,
+- production dependency audit: no known vulnerabilities,
+- GitHub Actions `CI` run `#3` / run ID `32148719586`: `success`, attempt 1,
+  commit `decce3de9ed611f47648501861ef6fd25a73c9b3`,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32148719586`.
+
+Local note:
+
+- the Windows host has no Docker/PostgreSQL service, so the 3 DB integration
+  tests were skipped locally; the authoritative clean-database execution is the
+  successful remote PostgreSQL 18.4 job above,
+- local migration SQL and snapshot hashes remained identical after regeneration,
+  and lint/typecheck/unit tests/build/audit passed.
+
+Provider/region decisions:
+
+- Vercel `fra1`, Neon/AWS Frankfurt, S3/GuardDuty/SES `eu-central-1`, Auth0 EU,
+  and Sentry Germany were recorded in ADR-009/010 and D-025,
+- account provisioning, commercial/DPA/legal review, exact backup RPO/RTO and
+  production owners/recipients remain explicit `TBD` launch gates.
 
 ---
 
