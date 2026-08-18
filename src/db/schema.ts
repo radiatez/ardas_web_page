@@ -22,6 +22,7 @@ import {
 import { siteSettingKeys } from "../config/site-settings";
 import { locales } from "../i18n/config";
 import { routeKeys } from "../i18n/routes";
+import { permissionScopes } from "../security/rbac/catalog";
 
 export const localeEnum = pgEnum("locale", locales);
 export const routeKeyEnum = pgEnum("route_key", routeKeys);
@@ -65,6 +66,7 @@ export const malwareScanStatusEnum = pgEnum("malware_scan_status", [
   "infected",
   "error",
 ]);
+export const permissionScopeEnum = pgEnum("permission_scope", permissionScopes);
 export const siteSettingKeyEnum = pgEnum("site_setting_key", siteSettingKeys);
 
 const publicationColumns = () => ({
@@ -84,6 +86,7 @@ export const adminUsers = pgTable(
   "admin_user",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    auth0Subject: varchar("auth0_subject", { length: 255 }).notNull(),
     email: varchar("email", { length: 320 }).notNull(),
     displayName: varchar("display_name", { length: 160 }).notNull(),
     status: adminUserStatusEnum("status").default("invited").notNull(),
@@ -96,7 +99,10 @@ export const adminUsers = pgTable(
       .notNull(),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   },
-  (table) => [uniqueIndex("admin_user_email_unique").on(table.email)],
+  (table) => [
+    uniqueIndex("admin_user_auth0_subject_unique").on(table.auth0Subject),
+    uniqueIndex("admin_user_email_unique").on(table.email),
+  ],
 );
 
 export const roles = pgTable(
@@ -153,6 +159,7 @@ export const rolePermissions = pgTable(
     permissionId: uuid("permission_id")
       .notNull()
       .references(() => permissions.id, { onDelete: "cascade" }),
+    scope: permissionScopeEnum("scope").default("all").notNull(),
   },
   (table) => [
     primaryKey({
@@ -176,7 +183,12 @@ export const media = pgTable(
     focalX: real("focal_x"),
     focalY: real("focal_y"),
     scanStatus: malwareScanStatusEnum("scan_status"),
+    scanAttemptCount: integer("scan_attempt_count").default(0).notNull(),
+    scanRequestedAt: timestamp("scan_requested_at", { withTimezone: true }),
     scanCompletedAt: timestamp("scan_completed_at", { withTimezone: true }),
+    scanLastResult: varchar("scan_last_result", { length: 80 }),
+    scanLastErrorCode: varchar("scan_last_error_code", { length: 120 }),
+    scanNextRetryAt: timestamp("scan_next_retry_at", { withTimezone: true }),
     createdBy: uuid("created_by").references(() => adminUsers.id, {
       onDelete: "set null",
     }),
@@ -200,6 +212,27 @@ export const media = pgTable(
       "media_focal_y_range",
       sql`${table.focalY} IS NULL OR (${table.focalY} >= 0 AND ${table.focalY} <= 1)`,
     ),
+  ],
+);
+
+export const malwareScanEvents = pgTable(
+  "malware_scan_event",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    providerEventId: varchar("provider_event_id", { length: 160 }).notNull(),
+    mediaId: uuid("media_id")
+      .notNull()
+      .references(() => media.id, { onDelete: "cascade" }),
+    result: varchar("result", { length: 80 }).notNull(),
+    processedAt: timestamp("processed_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("malware_scan_event_provider_event_unique").on(
+      table.providerEventId,
+    ),
+    index("malware_scan_event_media_idx").on(table.mediaId, table.processedAt),
   ],
 );
 
@@ -523,10 +556,10 @@ export const careerApplications = pgTable(
     jobPostingId: uuid("job_posting_id").references(() => jobPostings.id, {
       onDelete: "set null",
     }),
-    firstName: varchar("first_name", { length: 120 }).notNull(),
-    lastName: varchar("last_name", { length: 120 }).notNull(),
-    phoneNormalized: varchar("phone_normalized", { length: 32 }).notNull(),
-    emailNormalized: varchar("email_normalized", { length: 320 }).notNull(),
+    firstName: varchar("first_name", { length: 120 }),
+    lastName: varchar("last_name", { length: 120 }),
+    phoneNormalized: varchar("phone_normalized", { length: 32 }),
+    emailNormalized: varchar("email_normalized", { length: 320 }),
     gender: varchar("gender", { length: 80 }),
     birthDate: date("birth_date"),
     maritalStatus: varchar("marital_status", { length: 80 }),
@@ -543,12 +576,11 @@ export const careerApplications = pgTable(
     expectedSalaryTry: numeric("expected_salary_try", {
       precision: 12,
       scale: 2,
-    }).notNull(),
-    availableFrom: date("available_from").notNull(),
-    aboutText: text("about_text").notNull(),
+    }),
+    availableFrom: date("available_from"),
+    aboutText: text("about_text"),
     cvFileId: uuid("cv_file_id")
-      .notNull()
-      .references(() => media.id, { onDelete: "restrict" }),
+      .references(() => media.id, { onDelete: "set null" }),
     locale: localeEnum("locale").notNull(),
     privacyNoticeVersion: varchar("privacy_notice_version", {
       length: 120,
@@ -569,6 +601,10 @@ export const careerApplications = pgTable(
     retentionDueAt: timestamp("retention_due_at", {
       withTimezone: true,
     }).notNull(),
+    retentionHoldUntil: timestamp("retention_hold_until", {
+      withTimezone: true,
+    }),
+    anonymizedAt: timestamp("anonymized_at", { withTimezone: true }),
   },
   (table) => [
     index("career_application_status_created_idx").on(
@@ -576,13 +612,18 @@ export const careerApplications = pgTable(
       table.createdAt,
     ),
     index("career_application_retention_idx").on(table.retentionDueAt),
+    uniqueIndex("career_application_cv_file_unique").on(table.cvFileId),
     check(
       "career_application_company_source_consistent",
       sql`(${table.knowsCompany} AND ${table.knowsCompanySource} IS NOT NULL) OR (NOT ${table.knowsCompany} AND ${table.knowsCompanySource} IS NULL)`,
     ),
     check(
       "career_application_salary_nonnegative",
-      sql`${table.expectedSalaryTry} >= 0`,
+      sql`${table.expectedSalaryTry} IS NULL OR ${table.expectedSalaryTry} >= 0`,
+    ),
+    check(
+      "career_application_required_unless_anonymized",
+      sql`${table.anonymizedAt} IS NOT NULL OR (${table.firstName} IS NOT NULL AND ${table.lastName} IS NOT NULL AND ${table.phoneNormalized} IS NOT NULL AND ${table.emailNormalized} IS NOT NULL AND ${table.expectedSalaryTry} IS NOT NULL AND ${table.availableFrom} IS NOT NULL AND ${table.aboutText} IS NOT NULL AND ${table.cvFileId} IS NOT NULL)`,
     ),
   ],
 );
@@ -633,12 +674,12 @@ export const contactSubmissions = pgTable(
   "contact_submission",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    name: varchar("name", { length: 240 }).notNull(),
+    name: varchar("name", { length: 240 }),
     company: varchar("company", { length: 255 }),
-    emailNormalized: varchar("email_normalized", { length: 320 }).notNull(),
+    emailNormalized: varchar("email_normalized", { length: 320 }),
     phoneNormalized: varchar("phone_normalized", { length: 32 }),
-    subject: varchar("subject", { length: 255 }).notNull(),
-    message: text("message").notNull(),
+    subject: varchar("subject", { length: 255 }),
+    message: text("message"),
     locale: localeEnum("locale").notNull(),
     privacyNoticeVersion: varchar("privacy_notice_version", {
       length: 120,
@@ -656,6 +697,10 @@ export const contactSubmissions = pgTable(
     retentionDueAt: timestamp("retention_due_at", {
       withTimezone: true,
     }).notNull(),
+    retentionHoldUntil: timestamp("retention_hold_until", {
+      withTimezone: true,
+    }),
+    anonymizedAt: timestamp("anonymized_at", { withTimezone: true }),
   },
   (table) => [
     index("contact_submission_status_created_idx").on(
@@ -663,6 +708,33 @@ export const contactSubmissions = pgTable(
       table.createdAt,
     ),
     index("contact_submission_retention_idx").on(table.retentionDueAt),
+    check(
+      "contact_submission_required_unless_anonymized",
+      sql`${table.anonymizedAt} IS NOT NULL OR (${table.name} IS NOT NULL AND ${table.emailNormalized} IS NOT NULL AND ${table.subject} IS NOT NULL AND ${table.message} IS NOT NULL)`,
+    ),
+  ],
+);
+
+export const rateLimitBuckets = pgTable(
+  "rate_limit_bucket",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    route: varchar("route", { length: 120 }).notNull(),
+    identifierHash: varchar("identifier_hash", { length: 64 }).notNull(),
+    windowStartedAt: timestamp("window_started_at", {
+      withTimezone: true,
+    }).notNull(),
+    requestCount: integer("request_count").default(1).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("rate_limit_bucket_window_unique").on(
+      table.route,
+      table.identifierHash,
+      table.windowStartedAt,
+    ),
+    index("rate_limit_bucket_expiry_idx").on(table.expiresAt),
+    check("rate_limit_bucket_count_positive", sql`${table.requestCount} > 0`),
   ],
 );
 

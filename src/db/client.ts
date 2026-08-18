@@ -17,6 +17,8 @@ export function createDatabase(connectionString: string) {
   };
 }
 
+export type DatabaseClient = ReturnType<typeof createDatabase>["db"];
+
 export function createDatabaseFromEnvironment() {
   const connectionString = process.env.DATABASE_URL;
 

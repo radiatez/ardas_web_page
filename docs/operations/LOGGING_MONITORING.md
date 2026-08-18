@@ -50,9 +50,17 @@ Track:
 
 ## Alerting
 
-Define production alert destinations/provider during infrastructure selection.
+Application security failures emit structured error events suitable for the
+selected Sentry Germany integration. GuardDuty/S3/SQS service alarms use
+CloudWatch/EventBridge. Exact production projects, destinations and on-call
+recipients remain `TBD` until infrastructure provisioning.
 
 Alerts should not embed raw PII.
+
+The implemented sanitizer recursively redacts sensitive field names, email,
+phone, bearer/JWT-like values, form bodies, filenames and CV content before a
+structured record reaches the output sink. Record IDs and safe status/error codes
+remain available for correlation.
 
 ## v0.3 Additional Monitoring
 

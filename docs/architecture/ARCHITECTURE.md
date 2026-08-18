@@ -75,7 +75,7 @@ Vercel fra1 (Next.js Functions)
   ├─ Amazon S3 eu-central-1
   │    ├─ public
   │    ├─ protected
-  │    ├─ quarantine → GuardDuty Malware Protection → EventBridge
+  │    ├─ quarantine → GuardDuty Malware Protection → EventBridge → SQS
   │    └─ encrypted database backup/export
   ├─ Amazon SES eu-central-1
   └─ Sentry Germany + AWS CloudWatch/EventBridge
@@ -88,6 +88,26 @@ regions. Environment tenants/projects/buckets are separate.
 Provisioning, account owners, paid plan selection, DPA/subprocessor review,
 legal data-transfer assessment and alert recipients remain `TBD` production
 gates. See ADR-009 and ADR-010.
+
+## Milestone 2 Security Flow
+
+```text
+Auth0 EU session
+  → active local AdminUser by immutable Auth0 subject
+  → production MFA evidence
+  → PostgreSQL permission + scope
+  → server mutation / protected resource
+
+CV upload
+  → PDF validation (extension + MIME + signature + 10 MB)
+  → random-key quarantine object
+  → GuardDuty → EventBridge → SQS
+  → clean: protected
+  → every other state: inaccessible + retry/alert
+```
+
+Public career/contact persistence remains disabled until its later milestone;
+the Milestone 2 endpoints enforce request/rate limits and return unavailable.
 
 ## Portability and Recovery
 

@@ -4,3 +4,7 @@ saveExact: true
 allowBuilds:
   esbuild: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@auth0/nextjs-auth0@4.27.0'
+  - '@aws-sdk/client-s3@3.1112.0'
+  - '@aws-sdk/client-sqs@3.1112.0'

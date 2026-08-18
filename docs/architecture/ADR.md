@@ -323,3 +323,88 @@ Official references:
 - https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html
 - https://docs.aws.amazon.com/guardduty/latest/ug/how-malware-protection-for-s3-gdu-works.html
 - https://docs.aws.amazon.com/guardduty/latest/ug/monitor-enable-s3-object-tagging-malware-protection.html
+
+### ADR-011 — Milestone 2 Server Security Enforcement
+
+Date: 2026-08-18
+Status: Accepted; managed-service provisioning remains TBD
+
+#### Context
+
+Auth0, S3 and GuardDuty were selected in Milestone 1, but the application still
+needed explicit identity binding, permission enforcement, at-least-once scan
+delivery, fail-closed retries, audit integrity, abuse controls and retention
+execution. Provider account configuration is not a substitute for an application
+security boundary.
+
+#### Decision
+
+- Bind an Auth0 identity to exactly one local active admin through the immutable
+  OIDC `sub` claim. Require standard `amr: mfa` evidence for all production admin
+  access and every protected CV download; missing evidence denies access.
+- Keep the Auth0 EU tenant policy at MFA `Always` and public registration off.
+  The application check is an independent fail-closed layer, not a replacement
+  for tenant policy.
+- Expand every RBAC matrix row into atomic permission keys. Runtime code loads
+  permission + scope from PostgreSQL and never authorizes by role name. Seed the
+  accepted role grouping in a migration and exhaustively test every allowed and
+  denied role/permission pair.
+- Deliver GuardDuty object-scan events from EventBridge to private SQS. Store the
+  provider event ID uniquely, treat delivery as at-least-once, and accept only the
+  configured quarantine bucket. Only `NO_THREATS_FOUND` promotes an object.
+- Mark missing/error/timeout scans inaccessible, emit a safe operational signal,
+  and re-key/re-submit quarantine objects with bounded backoff for at most three
+  attempts. S3 promotion failure is compensated by deleting any incomplete
+  protected copy before retry.
+- Use PostgreSQL atomic fixed-window rate buckets. HMAC the client identifier with
+  a server secret so raw IP/form identity is never stored.
+- Make audit rows append-only with a PostgreSQL update/delete trigger. All audit
+  writers pass metadata through the PII redaction boundary.
+- Support scheduled anonymization using existing deadlines plus optional holds.
+  Personal/free-text fields and CV objects are removed; the database permits the
+  nullable post-retention shape only when `anonymized_at` is present.
+- Resolve Dealer Portal as validated setting, then validated environment fallback,
+  then disabled. Reject credentials, query, fragment and non-443 explicit ports in
+  addition to requiring HTTPS and an optional exact host allowlist.
+
+#### Alternatives Considered
+
+- Auth0 role/permission claims as the only authorization source: rejected because
+  account disable/revocation and application scopes must be authoritative on every
+  server request without trusting editable role names.
+- Direct public EventBridge webhook: rejected because a private SQS target gives
+  AWS-authenticated polling, at-least-once buffering and DLQ/queue-age controls.
+- In-memory/serverless rate limits: rejected because concurrent Vercel instances do
+  not share state. A separate Redis provider was not added for the initial form
+  volume because PostgreSQL already provides the needed atomic boundary.
+- A retention default: rejected because the approved legal/business durations are
+  still `TBD` and must not be invented.
+
+#### Consequences
+
+- Auth0 EU tenant creation, factor enablement, `Always` policy verification, admin
+  account bootstrap and recovery testing remain production deployment gates.
+- S3 bucket/IAM/TBAC, GuardDuty tagging, EventBridge rule, SQS/DLQ, scheduler and
+  alarm provisioning must be validated in the real AWS account before submissions
+  are enabled.
+- Static CSP currently allows inline scripts/styles for Next.js compatibility; the
+  nonce/hash hardening follow-up is recorded as R-028.
+- Public form endpoints enforce size/rate controls but intentionally remain
+  unavailable until their persistence milestones.
+
+#### Validation
+
+Milestone 2 validation includes exhaustive RBAC positives/negatives, production
+MFA denial, clean/error/timeout/promotion scan states, unscanned and unauthorized
+CV download denial, application/file relationship checks, audit immutability and
+mutation events, rate-limit atomicity, retention shape, PII redaction, security
+headers and clean PostgreSQL migration/regeneration.
+
+Official references:
+
+- https://auth0.com/docs/quickstart/webapp/nextjs
+- https://auth0.com/docs/secure/multi-factor-authentication/enable-mfa
+- https://dev.auth0.com/docs/secure/multi-factor-authentication/step-up-authentication/configure-step-up-authentication-for-web-apps
+- https://docs.aws.amazon.com/guardduty/latest/ug/monitor-with-eventbridge-s3-malware-protection.html
+- https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html
+- https://www.postgresql.org/docs/current/sql-insert.html

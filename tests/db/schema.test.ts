@@ -72,11 +72,12 @@ describe("Milestone 1 data model", () => {
     expect(departments.key.notNull).toBe(true);
   });
 
-  it("keeps general applications independent from job postings", () => {
+  it("keeps general applications independent and permits retention anonymization", () => {
     expect(careerApplications.jobPostingId.notNull).toBe(false);
     expect(careerApplications.departmentId.notNull).toBe(true);
     expect(careerApplications.locationId.notNull).toBe(true);
-    expect(careerApplications.cvFileId.notNull).toBe(true);
+    expect(careerApplications.cvFileId.notNull).toBe(false);
+    expect(careerApplications.anonymizedAt.notNull).toBe(false);
   });
 
   it("requires privacy provenance and a retention deadline on both forms", () => {

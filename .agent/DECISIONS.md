@@ -296,3 +296,48 @@ behavior. A protected media row requires `clean` at database level.
 `SiteSetting` accepts only the explicit non-secret `site_setting_key` allowlist.
 Provider credentials, authentication secrets, tokens, private keys and database
 URLs remain environment/secret-manager values and cannot be general CMS rows.
+
+## D-032 — Milestone 2 Admin Security Boundary
+**Status:** Accepted
+
+Auth0's immutable `sub` claim is the unique external identity bound to an active
+local `AdminUser`. A valid Auth0 session alone does not grant application access.
+Production admin access fails closed unless the verified session's standard
+`amr` claim contains `mfa`; protected CV download requires this MFA evidence in
+every environment.
+
+Roles only group grants. Runtime authorization reads atomic permission keys and
+optional scopes from PostgreSQL and never branches on a role name. The v0.3
+catalog is seeded by migration; `all`, `content`, `public_locale`, `recruitment`
+and `retention` scopes encode limited matrix cells.
+
+Dealer Portal values reject HTTP, credentials, query strings, fragments and
+non-443 explicit ports. An optional exact hostname allowlist is enforced before
+the setting or environment fallback can be enabled.
+
+## D-033 — GuardDuty Event Delivery and Retry
+**Status:** Accepted for application architecture; AWS provisioning TBD
+
+GuardDuty Malware Protection scan results travel through EventBridge to a
+private SQS queue. The application polls with AWS-authenticated SDK calls; there
+is no public scan-result webhook. Provider event IDs are unique/idempotent.
+
+`NO_THREATS_FOUND` alone may copy a CV from quarantine to protected storage.
+All other results, missing events, timeout and promotion errors remain
+quarantined/inaccessible. Timed-out/error objects are re-keyed as new quarantine
+objects for at most three scan attempts with bounded backoff; every failure emits
+a PII-safe operational alert signal. Queue/DLQ, IAM, bucket policy, GuardDuty
+tagging and production alarm provisioning remain deployment gates.
+
+## D-034 — Abuse Control and Retention Execution
+**Status:** Accepted
+
+Career/contact abuse control uses atomic PostgreSQL fixed-window buckets. Client
+identifiers are stored only as HMAC-SHA-256 values using a server secret; raw IP
+or form values are not persisted in rate-limit rows or logs.
+
+Retention duration has no invented default. Candidate/contact deadlines and
+optional holds drive an authenticated internal cleanup job. Anonymization clears
+personal/free-text fields and deletes CV objects; database checks allow nullable
+required fields only after `anonymized_at` is set. Approved duration values remain
+configurable/TBD before production form enablement.

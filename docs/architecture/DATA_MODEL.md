@@ -9,6 +9,7 @@ initial PostgreSQL migration is committed under `drizzle/`.
 
 ```text
 id
+auth0_subject
 email
 display_name
 status
@@ -37,7 +38,11 @@ action
 
 ### UserRole / RolePermission
 
-Join mappings.
+Join mappings. `RolePermission` also stores a permission scope:
+
+```text
+all | content | public_locale | recruitment | retention
+```
 
 ---
 
@@ -285,6 +290,8 @@ status
 created_at
 updated_at
 retention_due_at
+retention_hold_until nullable
+anonymized_at nullable
 ```
 
 ### CareerApplicationNote
@@ -331,6 +338,8 @@ privacy_acknowledged_at nullable
 status
 created_at
 retention_due_at
+retention_hold_until nullable
+anonymized_at nullable
 ```
 
 ---
@@ -351,7 +360,12 @@ height nullable
 focal_x nullable
 focal_y nullable
 scan_status nullable     # pending | clean | infected | error
+scan_attempt_count
+scan_requested_at nullable
 scan_completed_at nullable
+scan_last_result nullable
+scan_last_error_code nullable
+scan_next_retry_at nullable
 created_by nullable
 created_at
 ```
@@ -402,6 +416,27 @@ created_at
 ```
 
 Audit records are append-oriented.
+
+### MalwareScanEvent
+
+```text
+provider_event_id unique
+media_id
+result
+processed_at
+```
+
+Provides at-least-once GuardDuty event idempotency.
+
+### RateLimitBucket
+
+```text
+route
+identifier_hash       # HMAC; never raw IP/form identity
+window_started_at
+request_count
+expires_at
+```
 
 ---
 
@@ -464,3 +499,14 @@ erDiagram
   valid CMS setting keys.
 - A protected `Media` row requires `scan_status = clean`; moving/copying the
   object and updating the row is implemented in the security milestone.
+
+## Milestone 2 Implementation Notes
+
+- `AdminUser.auth0_subject` is unique and is the sole Auth0-to-local identity
+  binding; authorization still requires active local status.
+- Permission grants are atomic and scoped; roles are grouping records only.
+- Candidate/contact PII columns can become null only after anonymization. The
+  database retains required-at-submission checks while supporting retention.
+- A CV media row is unique to one application. GuardDuty provider event IDs are
+  unique, and non-clean files cannot satisfy the protected-storage constraint.
+- Audit rows are protected by a PostgreSQL trigger that rejects update/delete.

@@ -23,7 +23,7 @@ describeWithDatabase("generated PostgreSQL migration", () => {
     expect(result.rows[0]?.server_version).toMatch(/^18\./);
   });
 
-  it("creates the complete Milestone 1 table set on a clean database", async () => {
+  it("creates the complete Milestone 2 table set on a clean database", async () => {
     const result = await pool.query<{ table_name: string }>(
       `select table_name
          from information_schema.tables
@@ -51,11 +51,13 @@ describeWithDatabase("generated PostgreSQL migration", () => {
         "location_locale",
         "media",
         "media_locale",
+        "malware_scan_event",
         "page",
         "page_locale",
         "permission",
         "product_group",
         "product_group_locale",
+        "rate_limit_bucket",
         "role",
         "role_permission",
         "site_setting",
