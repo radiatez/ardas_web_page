@@ -42,7 +42,7 @@ Read:
 
 # Milestone 0 — Exact Versions, Repository, Scaffold & Environments
 
-Status: `[~]`
+Status: `[x]`
 
 ## Tasks
 
@@ -113,14 +113,22 @@ Notable fix:
   transitive advisory. Drizzle ORM/Kit was selected, optional peer auto-install
   was disabled, the lockfile was regenerated cleanly and the audit passed.
 
-Pending:
+Remote validation:
 
-- GitHub Actions result after the first authorized push.
+- authorized target: `https://github.com/radiatez/ardas_web_page.git`, default
+  branch `main`, authenticated owner permission `admin` / `push`,
+- first push commit: `66976476a8cf51284c658cba7bf3f44886357338`,
+- GitHub Actions `CI` run `#1` / run ID `32146805801`: `success`, attempt 1,
+  completed 2026-08-18,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32146805801`.
 
 Git record:
 
 ```text
 5e39f02 chore: initialize v0.3 Next.js application
+d5f8fdf docs: record milestone 0 local validation
+6697647 fix: keep unsupported locale 404 logs clean
 ```
 
 ---
