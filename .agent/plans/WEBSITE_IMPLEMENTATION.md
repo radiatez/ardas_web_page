@@ -103,7 +103,9 @@ Results:
 - Vitest: 2 files / 5 tests passed,
 - Next.js production build passed,
 - `/tr` and `/en` were statically generated,
-- root redirect contract test passed.
+- root redirect contract test passed,
+- production HTTP smoke: `/` 307 → `/tr`, `/tr` 200 with `lang=tr`, `/en`
+  200 with `lang=en`, unsupported `/de` 404 without an application error log.
 
 Notable fix:
 
