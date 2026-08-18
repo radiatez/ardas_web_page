@@ -7,11 +7,26 @@ import { recordAuth0Login } from "./login-events";
 
 let auth0Client: Auth0Client | undefined;
 
+export function hasCompleteAuth0Configuration(
+  environment: Readonly<Record<string, string | undefined>> = process.env,
+): boolean {
+  return Boolean(
+    environment.AUTH0_DOMAIN &&
+      environment.AUTH0_CLIENT_ID &&
+      environment.AUTH0_CLIENT_SECRET &&
+      environment.AUTH0_SECRET &&
+      (environment.APP_BASE_URL || environment.SITE_URL),
+  );
+}
+
 function safeReturnPath(value: string | undefined): string {
   return value?.startsWith("/") && !value.startsWith("//") ? value : "/admin";
 }
 
 export function getAuth0Client(): Auth0Client {
+  if (!hasCompleteAuth0Configuration()) {
+    throw new Error("Auth0 admin authentication is not configured.");
+  }
   auth0Client ??= new Auth0Client({
     appBaseUrl: process.env.APP_BASE_URL ?? process.env.SITE_URL,
     authorizationParameters: { scope: "openid profile email" },
