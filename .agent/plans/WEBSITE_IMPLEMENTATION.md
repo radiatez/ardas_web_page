@@ -50,7 +50,7 @@ Status: `[~]`
 - [x] Select exact Next.js / Node runtime / pnpm / TypeScript versions.
 - [x] Record exact versions in ADR/README/package manager config.
 - [x] Decide ORM/data-access layer.
-- [ ] Initialize/verify Git and initial commit.
+- [x] Initialize/verify Git and initial commit.
 - [x] Scaffold Next.js application.
 - [x] Configure strict TypeScript.
 - [x] Create `package.json` scripts.
@@ -113,8 +113,13 @@ Notable fix:
 
 Pending:
 
-- initial local Git commit,
 - GitHub Actions result after the first authorized push.
+
+Git record:
+
+```text
+5e39f02 chore: initialize v0.3 Next.js application
+```
 
 ---
 

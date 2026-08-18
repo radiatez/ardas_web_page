@@ -130,13 +130,15 @@ docs/
 
 ## Current Status
 
-Milestone 0 is active. The Next.js scaffold, strict TypeScript, pnpm lockfile,
-environment examples, tests and CI baseline are present.
+Milestone 0 local implementation and validation are complete. The Next.js
+scaffold, strict TypeScript, pnpm lockfile, environment examples, tests and CI
+baseline are present. GitHub Actions remains pending until the first authorized
+push.
 
 The next implementation step is:
 
 ```text
-complete Milestone 0 validation
+first authorized push / CI validation
 → Milestone 1 provider decisions
 → PostgreSQL schema/migrations
 → stable localized route registry
