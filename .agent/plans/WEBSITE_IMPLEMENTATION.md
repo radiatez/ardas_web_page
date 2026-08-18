@@ -233,26 +233,26 @@ Provider/region decisions:
 
 # Milestone 2 — Security Foundation: MFA, RBAC, Audit, Upload & Retention
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Tasks
 
-- [ ] Admin authentication.
-- [ ] MFA mandatory in production.
-- [ ] Server permission framework.
-- [ ] Implement RBAC incl. Contact Manager.
-- [ ] Audit foundation + integrity policy.
-- [ ] Protected/quarantine CV storage.
-- [ ] PDF-only 10MB validation.
-- [ ] Mandatory malware scanner.
-- [ ] Fail-closed scan behavior.
-- [ ] Protected CV download.
-- [ ] Rate limiting.
-- [ ] PII-safe logging.
-- [ ] Retention cleanup mechanism.
-- [ ] Dealer Portal secure setting.
-- [ ] Security headers/error baseline.
-- [ ] Incident-response/secret-rotation operational hooks.
+- [x] Admin authentication.
+- [x] MFA mandatory in production.
+- [x] Server permission framework.
+- [x] Implement RBAC incl. Contact Manager.
+- [x] Audit foundation + integrity policy.
+- [x] Protected/quarantine CV storage.
+- [x] PDF-only 10MB validation.
+- [x] Mandatory malware scanner.
+- [x] Fail-closed scan behavior.
+- [x] Protected CV download.
+- [x] Rate limiting.
+- [x] PII-safe logging.
+- [x] Retention cleanup mechanism.
+- [x] Dealer Portal secure setting.
+- [x] Security headers/error baseline.
+- [x] Incident-response/secret-rotation operational hooks.
 
 ## Acceptance
 
@@ -269,6 +269,87 @@ Status: `[ ]`
 ## Validation
 
 Run security/RBAC/upload test matrix.
+
+### Validation Record — 2026-08-18
+
+Authoritative remote environment:
+
+```text
+GitHub Actions ubuntu-24.04
+Node.js 24.19.0
+pnpm 11.22.0
+PostgreSQL 18.4 (official service image)
+Next.js 16.3.1 / Auth0 Next.js SDK 4.27.0
+AWS SDK for JavaScript v3.1112.0 (S3 + SQS)
+Drizzle ORM 0.45.2 / Drizzle Kit 0.31.10
+```
+
+Commands / CI gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:migrate
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+```
+
+Results:
+
+- frozen install passed on the pinned runtime,
+- both committed migrations applied to a newly initialized PostgreSQL 18.4
+  database and created the 29-table Milestone 2 schema,
+- the migration seeded 5 role groupings, 58 atomic permissions and scoped role
+  grants; PostgreSQL rejected audit update/delete operations,
+- Drizzle metadata check passed; regeneration reported no schema change and
+  produced no migration/snapshot Git diff,
+- ESLint passed with zero warnings,
+- TypeScript and Next.js route generation passed,
+- Vitest: 16 files / 58 tests passed remotely, including 9 real PostgreSQL tests;
+  exhaustive RBAC positives/negatives, production MFA denial, unscanned and
+  unauthorized CV denial, scanner error/timeout/promotion fail-closed behavior,
+  audit wiring/immutability, atomic rate limiting and PII redaction passed,
+- production build passed with TR/EN static routes plus protected admin/internal
+  security endpoints,
+- local production HTTP checks: `/` → `307 /tr`, `/tr` and `/en` → `200`;
+  with Auth0 intentionally unconfigured, `/admin` and `/auth/login` fail closed
+  with `503` while public routes remain available,
+- HTTP responses included HSTS, CSP with `frame-ancestors 'none'`, nosniff,
+  Referrer-Policy, X-Frame-Options and Permissions-Policy,
+- production dependency audit: no known vulnerabilities,
+- implementation commit `92ea7ee3767c9bb10410d3b74476b057f9e9edb8` passed
+  GitHub Actions `CI` run `#5` / run ID `32153073771`, attempt 1,
+- HTTP-discovered Auth0 configuration fix commit
+  `aec10f9cd0a9d9557115952d72c9f2ad0ded221d` passed final GitHub Actions `CI`
+  run `#6` / run ID `32153677476`, attempt 1,
+- final run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32153677476`.
+
+Local note:
+
+- the Windows host runtime was Node.js 24.14.0 and has no Docker/PostgreSQL
+  service, so 9 DB integration tests were skipped locally; the authoritative
+  clean-database execution used the pinned Node.js 24.19.0 + PostgreSQL 18.4 CI
+  environment,
+- local lint/typecheck/49 non-DB tests/build/audit, migration hash regeneration
+  and production HTTP/header checks passed.
+
+Provisioning / launch gates retained as `TBD`:
+
+- Auth0 EU tenant creation, factor enablement, MFA `Always` verification, public
+  registration disablement, admin bootstrap/recovery ownership,
+- AWS S3 bucket/IAM/TBAC, GuardDuty plan/tagging, EventBridge → SQS/DLQ,
+  scheduler and CloudWatch alert provisioning,
+- Sentry/SES projects, alert recipients, DPA/subprocessor/legal review,
+- approved candidate/contact/audit retention durations.
+
+Public career/contact persistence remains intentionally unavailable until its
+later milestone; Milestone 2 supplies and validates the security boundary only.
 
 ---
 
