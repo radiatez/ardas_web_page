@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Milestone 0 Application Scaffold
+## Unreleased — Milestone 0–1 Foundation
 
 - Confirmed `ardas_web_page` as the application repository root.
 - Pinned Node.js, pnpm, Next.js, React, TypeScript, ESLint and Vitest versions.
@@ -12,6 +12,17 @@
 - Added safe environment examples for local/staging/production.
 - Added GitHub Actions CI for install, lint, typecheck, test and build.
 - Verified production dependencies with no known audit vulnerabilities.
+- Completed the first `origin/main` push and verified GitHub Actions CI.
+- Selected PostgreSQL 18 and added reproducible Drizzle migrations.
+- Added stable TR/EN route keys, localized slugs and locale publication rules.
+- Added Department, Media, SlugRedirect, privacy provenance, AuditEvent and
+  non-secret SiteSetting models.
+- Added public/protected/quarantine storage states with a database guard that
+  protected media must have a clean malware scan.
+- Selected the EU-centred Vercel, Neon, AWS, Auth0 and Sentry provider topology;
+  provisioning and legal/commercial approval remain launch-gated.
+- Extended CI with clean PostgreSQL migration, migration reproducibility,
+  database integration tests and production dependency audit.
 
 ## v0.3 — Data Model, RBAC, Legal Routes & Security Hardening
 
@@ -25,7 +36,8 @@ This version incorporates the second full project review.
   - TypeScript
   - pnpm
   - PostgreSQL
-- Provider choices (hosting, DB hosting, object storage, auth, email) remain implementation-time architecture decisions.
+- Provider choices (hosting, DB hosting, object storage, auth, email) were left
+  for the Milestone 1 architecture decision recorded above.
 - Split Milestone 5 validation so public form persistence is tested before Admin/HR management E2Es.
 - Moved inbox/HR management E2Es to the milestones where those admin modules exist.
 

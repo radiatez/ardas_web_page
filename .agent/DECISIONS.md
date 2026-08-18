@@ -199,19 +199,28 @@ Ordinary admins cannot edit/delete them.
 
 Exact retention period is approval/operations decision before production.
 
-## D-025 — Providers
-**Status:** TBD During Architecture
+## D-025 — Providers and Data Regions
+**Status:** Accepted for architecture; provisioning/contracts TBD
 
-Choose during implementation:
+Selected on 2026-08-18:
 
-- hosting
-- PostgreSQL hosting
-- object storage
-- auth/MFA implementation/provider
-- email
-- monitoring
+```text
+Hosting: Vercel, Functions fra1 (Frankfurt)
+PostgreSQL: Neon, AWS eu-central-1 (Frankfurt)
+Object storage: Amazon S3, eu-central-1
+Authentication/MFA: Auth0 EU tenant, MFA Always
+Malware scanner: Amazon GuardDuty Malware Protection for S3, eu-central-1
+Transactional email: Amazon SES, eu-central-1
+Application monitoring: Sentry Germany region
+AWS service monitoring: CloudWatch + EventBridge, eu-central-1
+```
 
-Provider selection must satisfy security/backup/data-region requirements.
+Public static assets may use Vercel's global CDN. Candidate/contact records,
+CV objects and primary server execution use the selected EU regions.
+
+Account provisioning, plan/cost approval, DPA/subprocessor review, legal data
+transfer assessment, production owners and alert recipients remain `TBD` launch
+gates. See ADR-009 and ADR-010.
 
 ## D-026 — Milestone 0 Toolchain Versions
 **Status:** Accepted
@@ -251,3 +260,39 @@ high-severity transitive advisory at selection time. A major-version override
 was not accepted as a safe production baseline.
 
 Database schema and initial Drizzle migration are delivered in Milestone 1.
+
+## D-028 — PostgreSQL Version and Migration Contract
+**Status:** Accepted
+
+Use PostgreSQL 18. The reproducible local/CI baseline is the official
+`postgres:18.4` image; Neon manages supported production minor updates.
+
+The schema lives in `src/db/schema.ts`; generated SQL and Drizzle metadata are
+committed under `drizzle/`. CI must apply migrations to a clean database, run DB
+tests, regenerate metadata without a Git diff, and pass dependency audit.
+
+## D-029 — Locale-Owned Data and Publication
+**Status:** Accepted
+
+Stable parent IDs and route keys are language-neutral. Localized rows own
+localized slugs/content and their own `draft | published | archived` lifecycle,
+including publish/schedule/archive timestamps. Missing or unpublished direct
+locale access is unavailable/404; only the language switch may fall back to the
+target locale homepage.
+
+## D-030 — Storage Classes and Scan State
+**Status:** Accepted
+
+`Media.storage_class` is one of `public | protected | quarantine`.
+`Media.scan_status` is one of `pending | clean | infected | error`.
+
+Amazon GuardDuty results map to the internal state. `UNSUPPORTED`,
+`ACCESS_DENIED`, `FAILED`, timeout and scanner unavailability map to fail-closed
+behavior. A protected media row requires `clean` at database level.
+
+## D-031 — Site Settings Exclude Secrets
+**Status:** Accepted
+
+`SiteSetting` accepts only the explicit non-secret `site_setting_key` allowlist.
+Provider credentials, authentication secrets, tokens, private keys and database
+URLs remain environment/secret-manager values and cannot be general CMS rows.

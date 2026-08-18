@@ -66,14 +66,34 @@ corepack pnpm run check
 The root path redirects to `/tr`; the first scaffold contains `/tr` and `/en`.
 The temporary Milestone 0 surface is `noindex` and is not approved final content.
 
-Provider choices remain TBD until architecture implementation:
+Milestone 1 provider architecture:
 
-- hosting
-- PostgreSQL hosting
-- protected object storage
-- authentication/MFA implementation/provider
-- transactional email
-- monitoring
+```text
+Hosting: Vercel fra1
+PostgreSQL 18: Neon / AWS eu-central-1
+Object storage: Amazon S3 eu-central-1
+Authentication/MFA: Auth0 EU / MFA Always
+Malware scanning: GuardDuty Malware Protection for S3
+Transactional email: Amazon SES eu-central-1
+Monitoring: Sentry Germany + AWS CloudWatch/EventBridge
+```
+
+Provider provisioning, commercial/legal review and production credentials remain
+launch-gated. See `docs/architecture/ADR.md`.
+
+## Database Development
+
+The schema is `src/db/schema.ts`; generated SQL is committed under `drizzle/`.
+With a developer-owned `.env` and a local PostgreSQL 18 instance:
+
+```text
+corepack pnpm run db:generate
+corepack pnpm run db:check
+corepack pnpm run db:migrate
+```
+
+`compose.yaml` provides the selected local database shape where Docker is
+available. CI always applies the migration to a clean PostgreSQL 18 database.
 
 ## Agent Reading Order
 
@@ -130,16 +150,8 @@ docs/
 
 ## Current Status
 
-Milestone 0 local implementation and validation are complete. The Next.js
-scaffold, strict TypeScript, pnpm lockfile, environment examples, tests and CI
-baseline are present. GitHub Actions remains pending until the first authorized
-push.
-
-The next implementation step is:
-
-```text
-first authorized push / CI validation
-→ Milestone 1 provider decisions
-→ PostgreSQL schema/migrations
-→ stable localized route registry
-```
+Milestone 0 is complete, pushed to `origin/main`, and remotely validated by
+GitHub Actions. Milestone 1 implements provider decisions, PostgreSQL/Drizzle
+migrations, localized route identity/publication, privacy provenance, storage
+states, audit foundation and data-model tests. Public design starts only in a
+later milestone.

@@ -24,3 +24,8 @@
 | R-020 | Email/domain misconfiguration causes notification delivery failures | Medium | Medium | SPF/DKIM/DMARC + verified sender + monitoring/retry | Open |
 | R-021 | Developer/CI toolchain drift creates non-reproducible builds | Medium | Medium | Exact package versions, `.node-version`, `packageManager`, frozen lockfile, pinned CI | Mitigated by design |
 | R-022 | Dependency lifecycle scripts execute unexpectedly during install | High | Low | pnpm build-script allowlist; frozen lockfile; supply-chain age verification | Mitigated by design |
+| R-023 | Provider contract/DPA/data-transfer review is incomplete at launch | High | Medium | Provisioning does not equal legal approval; DPA/subprocessor/region review remains a launch gate | Open |
+| R-024 | Cross-provider event failure leaves clean or unsafe CVs stuck/misclassified | Critical | Medium | Fail-closed quarantine, idempotent GuardDuty event handling, retries, queue-age/backlog alarms | Mitigated by design; implementation pending M2 |
+| R-025 | Auth0 tenant policy permits an admin login without MFA | Critical | Low | EU environment isolation, MFA `Always`, no public registration, production negative/bypass tests | Mitigated by design; implementation pending M2 |
+| R-026 | Managed database restore history is insufficient or provider-coupled | High | Low | Neon PITR plus encrypted logical exports and periodic `pg_restore` rehearsal | Open |
+| R-027 | Monitoring or email payloads duplicate candidate/contact PII | High | Medium | Record-ID-only notifications where practical, strict Sentry scrubbing, no bodies/CV data in telemetry | Mitigated by design; implementation pending |

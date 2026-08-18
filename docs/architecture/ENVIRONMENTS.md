@@ -19,6 +19,11 @@ staging
 production
 ```
 
+Managed resources are isolated by environment. Staging must have its own Vercel
+project/environment, Neon branch or project according to access boundaries,
+Auth0 tenant/application, S3 buckets/prefix policy, SES configuration and
+Sentry project.
+
 ## Local
 
 - developer data only,
@@ -95,6 +100,9 @@ Rules:
 - backward-compatible deployment strategy where practical,
 - pre-migration backup for risky changes,
 - rollback/forward-fix plan documented.
+
+CI validates migrations against a clean PostgreSQL 18 database. Production uses
+Neon in AWS Frankfurt; local/CI use the official PostgreSQL 18.4 image.
 
 ## Environment Promotion
 

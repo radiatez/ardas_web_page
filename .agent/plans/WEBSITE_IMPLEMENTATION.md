@@ -135,24 +135,28 @@ d5f8fdf docs: record milestone 0 local validation
 
 # Milestone 1 — Architecture, Data Model, Providers, TR/EN & Routing
 
-Status: `[ ]`
+Status: `[~]`
 
 ## Tasks
 
-- [ ] Select hosting, PostgreSQL hosting, object storage, auth/MFA, email, monitoring providers.
-- [ ] Document data regions.
-- [ ] Implement stable route keys + localized slugs.
-- [ ] `/` → `/tr`.
-- [ ] Implement unpublished locale 404.
-- [ ] Implement switch fallback.
-- [ ] Implement SlugRedirect.
-- [ ] Implement locale-aware publication on all localized entities.
-- [ ] Implement Department/DepartmentLocale.
-- [ ] Implement MediaLocale.
-- [ ] Implement form privacy provenance fields.
-- [ ] Configure DB/migrations.
-- [ ] Define public/protected/quarantine storage classes.
-- [ ] Record provider/architecture ADRs.
+- [x] Select hosting, PostgreSQL hosting, object storage, auth/MFA, malware, email and monitoring providers.
+- [x] Document data regions and remaining provisioning/legal gates.
+- [x] Select PostgreSQL 18 and implement the Drizzle schema.
+- [x] Implement stable route keys + localized slugs.
+- [x] `/` → `/tr`.
+- [x] Implement unpublished locale availability/404 contract.
+- [x] Implement switch fallback.
+- [x] Implement SlugRedirect.
+- [x] Implement locale-aware publication on all localized entities.
+- [x] Implement Department/DepartmentLocale.
+- [x] Implement Media/MediaLocale.
+- [x] Implement form privacy provenance and retention fields.
+- [x] Keep `CareerApplication.job_posting_id` nullable.
+- [x] Implement AuditEvent foundation.
+- [x] Implement secret-excluding SiteSetting model.
+- [x] Configure DB/migrations.
+- [x] Define public/protected/quarantine storage classes.
+- [x] Record provider/architecture ADRs and decisions.
 
 ## Acceptance
 

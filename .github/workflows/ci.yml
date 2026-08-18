@@ -17,6 +17,24 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ardas_ci
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ardas_ci
+
+    services:
+      postgres:
+        image: postgres:18.4
+        env:
+          POSTGRES_DB: ardas_ci
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ardas_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
 
     steps:
       - name: Check out repository
@@ -36,6 +54,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply migrations to clean PostgreSQL
+        run: pnpm run db:migrate
+
+      - name: Verify migration metadata
+        run: pnpm run db:check
+
+      - name: Verify migration reproducibility
+        run: |
+          pnpm run db:generate
+          git diff --exit-code -- drizzle
+
       - name: Lint
         run: pnpm run lint
 
@@ -47,3 +76,6 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Audit production dependencies
+        run: pnpm run audit:prod

@@ -1,6 +1,7 @@
 # Data Model v0.3
 
-Logical model; exact ORM schema follows during implementation.
+Logical model. The exact implemented Drizzle schema is `src/db/schema.ts`; the
+initial PostgreSQL migration is committed under `drizzle/`.
 
 ## Authentication / Authorization
 
@@ -448,3 +449,18 @@ erDiagram
 - CV uses protected/quarantine media storage,
 - departments are managed entities,
 - audit metadata avoids raw sensitive content.
+
+## Milestone 1 Implementation Notes
+
+- PostgreSQL enums share the application `tr/en`, route-key, publication,
+  storage and scan-state contracts.
+- Every localized table has locale-owned publication fields.
+- `job_posting_id` remains nullable for general applications.
+- Form retention deadlines and privacy provenance are required by schema;
+  acknowledgement timestamps remain nullable pending approved legal wording.
+- Location address/contact structure remains JSON `TBD` until approved exact
+  business data/field requirements exist.
+- `SiteSetting` uses a non-secret key allowlist. Credentials and tokens are not
+  valid CMS setting keys.
+- A protected `Media` row requires `scan_status = clean`; moving/copying the
+  object and updating the row is implemented in the security milestone.

@@ -16,8 +16,12 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "audit:prod": "corepack pnpm audit --prod --audit-level=high",
-    "check": "eslint . --max-warnings=0 && next typegen && tsc --noEmit && vitest run && next build"
+    "check": "eslint . --max-warnings=0 && next typegen && tsc --noEmit && drizzle-kit check && vitest run && next build"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
