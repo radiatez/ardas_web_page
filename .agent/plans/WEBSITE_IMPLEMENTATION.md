@@ -355,27 +355,105 @@ later milestone; Milestone 2 supplies and validates the security boundary only.
 
 # Milestone 3 — Design System & Public Shell
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Tasks
 
-- [ ] Implement design tokens.
-- [ ] Typography/grid/spacing.
-- [ ] Header/nav.
-- [ ] locale switcher.
-- [ ] Dealer Portal action.
-- [ ] footer.
-- [ ] responsive shell.
-- [ ] reduced-motion motion primitives.
-- [ ] media focal point + localized alt support.
-- [ ] localized 404/500.
-- [ ] legal route shell.
+- [x] Implement design tokens.
+- [x] Typography/grid/spacing.
+- [x] Header/nav.
+- [x] locale switcher.
+- [x] Dealer Portal action.
+- [x] footer.
+- [x] responsive shell.
+- [x] reduced-motion motion primitives.
+- [x] media focal point + localized alt support.
+- [x] localized 404/500.
+- [x] legal route shell.
 
 ## Acceptance
 
 - corporate design preserved,
 - mobile/keyboard accessible,
 - localized shell works.
+
+### Validation Record — 2026-08-19
+
+Authoritative remote environment:
+
+```text
+GitHub Actions ubuntu-latest
+Node.js 24.19.0
+pnpm 11.22.0
+PostgreSQL 18.4 (official service image)
+Next.js 16.3.1 / React 19.2.8
+TypeScript 6.0.3 / Vitest 4.1.10
+Testing Library React 16.3.2 / axe-core 4.13.0 / jsdom 30.0.1
+```
+
+Commands / CI gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:migrate
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+```
+
+Results:
+
+- frozen install passed on the pinned remote runtime,
+- clean PostgreSQL 18.4 migration, Drizzle metadata check and migration
+  regeneration/no-diff gates passed; the Milestone 1–2 schema was unchanged,
+- ESLint passed with zero warnings and TypeScript/Next.js route generation passed,
+- Vitest passed remotely with 23 files / 79 tests, including 9 real PostgreSQL
+  tests; local Windows execution passed 21 files / 70 non-DB tests with 9 DB
+  tests skipped because no local PostgreSQL service was available,
+- public-shell coverage includes TR/EN navigation and equivalent/fallback locale
+  switching, Dealer Portal enabled/disabled/external-link behavior and proof that
+  public presentation components contain no configured portal URL,
+- accessibility coverage includes axe semantic checks, WCAG AA token contrast,
+  visible-focus styling, mobile-menu focus trap/return/Escape, 44px targets,
+  meaningful/decorative MediaLocale alt behavior and reduced-motion overrides,
+- responsive contract checks passed for mobile-first 4/8/12-column layouts,
+  40/64/80rem breakpoints, responsive media and the horizontal-overflow guard,
+- production build passed; public routes are dynamic so the secure server-side
+  Dealer Portal resolution is evaluated at request time,
+- local production HTTP checks: `/` redirects to `/tr`; `/tr`, `/en`, localized
+  legal routes and `/tr/unavailable` returned `200`; an unknown English route
+  returned `404` with English system copy; the unlinked design-system preview
+  returned `404` in production,
+- production responses retained CSP, HSTS and Permissions-Policy security headers,
+- production dependency audit reported no known vulnerabilities; the full
+  development graph retains one moderate, development-only esbuild advisory under
+  the pre-existing Drizzle Kit loader and has no high/critical advisory,
+- implementation commit `eff4c40f2fff1353a6be37ddc5daf3ba86a95bc8`
+  passed GitHub Actions `CI` run `#8` / run ID `32221814813`, attempt 1,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32221814813`.
+
+Local note:
+
+- the Windows host runtime was Node.js 24.14.0 rather than the pinned 24.19.0;
+  authoritative runtime and PostgreSQL validation used GitHub Actions,
+- the in-app browser connection was blocked before page control by the installed
+  browser plugin's trusted-code-path validation. No alternate browser automation
+  surface was substituted. Production HTTP/render checks plus automated DOM,
+  keyboard, axe, contrast, reduced-motion and responsive-contract tests passed;
+  supported-browser visual regression remains part of the Milestone 8 matrix.
+
+Scope retained:
+
+- no homepage narrative sections were implemented; those remain Milestone 4,
+- no business logic, data model, auth, RBAC, upload or retention behavior changed,
+- final logo, palette, font, approved photography, exact contact information and
+  approved legal copy remain explicit `TBD` launch gates.
 
 ---
 
