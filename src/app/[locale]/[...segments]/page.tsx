@@ -3,49 +3,57 @@ import { notFound } from "next/navigation";
 
 import {
   LegalPageShell,
-  type LegalRouteKey,
 } from "@/components/public/legal-page-shell";
-import { publicShellCopy } from "@/content/public-shell";
+import { CorePublicPage } from "@/components/public/core-public-page";
+import {
+  isPublicPageRouteKey,
+  type PublicPageRouteKey,
+} from "@/content/public-pages";
 import { isLocale } from "@/i18n/config";
 import { getRouteByPath } from "@/i18n/routes";
+import { getCachedPublicPageBundle } from "@/public/content-repository";
+import { buildPublicPageMetadata } from "@/public/metadata";
 
 type CatchAllPageProps = {
   params: Promise<{ locale: string; segments: string[] }>;
 };
 
-const legalRouteKeys = new Set<LegalRouteKey>([
+const legalRouteKeys = new Set<PublicPageRouteKey>([
   "privacy",
   "cookies",
   "data-protection",
 ]);
 
-async function resolveLegalRoute({ params }: CatchAllPageProps) {
+async function resolvePublicRoute({ params }: CatchAllPageProps) {
   const { locale, segments } = await params;
   if (!isLocale(locale)) return undefined;
 
   const route = getRouteByPath(`/${locale}/${segments.join("/")}`);
-  if (!route || !legalRouteKeys.has(route.routeKey as LegalRouteKey)) {
+  if (!route || !isPublicPageRouteKey(route.routeKey) || route.routeKey === "home") {
     return undefined;
   }
 
-  return { locale, routeKey: route.routeKey as LegalRouteKey };
+  return { locale, routeKey: route.routeKey };
 }
 
 export async function generateMetadata(
   props: CatchAllPageProps,
 ): Promise<Metadata> {
-  const route = await resolveLegalRoute(props);
+  const route = await resolvePublicRoute(props);
   if (!route) return {};
-
-  return {
-    title: publicShellCopy[route.locale].legal[route.routeKey].title,
-    robots: { index: false, follow: false },
-  };
+  const bundle = await getCachedPublicPageBundle(route.routeKey, route.locale);
+  return bundle ? buildPublicPageMetadata(bundle.page) : {};
 }
 
 export default async function CatchAllPage(props: CatchAllPageProps) {
-  const route = await resolveLegalRoute(props);
+  const route = await resolvePublicRoute(props);
   if (!route) notFound();
+  const bundle = await getCachedPublicPageBundle(route.routeKey, route.locale);
+  if (!bundle) notFound();
 
-  return <LegalPageShell locale={route.locale} routeKey={route.routeKey} />;
+  return legalRouteKeys.has(route.routeKey) ? (
+    <LegalPageShell page={bundle.page} />
+  ) : (
+    <CorePublicPage bundle={bundle} />
+  );
 }

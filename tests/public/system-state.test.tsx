@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { LegalPageShell } from "../../src/components/public/legal-page-shell";
 import { SystemState } from "../../src/components/public/system-state";
+import { getDevelopmentPage } from "../../src/content/public-pages";
 
 describe("localized public system states", () => {
   it("renders Turkish 404 copy without exposing implementation detail", () => {
@@ -23,9 +24,9 @@ describe("localized public system states", () => {
 
   it("keeps legal copy explicitly approval-gated", () => {
     const html = renderToStaticMarkup(
-      <LegalPageShell locale="en" routeKey="privacy" />,
+      <LegalPageShell page={getDevelopmentPage("privacy", "en")} />,
     );
-    expect(html).toContain("Approved content is pending.");
+    expect(html).toContain("Approved legal copy is pending.");
     expect(html).toContain("Content: TBD.");
   });
 });

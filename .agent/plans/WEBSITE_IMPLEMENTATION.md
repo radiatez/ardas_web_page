@@ -459,7 +459,7 @@ Scope retained:
 
 # Milestone 4 — Homepage & Corporate Public Pages
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Canonical Narrative
 
@@ -476,19 +476,95 @@ Impact
 
 ## Tasks
 
-- [ ] Homepage.
-- [ ] Corporate.
-- [ ] Brands.
-- [ ] Product Groups.
-- [ ] Locations.
-- [ ] legal page rendering.
-- [ ] bilingual/publication-aware CMS models connected.
+- [x] Homepage.
+- [x] Corporate.
+- [x] Brands.
+- [x] Product Groups.
+- [x] Locations.
+- [x] legal page rendering.
+- [x] bilingual/publication-aware CMS models connected.
 
 ## Acceptance
 
 - public site looks corporate, not B2B/e-commerce,
 - localized publication state respected,
 - media alt TR/EN works.
+
+### Validation Record — 2026-08-19
+
+Local environment:
+
+```text
+Windows
+Node.js 24.14.0 (host; project/CI pin is 24.19.0)
+pnpm 11.22.0
+Next.js 16.3.1 / React 19.2.8
+TypeScript 6.0.3 / Vitest 4.1.10
+Drizzle ORM 0.45.2 / Drizzle Kit 0.31.10
+```
+
+Commands / gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+production HTTP route/header/metadata checks
+```
+
+Results:
+
+- frozen install passed with pnpm 11.22.0 and the committed lockfile,
+- Drizzle metadata check passed; migration regeneration found no schema change
+  and produced no `drizzle/` diff,
+- ESLint passed with zero warnings; TypeScript and Next.js route generation passed,
+- local Vitest passed 22 files / 81 tests with 3 PostgreSQL-dependent files /
+  11 tests skipped because this Windows host has no PostgreSQL or Docker service,
+- coverage includes bounded/versioned CMS parsing, route-key CTA allowlisting,
+  explicit local-only TBD content, HTTPS media resolution/path hardening,
+  localized alt/decorative semantics, published-locale metadata, locale-switch
+  behavior and full-homepage axe semantics,
+- production build passed with dynamic TR/EN homepage, corporate, brands,
+  product-groups, locations, careers/contact CTA and legal routes plus dynamic
+  publication-aware sitemap and robots output,
+- local production HTTP checks returned `200` for all required TR/EN routes,
+  `404` for an unknown localized route and `307` for `/` plus locale-switch
+  resolution; placeholder routes contained canonical/hreflang metadata and
+  remained `noindex`,
+- HTTP responses retained HSTS, CSP `frame-ancestors 'none'`, nosniff,
+  Referrer-Policy, X-Frame-Options and Permissions-Policy,
+- automated responsive contract checks cover the mobile-first 4/8/12 grid,
+  40/64/80rem breakpoints, reduced motion, focus behavior, responsive media and
+  the horizontal-overflow guard,
+- production dependency audit reported no known vulnerabilities.
+
+Remote validation:
+
+- GitHub Actions clean PostgreSQL 18.4 migration, 11 real database tests and the
+  pinned Node.js 24.19.0 full gate: pending implementation push.
+
+Validation limitation:
+
+- the installed in-app Browser plugin was blocked before page control by its
+  trusted-code-path validation; no alternate browser automation surface was
+  substituted. Automated DOM/axe/contrast/keyboard/responsive checks and real
+  production HTTP rendering passed. Supported-browser visual/CWV validation
+  remains in the Milestone 8 browser matrix.
+
+Scope retained:
+
+- no form persistence, admin/CMS UI, auth/RBAC, upload, retention or other
+  business/security behavior changed,
+- local/test placeholders are explicit `TBD` and `noindex`; staging/production
+  have no placeholder fallback and direct unpublished locale access returns 404,
+- approved brand list/product taxonomy, exact addresses/contact details, legal
+  text, final identity and photography remain Milestone 9 launch gates.
 
 ---
 

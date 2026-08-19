@@ -362,3 +362,32 @@ pathname-aware locale switch require client JavaScript. Dealer Portal UI receive
 the existing server-side `SiteSetting → environment → disabled` resolution and
 never contains a configured URL. The development showcase is unlinked, `noindex`,
 and returns 404 in production.
+
+## D-036 — Published Public Content Rendering Contract
+**Status:** Accepted; production content remains approval-gated
+
+Public pages render server-side from the existing neutral `Page` route key and
+locale-owned `PageLocale` row. `content_json` uses a bounded, versioned
+`schemaVersion: 1` editorial-block contract. The renderer accepts known text,
+internal route-key actions and UUID media references only; it does not render raw
+HTML, arbitrary component names or editor-supplied external URLs.
+
+The public boundary is:
+
+- the requested `PageLocale` must be `published`, within its publication window
+  and use the registered localized slug,
+- collections include only active parents with a published requested-locale row,
+- public imagery requires `Media.storage_class = public`, a published matching
+  `MediaLocale`, dimensions, an HTTPS `PUBLIC_MEDIA_BASE_URL`, and localized alt
+  text unless the editorial block explicitly marks it decorative,
+- local/test may use clearly labelled `TBD` placeholder documents; staging and
+  production never fall back to placeholder content,
+- placeholder pages are `noindex`; the sitemap contains CMS-published pages only,
+- canonical, hreflang and social metadata advertise only published locale
+  variants,
+- language switching resolves publication server-side and falls back to the
+  target locale homepage when the equivalent is unavailable.
+
+The contract is compatible with the existing `ContentRevision` snapshots and
+the Milestone 6 preview/publish/rollback work. CMS authoring validation and
+preview UI remain Milestone 6 scope.

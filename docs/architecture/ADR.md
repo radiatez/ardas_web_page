@@ -465,3 +465,71 @@ boundaries must remain authoritative.
 Validate with lint/typecheck/build, component and route tests, axe semantic checks,
 token contrast tests, keyboard focus-trap tests, reduced-motion checks and
 mobile/tablet/desktop HTTP/render review.
+
+### ADR-013 — Versioned, Publication-Aware Public Renderer
+
+Date: 2026-08-19
+Status: Accepted; approved production content and media remain TBD
+
+#### Context
+
+Milestone 4 must render bilingual corporate pages from the Milestone 1 data
+model without implementing the Milestone 6 admin CMS. Direct locale access,
+language switching, SEO and media must all enforce one publication boundary.
+Unapproved copy, brands, taxonomy, addresses, legal text and photography must not
+be invented or leak into production.
+
+#### Decision
+
+- Resolve every page through its language-neutral `Page.route_key` and the
+  requested `PageLocale`. Require the registered localized slug plus an active
+  publication window; a missing/unpublished variant returns 404.
+- Treat `PageLocale.content_json` as a bounded `schemaVersion: 1` editorial-block
+  document. Parse known text fields, internal route-key calls to action and UUID
+  media references. Do not accept raw HTML, arbitrary components or external CTA
+  URLs from editorial JSON.
+- Query brands, product groups and locations only when the parent is active and
+  the requested locale row is publicly available. The homepage uses only brands
+  marked `featured`.
+- Resolve imagery only from the public storage class and a published matching
+  `MediaLocale`. Build object URLs from a validated HTTPS
+  `PUBLIC_MEDIA_BASE_URL`; require dimensions and localized alt text for
+  meaningful imagery. Explicit decorative blocks receive empty alt semantics.
+- Permit explicit `TBD` documents only in local/test environments so development
+  can be reviewed without fabricated production content. Never use this fallback
+  in staging or production and mark all fallback metadata `noindex`.
+- Generate canonical, hreflang, Open Graph and Twitter metadata from the same
+  publication result. Include only CMS-published pages in the dynamic sitemap.
+- Send language-switch links through a server resolver, which selects the
+  published equivalent or the target locale homepage according to I18N policy.
+
+#### Alternatives Considered
+
+- Raw HTML stored in `content_json`: rejected because it expands the XSS and
+  design-consistency boundary and is harder to validate/revise safely.
+- Hard-coded production page copy and collection entries: rejected because
+  approved business/legal/media content is still `TBD` and the models already
+  define locale-owned publication.
+- Client-side content fetch and publication checks: rejected because it can leak
+  unpublished payloads, weakens SEO and duplicates the server security boundary.
+- Always falling back to development copy when the database is empty: rejected
+  because production must fail closed for unpublished content.
+
+#### Consequences
+
+- Milestone 6 authoring must emit and validate the versioned block contract and
+  use existing revision snapshots for preview/rollback.
+- Production requires `SITE_URL`, `DATABASE_URL` and an HTTPS
+  `PUBLIC_MEDIA_BASE_URL` before approved media can render and index correctly.
+- Invalid/missing media metadata degrades to the explicit pending-media surface
+  rather than publishing an inaccessible image.
+- Adding a new public block type requires a reviewed schema/parser/renderer
+  change rather than arbitrary CMS markup.
+
+#### Validation
+
+Validate parser bounds and route allowlists, local-versus-production fallback,
+localized publication and slug denial on PostgreSQL, featured collection
+rendering, media URL/alt constraints, publication-aware canonical/hreflang and
+sitemap behavior, localized route HTTP status, axe semantics, token contrast,
+reduced motion and mobile-first overflow contracts.

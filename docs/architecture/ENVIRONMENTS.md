@@ -62,6 +62,7 @@ Examples:
 
 ```text
 SITE_URL
+PUBLIC_MEDIA_BASE_URL (HTTPS public object/CDN base; no credentials)
 DEFAULT_LOCALE
 SUPPORTED_LOCALES
 public analytics ID if used

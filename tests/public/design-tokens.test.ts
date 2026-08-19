@@ -82,4 +82,18 @@ describe("design token accessibility", () => {
       /@media \(min-width: 80rem\)[\s\S]*?\.public-header__desktop-navigation,[\s\S]*?display:\s*block;/,
     );
   });
+
+  it("gives Milestone 4 editorial layouts explicit mobile and desktop contracts", () => {
+    expect(globalCss).toMatch(/\.home-impact__copy,[\s\S]*?grid-column:\s*1 \/ -1;/);
+    expect(globalCss).toMatch(
+      /@media \(min-width: 64rem\)[\s\S]*?\.home-impact__copy\s*\{[\s\S]*?grid-column:\s*1 \/ span 7;/,
+    );
+    expect(globalCss).toMatch(
+      /\.home-products__grid\s*\{[\s\S]*?display:\s*grid;/,
+    );
+    expect(globalCss).toMatch(
+      /@media \(min-width: 64rem\)[\s\S]*?\.home-products__grid\s*\{[\s\S]*?repeat\(3,/,
+    );
+    expect(globalCss).toContain("minmax(0, 1fr)");
+  });
 });

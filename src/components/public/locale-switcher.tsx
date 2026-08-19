@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 
 import { getAlternateLocale, type Locale } from "@/i18n/config";
 import {
-  getLanguageSwitchTarget,
   getRouteByPath,
   type RouteKey,
 } from "@/i18n/routes";
@@ -21,7 +20,9 @@ export function getLocaleSwitchHref(
   const routeKey = currentRoute?.routeKey ?? "home";
 
   return {
-    href: getLanguageSwitchTarget(routeKey, targetLocale, Boolean(currentRoute)),
+    href: (currentRoute
+      ? `/${targetLocale}/locale-switch/${routeKey}`
+      : `/${targetLocale}`) as Route,
     targetLocale,
     routeKey,
   };

@@ -4,10 +4,10 @@ import { getLocaleSwitchHref } from "../../src/components/public/locale-switcher
 
 describe("public locale switcher", () => {
   it.each([
-    ["/tr", "tr", "/en"],
-    ["/tr/kurumsal", "tr", "/en/corporate"],
-    ["/en/product-groups", "en", "/tr/urun-gruplari"],
-    ["/tr/cerez-politikasi/", "tr", "/en/cookie-policy"],
+    ["/tr", "tr", "/en/locale-switch/home"],
+    ["/tr/kurumsal", "tr", "/en/locale-switch/corporate"],
+    ["/en/product-groups", "en", "/tr/locale-switch/product-groups"],
+    ["/tr/cerez-politikasi/", "tr", "/en/locale-switch/cookies"],
   ] as const)("switches %s to its localized equivalent", (path, locale, expected) => {
     expect(getLocaleSwitchHref(path, locale).href).toBe(expected);
   });

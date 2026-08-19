@@ -6,6 +6,7 @@ import { PublicFooter } from "@/components/public/public-footer";
 import { PublicHeader } from "@/components/public/public-header";
 import { isLocale, locales } from "@/i18n/config";
 import { getPublicDealerPortalResolution } from "@/public/dealer-portal";
+import { resolveMetadataBaseUrl } from "@/public/metadata";
 
 import "@/styles/tokens.css";
 import "@/styles/global.css";
@@ -22,6 +23,7 @@ export async function generateMetadata({
   const isEnglish = locale === "en";
 
   return {
+    metadataBase: resolveMetadataBaseUrl(),
     title: {
       default: "ARDAŞ",
       template: "%s · ARDAŞ",
@@ -29,10 +31,6 @@ export async function generateMetadata({
     description: isEnglish
       ? "Ardaş Yedek Parça corporate website."
       : "Ardaş Yedek Parça kurumsal web sitesi.",
-    robots: {
-      index: false,
-      follow: false,
-    },
   };
 }
 

@@ -20,6 +20,22 @@ const contentSecurityPolicy = [
   "upgrade-insecure-requests",
 ].join("; ");
 
+export function resolvePublicMediaRemotePattern(value = process.env.PUBLIC_MEDIA_BASE_URL) {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password) return undefined;
+    return {
+      protocol: "https" as const,
+      hostname: url.hostname,
+      port: url.port,
+      pathname: `${url.pathname.replace(/\/$/, "")}/**`,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
 export const securityHeaders = [
   {
     key: "Content-Security-Policy",
@@ -39,11 +55,16 @@ export const securityHeaders = [
   },
 ] as const;
 
+const publicMediaRemotePattern = resolvePublicMediaRemotePattern();
+
 const nextConfig: NextConfig = {
   agentRules: false,
   poweredByHeader: false,
   reactStrictMode: true,
   typedRoutes: true,
+  images: publicMediaRemotePattern
+    ? { remotePatterns: [publicMediaRemotePattern] }
+    : undefined,
   async redirects() {
     return [rootRedirect];
   },

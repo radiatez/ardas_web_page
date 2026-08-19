@@ -30,3 +30,4 @@
 | R-026 | Managed database restore history is insufficient or provider-coupled | High | Low | Neon PITR plus encrypted logical exports and periodic `pg_restore` rehearsal | Open |
 | R-027 | Monitoring or email payloads duplicate candidate/contact PII | High | Medium | Record-ID-only notifications where practical, strict Sentry scrubbing, no bodies/CV data in telemetry | Mitigated in logging; Sentry/SES validation pending |
 | R-028 | Static CSP needs inline script/style compatibility for the current Next.js runtime | High | Low | Restrictive default/object/frame/connect policy now; migrate to nonce/hash CSP when dynamic admin rendering is introduced | Open |
+| R-029 | CMS emits an unsupported or malformed public content block | Medium | Medium | Versioned allowlist parser safely drops unknown fields; Milestone 6 must add authoring validation and preview regression tests | Partially mitigated; CMS validation pending |
