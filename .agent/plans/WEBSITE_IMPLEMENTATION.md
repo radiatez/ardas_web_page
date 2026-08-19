@@ -544,10 +544,29 @@ Results:
   the horizontal-overflow guard,
 - production dependency audit reported no known vulnerabilities.
 
+Authoritative remote environment:
+
+```text
+GitHub Actions ubuntu-24.04
+Node.js 24.19.0
+pnpm 11.22.0
+PostgreSQL 18.4 (official service image)
+```
+
 Remote validation:
 
-- GitHub Actions clean PostgreSQL 18.4 migration, 11 real database tests and the
-  pinned Node.js 24.19.0 full gate: pending implementation push.
+- clean PostgreSQL 18.4 migration and Drizzle metadata checks passed; migration
+  regeneration reported no schema change and produced no Git diff,
+- ESLint, TypeScript/Next.js route generation and production build passed on the
+  pinned Node.js 24.19.0 runtime,
+- Vitest passed 25 files / 92 tests with all 11 PostgreSQL integration tests,
+  including published-TR/draft-EN denial and localized slug-registry enforcement,
+- frozen install and the production dependency audit passed with no known
+  vulnerabilities,
+- implementation commit `d6f83dcfcab9c323ae27595f6e530d84b9077a0a`
+  passed GitHub Actions `CI` run `#10` / run ID `32224695146`, attempt 1,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32224695146`.
 
 Validation limitation:
 
