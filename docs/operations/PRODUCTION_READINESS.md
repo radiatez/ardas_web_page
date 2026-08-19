@@ -128,7 +128,7 @@ corporate and legal pages remain available.
 - Staging sign-off, production smoke evidence and rollback of a known-good hosted
   deployment.
 - Production field Core Web Vitals p75 for LCP, INP and CLS after deployment.
-  Existing `CLS=0`, lab `LCP=136 ms` and `150,554` delivered JS bytes are local
+  Existing `CLS=0`, lab `LCP=120 ms` and `150,484` delivered JS bytes are local
   regression diagnostics, not field p75.
 
 ## Information required from the owner
