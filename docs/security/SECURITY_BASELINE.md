@@ -70,12 +70,21 @@ At minimum:
 - CSRF/origin protection according to session architecture,
 - default output escaping,
 - sanitize approved rich HTML,
-- CSP where practical,
+- per-request cryptographic CSP nonce forwarded through the App Router and Auth0,
+- `script-src` nonce + `strict-dynamic`; no `unsafe-inline`/`unsafe-eval`,
+- `style-src` nonce plus only the documented exact Next Image attribute hash,
+- same-origin `connect-src`; validated HTTPS public-media origin only where configured,
+- `object-src 'none'`, `frame-src 'none'`, `frame-ancestors 'none'`, bounded
+  `base-uri` and `form-action`,
 - HSTS,
 - X-Content-Type-Options,
 - Referrer-Policy,
 - frame-ancestor protection,
-- appropriate Permissions-Policy.
+- appropriate Permissions-Policy,
+- private/no-store for admin, preview, auth, API and isolated test surfaces.
+
+Framework or Auth0 upgrades must rerun the CSP browser matrix. Do not replace a
+failed hash/nonce contract with a broad inline allowance.
 
 ## Logging
 

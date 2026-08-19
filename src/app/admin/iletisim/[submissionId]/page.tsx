@@ -14,7 +14,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
       <dt>Mesaj</dt><dd>{submission.message ?? "Anonimleştirildi"}</dd><dt>Notice sürümü</dt><dd>{submission.privacyNoticeVersion}</dd>
       <dt>Gösterilme</dt><dd>{submission.privacyNoticeShownAt.toLocaleString("tr-TR")}</dd><dt>Onay</dt><dd>{submission.privacyAcknowledgedAt?.toLocaleString("tr-TR") ?? "—"}</dd>
       <dt>Retention due</dt><dd>{submission.retentionDueAt.toLocaleString("tr-TR")}</dd><dt>Hold</dt><dd>{submission.retentionHoldUntil?.toLocaleString("tr-TR") ?? "Yok"}</dd>
-    </dl><h2 style={{ marginTop: "2rem" }}>İç notlar</h2>{notes.length ? notes.map((note) => <article key={note.id} style={{ borderTop: "1px solid #ddd", padding: "1rem 0" }}><small>{note.createdAt.toLocaleString("tr-TR")}</small><p>{note.body}</p></article>) : <p className="admin-help">İç not yok.</p>}</section>
+    </dl><h2 className="admin-section-title">İç notlar</h2>{notes.length ? notes.map((note) => <article className="admin-note" key={note.id}><small>{note.createdAt.toLocaleString("tr-TR")}</small><p>{note.body}</p></article>) : <p className="admin-help">İç not yok.</p>}</section>
       <ContactActions id={submission.id} currentStatus={submission.status} />
     </div>
   </main>;

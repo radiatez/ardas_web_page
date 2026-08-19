@@ -10,12 +10,13 @@ import { parseContactRequestBody } from "@/forms/parsing";
 import { persistContactSubmission } from "@/forms/submissions";
 import { RateLimitExceededError, SecurityBoundaryError } from "@/security/errors";
 import { securityLogger } from "@/security/logging";
-import { guardPublicFormRequest } from "@/security/request-limits";
+import { assertJsonRequest, guardPublicFormRequest } from "@/security/request-limits";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    assertJsonRequest(request);
     const { db } = getRuntimeDatabase();
     const body = await guardPublicFormRequest(db, request, "contact");
     const raw = parseContactRequestBody(body);

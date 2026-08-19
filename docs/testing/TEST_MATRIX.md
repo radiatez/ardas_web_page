@@ -135,3 +135,29 @@ HR cannot modify Dealer Portal/site security settings.
 
 ### Milestone 8
 Run all critical E2Es together across supported environment.
+
+## Milestone 8 Full Regression Record — 2026-08-19
+
+| Gate | Result |
+|---|---|
+| Frozen install | Passed; exact lockfile |
+| PostgreSQL | Official 18.4 disposable service; migrations/check/reproducibility passed |
+| Vitest | 36 files / 139 tests passed |
+| Real PostgreSQL subset | 7 files / 27 tests passed |
+| E2E-01 → E2E-09 | Passed together on one migrated schema/build |
+| Browser matrix | Chromium, Firefox, WebKit, Pixel 7 and iPhone 15 profiles passed |
+| Playwright registrations | 24 passed; 11 intentional project-guard skips; 35 total |
+| Accessibility | axe serious/critical violations 0; keyboard, skip-link, drawer/dialog focus passed |
+| Responsive | 320, 390, 768, 1440 and 1920 widths; no horizontal overflow |
+| CSP/headers | Nonce/hash strict policy, private no-store and Auth0 nonce/redirect contract passed |
+| Security | 58-permission matrix, cross-module API denials, MFA/session, CV/form/XSS/log/audit passed |
+| SEO | canonical, hreflang, sitemap, robots, 301, localized 404 and noindex contracts passed |
+| Lab diagnostic | CLS 0; LCP 136 ms; JS 150,554 bytes; not field p75 |
+| Recovery | Portable backup/restore plus post-restore retention cleanup passed |
+| Cleanup | No disposable container, network or volume remained |
+
+The admin browser path is an isolated presentation fixture using the real CMS
+and HR controls. It contains no credentials, session bypass or personal data,
+requires two explicit test-only environment gates, is noindex/robots-disallowed
+and returns 404 when either gate is absent. Authorization and E2E-06 through
+E2E-09 remain exercised against the server services and real PostgreSQL tests.

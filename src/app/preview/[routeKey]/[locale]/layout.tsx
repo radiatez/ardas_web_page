@@ -15,7 +15,7 @@ export default async function PreviewLayout({ children, params }: {
   if (!isLocale(locale)) notFound();
   const dealerPortal = await getPublicDealerPortalResolution();
   return <html lang={locale}><body><a className="skip-link" href="#main-content">{locale === "tr" ? "Ana içeriğe geç" : "Skip to main content"}</a>
-    <div style={{ position: "sticky", top: 0, zIndex: 1000, padding: ".65rem 1rem", background: "#111", color: "#fff", font: "700 12px/1.4 Arial", letterSpacing: ".08em", textTransform: "uppercase" }}>Yetkili taslak önizleme · noindex · {locale}</div>
+    <div className="preview-security-banner">Yetkili taslak önizleme · noindex · {locale}</div>
     <PublicHeader dealerPortal={dealerPortal} locale={locale} />{children}<PublicFooter dealerPortal={dealerPortal} locale={locale} />
   </body></html>;
 }

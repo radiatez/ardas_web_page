@@ -2,7 +2,7 @@ import type { SessionData } from "@auth0/nextjs-auth0/types";
 import { describe, expect, it } from "vitest";
 
 import { sessionUsedMfa } from "../../src/auth/admin-access";
-import { hasCompleteAuth0Configuration } from "../../src/auth/auth0";
+import { hasCompleteAuth0Configuration, safeReturnPath } from "../../src/auth/auth0";
 
 function session(amr?: unknown): SessionData {
   return {
@@ -31,5 +31,20 @@ describe("Auth0 admin session", () => {
     expect(sessionUsedMfa(session(["pwd"]))).toBe(false);
     expect(sessionUsedMfa(session(undefined))).toBe(false);
     expect(sessionUsedMfa(session("mfa"))).toBe(false);
+  });
+
+  it("prevents callback open redirects and keeps local admin return paths", () => {
+    expect(safeReturnPath("/admin/basvurular?page=2")).toBe(
+      "/admin/basvurular?page=2",
+    );
+    for (const unsafe of [
+      "https://attacker.example",
+      "//attacker.example/path",
+      "/\\attacker.example/path",
+      "\\attacker.example",
+      undefined,
+    ]) {
+      expect(safeReturnPath(unsafe)).toBe("/admin");
+    }
   });
 });

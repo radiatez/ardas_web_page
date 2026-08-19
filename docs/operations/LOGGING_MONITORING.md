@@ -71,3 +71,20 @@ Monitor:
 - MFA failures/resets,
 - email sender reputation/delivery failures,
 - unexpected slug redirect loops.
+
+## Milestone 8 Performance Baseline
+
+Production-build Chromium lab regression on 2026-08-19 recorded:
+
+```text
+CLS: 0
+LCP: 136 ms
+Transferred JavaScript: 150,554 bytes
+```
+
+The automated guard limits CLS to `0.10`, LCP to `2.5 s` and delivered JS to
+`500,000 bytes`. These local values are diagnostic, not production field p75 and
+do not prove INP. Vercel field telemetry plus approved monitoring must establish
+LCP/INP/CLS p75 after staging/production provisioning. Alert destinations,
+sample rates, Sentry/CloudWatch configuration and provider-side PII scrubbing
+remain Milestone 9 gates.

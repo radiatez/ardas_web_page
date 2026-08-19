@@ -792,3 +792,66 @@ positive access, pending/quarantine/error/infected/missing/wrong-relation and
 unauthorized CV denials, named RBAC negatives, accessible controls/dialog focus,
 clean PostgreSQL 18.4 migrations, reproducibility, lint, typecheck, all tests,
 production build and dependency audit.
+
+### ADR-018 — Per-Request Strict CSP and Repeatable Release Verification
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+The previous static CSP could not safely authorize Next.js runtime script/style
+output without broad inline allowances. Milestone 8 also needs one repeatable
+workflow that proves the application, PostgreSQL schema, browser behavior and
+recovery documentation together rather than as isolated milestone checks.
+
+#### Decision
+
+- Generate a cryptographically random nonce per request in the Next.js proxy.
+  Forward the nonce and CSP to the App Router and give the nonce to Auth0's SDK.
+- Use nonce plus `strict-dynamic` for scripts and forbid script attributes and
+  `unsafe-eval`. Use nonce styles and one exact SHA-256 `unsafe-hashes` exception
+  for Next Image's generated `color:transparent` attribute. Do not permit global
+  `unsafe-inline`, wildcard/blanket HTTPS provider access or frames/objects.
+- Keep `connect-src` same-origin and add only a parsed HTTPS public-media origin
+  to image/media directives. Apply HSTS and the existing header baseline; mark
+  admin, preview, auth, API and test presentation responses private/no-store.
+- Harden callback return paths to same-origin absolute paths. A synthetic admin
+  presentation surface may exercise real CMS/HR controls without credentials or
+  personal data only behind two explicit test gates; it has no server/API auth
+  bypass, is noindex/robots-disallowed and otherwise returns 404.
+- Pin Playwright and axe. Run Chromium, Firefox, WebKit and mobile profiles from
+  the production build. Extend the disposable PostgreSQL 18.4 command to include
+  all regression tests, browser/axe/responsive checks, portable restore and a
+  non-destructive rollback contract before cleanup.
+
+#### Alternatives Considered
+
+- Keep a static policy with `unsafe-inline`: rejected because it weakens the
+  executable-content boundary for every route.
+- Add broad provider or `https:` sources pre-emptively: rejected because only
+  configured, validated dependencies should enter the policy.
+- Bypass Auth0 or seed a fake authenticated production session for UI tests:
+  rejected. The presentation fixture has no data/service privileges and tests
+  only rendering/focus semantics.
+- Treat Lighthouse/lab timing as production p75: rejected; field telemetry is a
+  separate launch gate.
+
+#### Consequences
+
+- Framework upgrades must revalidate the exact style-attribute hash and the
+  multi-engine browser suite; a changed Next Image attribute fails closed.
+- Real Auth0 hosted redirects and provider origins still require Milestone 9
+  tenant/staging evidence, but the adapter/nonce/open-redirect contract is
+  covered now.
+- Local restore proves PostgreSQL portability, not production RPO/RTO or Neon
+  PITR history. Those remain explicit launch gates.
+
+#### Validation
+
+Run frozen install, migration apply/check/generate-no-diff, lint, typecheck,
+all Vitest/PostgreSQL tests, production build, production dependency audit,
+Playwright/axe across three engines and mobile profiles, five-width overflow and
+reduced-motion checks, CSP/header/Auth/session/RBAC/CV/form/XSS/log/SEO
+regressions, `pg_dump`/`pg_restore` with post-restore retention, rollback contract
+validation and post-run Docker orphan inspection. Require the same checks in CI.

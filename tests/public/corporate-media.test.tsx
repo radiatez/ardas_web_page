@@ -41,4 +41,23 @@ describe("localized corporate media", () => {
     expect(toFocalPercentage(0.42)).toBe(42);
     expect(toFocalPercentage(1.5)).toBe(100);
   });
+
+  it("uses bounded classes instead of CSP-blocked inline styles", () => {
+    const html = renderToStaticMarkup(
+      <CorporateMedia
+        focalX={0.42}
+        focalY={0.68}
+        height={720}
+        mediaLocale={{ locale: "tr", altText: "Depo operasyonu" }}
+        src="/media/warehouse.jpg"
+        width={1280}
+      />,
+    );
+    expect(html).toContain('style="color:transparent"');
+    expect(html).not.toContain("object-position");
+    expect(html).not.toContain("aspect-ratio");
+    expect(html).toContain("corporate-media__image--x-40");
+    expect(html).toContain("corporate-media__image--y-70");
+    expect(html).toContain("corporate-media__viewport--landscape");
+  });
 });

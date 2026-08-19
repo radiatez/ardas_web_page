@@ -14,7 +14,7 @@ export default async function ContactInboxPage({ searchParams }: { searchParams:
   const messages = await listContactInbox(db, principal, { status, query: typeof query.q === "string" ? query.q : undefined,
     from: from && !Number.isNaN(from.getTime()) ? from : undefined, to: to && !Number.isNaN(to.getTime()) ? to : undefined });
   return <main><div className="admin-page-heading"><div><span className="admin-kicker">Kişisel veri · sınırlı erişim</span><h1>İletişim Kutusu</h1></div><p>Liste görünümü yalnızca tarih, ad, konu ve durumu gösterir. Mesaj gövdesi detay ekranında permission kontrolünden sonra açılır.</p></div>
-    <form className="admin-panel" method="get" style={{ marginBottom: "1rem", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr auto", gap: ".7rem", alignItems: "end" }}>
+    <form className="admin-panel admin-contact-filters" method="get">
       <label>Arama<input name="q" defaultValue={typeof query.q === "string" ? query.q : ""} placeholder="Ad veya konu" /></label>
       <label>Durum<select name="status" defaultValue={status ?? ""}><option value="">Tümü</option>{contactInboxStatuses.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
       <label>Başlangıç<input name="from" type="date" defaultValue={typeof query.from === "string" ? query.from : ""} /></label>

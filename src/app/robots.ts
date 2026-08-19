@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         "/api/",
         "/admin/",
         "/preview/",
+        "/e2e-test-surface/",
         "/tr/design-system-preview",
         "/en/design-system-preview",
         "/tr/locale-switch/",

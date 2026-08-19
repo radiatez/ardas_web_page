@@ -122,6 +122,28 @@ describe("permission RBAC", () => {
         permission: "Applications:view",
       }),
     ).toThrowError("permission_denied");
+
+    for (const permission of [
+      "Pages:publish",
+      "Users:view",
+      "Roles:assign",
+    ] as const) {
+      expect(() =>
+        assertAuthorized(principal("contact_manager"), { permission }),
+      ).toThrowError("permission_denied");
+    }
+    for (const permission of ["Users:view", "Roles:assign", "Contact:view"] as const) {
+      expect(() =>
+        assertAuthorized(principal("hr"), { permission }),
+      ).toThrowError("permission_denied");
+    }
+    for (const permission of permissionKeys.filter((key) =>
+      /:(?:create|edit|publish|schedule|archive|rollback|upload-public|delete-public|status|notes|cv-download|delete|anonymize|update-status|internal-note|edit-general|update|assign|export)$/.test(key),
+    )) {
+      expect(() =>
+        assertAuthorized(principal("viewer"), { permission }),
+      ).toThrowError("permission_denied");
+    }
   });
 
   it("enforces limited scopes without consulting role names", () => {

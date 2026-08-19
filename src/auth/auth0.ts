@@ -19,19 +19,25 @@ export function hasCompleteAuth0Configuration(
   );
 }
 
-function safeReturnPath(value: string | undefined): string {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/admin";
+export function safeReturnPath(value: string | undefined): string {
+  if (!value?.startsWith("/") || value.startsWith("//") || value.includes("\\")) {
+    return "/admin";
+  }
+  try {
+    const parsed = new URL(value, "https://ardas.invalid");
+    return parsed.origin === "https://ardas.invalid" ? `${parsed.pathname}${parsed.search}` : "/admin";
+  } catch {
+    return "/admin";
+  }
 }
 
-export function getAuth0Client(): Auth0Client {
-  if (!hasCompleteAuth0Configuration()) {
-    throw new Error("Auth0 admin authentication is not configured.");
-  }
-  auth0Client ??= new Auth0Client({
+function createAuth0Client(cspNonce?: string): Auth0Client {
+  return new Auth0Client({
     appBaseUrl: process.env.APP_BASE_URL ?? process.env.SITE_URL,
     authorizationParameters: { scope: "openid profile email" },
     signInReturnToPath: "/admin",
     logoutStrategy: "oidc",
+    cspNonce,
     session: {
       rolling: true,
       absoluteDuration: 60 * 60 * 12,
@@ -63,6 +69,13 @@ export function getAuth0Client(): Auth0Client {
       );
     },
   });
+}
 
+export function getAuth0Client(cspNonce?: string): Auth0Client {
+  if (!hasCompleteAuth0Configuration()) {
+    throw new Error("Auth0 admin authentication is not configured.");
+  }
+  if (cspNonce) return createAuth0Client(cspNonce);
+  auth0Client ??= createAuth0Client();
   return auth0Client;
 }

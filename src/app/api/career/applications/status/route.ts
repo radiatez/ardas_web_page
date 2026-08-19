@@ -3,7 +3,7 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { resolvePublicCareerScanStatus } from "@/forms/status";
 import { RateLimitExceededError, SecurityBoundaryError } from "@/security/errors";
 import { securityLogger } from "@/security/logging";
-import { guardPublicFormRequest } from "@/security/request-limits";
+import { assertJsonRequest, guardPublicFormRequest } from "@/security/request-limits";
 
 export const runtime = "nodejs";
 
@@ -28,6 +28,7 @@ function localizedMessage(locale: Locale, status: "clean" | "infected" | "proces
 
 export async function POST(request: Request) {
   try {
+    assertJsonRequest(request);
     const { db } = getRuntimeDatabase();
     const bytes = await guardPublicFormRequest(db, request, "careerStatus");
     let body: unknown;

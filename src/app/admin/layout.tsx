@@ -1,7 +1,7 @@
-import type { Metadata, Route } from "next";
-import Link from "next/link";
+import type { Metadata } from "next";
 
 import { resolveRequestAdminPrincipal } from "@/admin/request-access";
+import { AdminShell } from "@/components/admin/admin-shell";
 import type { PermissionKey } from "@/security/rbac/catalog";
 import "@/styles/admin.css";
 
@@ -28,17 +28,8 @@ const navigation: readonly { href: string; label: string; permission: Permission
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const principal = await resolveRequestAdminPrincipal();
-  return <div className="admin-shell">
-    <aside className="admin-sidebar">
-      <Link className="admin-brand" href="/admin">ARDAŞ<small>YÖNETİM MERKEZİ</small></Link>
-      {principal ? <nav className="admin-nav" aria-label="Yönetim modülleri">
-        {navigation.filter((item) => principal.permissions[item.permission]?.length).map((item) => <Link href={item.href as Route} key={item.href}>{item.label}</Link>)}
-      </nav> : null}
-      <div className="admin-sidebar__footer">Permission tabanlı erişim<br />Production: MFA zorunlu</div>
-    </aside>
-    <div className="admin-main">
-      <header className="admin-topbar"><span>Türkçe yönetim arayüzü</span><Link href="/tr" target="_blank">Public siteyi aç ↗</Link></header>
-      <div className="admin-content">{children}</div>
-    </div>
-  </div>;
+  const visibleNavigation = principal
+    ? navigation.filter((item) => principal.permissions[item.permission]?.length)
+    : [];
+  return <AdminShell navigation={visibleNavigation}>{children}</AdminShell>;
 }

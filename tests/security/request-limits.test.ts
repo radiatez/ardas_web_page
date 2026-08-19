@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   assertContentLengthWithinLimit,
+  assertJsonRequest,
   assertTrustedPublicFormOrigin,
   readRequestBodyWithinLimit,
 } from "../../src/security/request-limits";
@@ -26,6 +27,19 @@ describe("public form request-size limits", () => {
     await expect(readRequestBodyWithinLimit(request, 100)).rejects.toThrowError(
       "request_too_large",
     );
+  });
+
+  it("rejects invalid content types before parsing public JSON forms", () => {
+    expect(() => assertJsonRequest(new Request("https://example.test/api/contact", {
+      method: "POST",
+      headers: { "content-type": "text/plain" },
+      body: "{}",
+    }))).toThrowError("unsupported_media_type");
+    expect(() => assertJsonRequest(new Request("https://example.test/api/contact", {
+      method: "POST",
+      headers: { "content-type": "application/json; charset=utf-8" },
+      body: "{}",
+    }))).not.toThrow();
   });
 
   it("enforces the configured same-origin boundary outside local/test", () => {

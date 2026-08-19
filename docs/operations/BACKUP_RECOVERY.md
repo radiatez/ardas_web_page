@@ -59,3 +59,26 @@ Record:
 - storage region,
 - restore steps,
 - last successful restore test.
+
+## Portable Local Drill
+
+`pnpm run drill:recovery` is restricted to localhost databases named
+`ardas_test` or `ardas_ci` and an active PostgreSQL 18.4 disposable container.
+It:
+
+1. writes a non-PII, expired verification fixture,
+2. creates a custom-format `pg_dump`,
+3. drops/recreates only the allowed disposable database,
+4. restores with `pg_restore --exit-on-error --no-owner`,
+5. verifies the Drizzle migration journal and critical fixture,
+6. reapplies retention cleanup and verifies the expired fixture is gone,
+7. removes the temporary dump from the container.
+
+### Validation Record — 2026-08-19
+
+PostgreSQL `18.4`: backup passed, destructive disposable reset passed, restore
+passed, migration journal passed, critical fixture passed and post-restore
+retention cleanup passed. `pnpm test:integration` then removed the container,
+network and temporary data. This proves procedure portability only; production
+frequency, Neon PITR, object-storage recovery, RPO/RTO and scheduled rehearsal
+remain Milestone 9 gates.

@@ -79,6 +79,7 @@ const testEnvironment = {
   DATABASE_URL: testDatabaseUrl,
   TEST_DATABASE_URL: testDatabaseUrl,
 };
+const fullIntegration = process.argv.includes("--full");
 
 run(docker, [...compose, "down", "--volumes", "--remove-orphans"], {
   allowFailure: true,
@@ -91,7 +92,17 @@ try {
   started = true;
   runPnpm(["run", "db:migrate"], testEnvironment);
   runPnpm(["run", "db:check"], testEnvironment);
+  if (fullIntegration) {
+    runPnpm(["run", "db:generate"], testEnvironment);
+    run("git", ["diff", "--exit-code", "--", "drizzle"]);
+  }
   runPnpm(["run", "test"], testEnvironment);
+  if (fullIntegration) {
+    runPnpm(["run", "build"], testEnvironment);
+    runPnpm(["run", "test:e2e"], testEnvironment);
+    runPnpm(["run", "drill:recovery"], testEnvironment);
+    runPnpm(["run", "validate:rollback"], testEnvironment);
+  }
 } finally {
   if (started) {
     run(docker, [...compose, "down", "--volumes", "--remove-orphans"], {

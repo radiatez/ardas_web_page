@@ -1051,28 +1051,91 @@ Production gates retained:
 
 # Milestone 8 — Full Security, Accessibility, SEO, Performance & E2E
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Tasks
 
-- [ ] full RBAC pass.
-- [ ] upload/security review.
-- [ ] MFA bypass review.
-- [ ] dependency audit.
-- [ ] CSP/headers.
-- [ ] WCAG 2.2 AA.
-- [ ] browser matrix.
-- [ ] CWV optimization.
-- [ ] sitemap/canonical/hreflang.
-- [ ] full E2E suite.
-- [ ] audit integrity checks.
-- [ ] incident response tabletop/rotation test where practical.
+- [x] full RBAC pass.
+- [x] upload/security review.
+- [x] MFA bypass review.
+- [x] dependency audit.
+- [x] CSP/headers.
+- [x] WCAG 2.2 AA.
+- [x] browser matrix.
+- [x] CWV optimization.
+- [x] sitemap/canonical/hreflang.
+- [x] full E2E suite.
+- [x] audit integrity checks.
+- [x] incident response tabletop/rotation test where practical.
 
 ## Acceptance
 
 - no Critical unresolved risk,
 - full test matrix passes,
 - supported browsers/accessibility validated.
+
+## Validation Record — 2026-08-19
+
+Local integration environment:
+
+```text
+Windows / PowerShell
+Node.js 24.14.0 host (repository/CI pin: 24.19.x)
+pnpm 11.22.0 via Corepack
+Next.js 16.3.1 / React 19.2.8
+Docker Engine 29.7.2 / Docker Compose 5.4.0
+PostgreSQL 18.4 official disposable image
+Playwright 1.62.1 / axe-core Playwright 4.13.0
+```
+
+Repeatable validation:
+
+- frozen `pnpm install --frozen-lockfile`: passed; lockfile unchanged,
+- `pnpm test:integration`: passed from clean disposable PostgreSQL start through
+  migration, full regression, production build, browser matrix, restore drill,
+  rollback contract and automatic cleanup,
+- Drizzle migration apply/check/generate: passed; 5 committed migrations and no
+  generated migration diff,
+- lint and typecheck: passed with zero warnings/errors,
+- Vitest: 36 files / 139 tests passed; 7 PostgreSQL integration files / 27
+  PostgreSQL tests included,
+- production build: passed,
+- Playwright: 35 project/test registrations; 24 passed and 11 intentional
+  project-guard skips across Chromium, Firefox, WebKit, Pixel 7/Android Chrome
+  and iPhone 15/iOS Safari-equivalent profiles,
+- automated axe WCAG 2.2 AA serious/critical violations: 0 on localized public,
+  form, 404, admin CMS and HR presentation paths,
+- responsive matrix: 320×720, 390×844, 768×1024, 1440×900 and 1920×1080;
+  no horizontal overflow,
+- strict per-request nonce/hash CSP: public, forms, media, preview/admin
+  fail-closed contracts and Auth0 nonce/redirect contract passed; no
+  `unsafe-inline` or `unsafe-eval`; R-028 mitigated,
+- security regression: 58-permission RBAC matrix, cross-module denials,
+  MFA/session/open-redirect, CV fail-closed matrix, form/input/XSS, immutable
+  audit and PII log-redaction tests passed,
+- SEO regression: canonical/hreflang, sitemap/robots, localized 404, 301 slug
+  history, noindex private/preview/test surfaces and unpublished omission passed,
+- local lab baseline (not field p75): CLS `0`, LCP `136 ms`, delivered JS
+  `150,554 bytes`; field CWV monitoring remains a production gate,
+- `pnpm run drill:recovery`: custom-format `pg_dump`/`pg_restore`, migration
+  journal, critical fixture and post-restore retention cleanup passed,
+- `pnpm run validate:rollback`: procedure contract passed; all 5 migrations
+  contain no database drop/truncate rollback operation,
+- production dependency audit: 0 known vulnerabilities; Playwright/axe versions
+  are exact and pnpm lifecycle builds remain allowlisted,
+- post-run Docker inspection: 0 `ardas-test` containers, networks or volumes.
+
+Remote validation:
+
+- GitHub Actions result is recorded after the implementation commit is pushed.
+
+Production gates intentionally retained for Milestone 9:
+
+- Auth0 EU tenant plus MFA Always evidence; Neon, S3/IAM,
+  GuardDuty/EventBridge/SQS, SES and Sentry/CloudWatch provisioning,
+- provider-side PII scrubbing, DPA/data-region approval, approved legal text and
+  retention days, production backup schedule/PITR rehearsal and live alerts,
+- field CWV p75 evidence and final approved identity/content/media.
 
 ---
 

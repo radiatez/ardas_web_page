@@ -150,7 +150,7 @@ export function CatalogInlineEditor({ kind, item }: { kind: string; item: {
       setNotice({ type: "success", text: "Çalışma kopyası yayınlandı." }); }
     catch (error) { setNotice({ type: "error", text: error instanceof Error ? error.message : "Yayın tamamlanamadı" }); }
   }
-  return <details><summary>Düzenle</summary><form className="admin-compact-form" onSubmit={submit} style={{ minWidth: "18rem", paddingTop: ".8rem" }}>
+  return <details><summary>Düzenle</summary><form className="admin-compact-form" onSubmit={submit}>
     {kind !== "brands" ? <label>Anahtar<input name="key" defaultValue={item.key} required /></label> : <input name="key" type="hidden" value={item.key} />}
     <label>Ad<input name="name" defaultValue={item.name ?? ""} required /></label>
     {kind === "product-groups" ? <label>Slug<input name="slug" defaultValue={item.slug ?? ""} required /></label> : null}

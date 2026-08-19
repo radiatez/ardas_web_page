@@ -67,7 +67,7 @@ export default async function AdminModulePage({ params }: { params: Promise<{ mo
     const principal = await requireAdminPagePermission("SiteSettings:view", { returnTo: "/admin/ayarlar" });
     const values = await db.select().from(siteSettings); const map = new Map(values.map((row) => [row.key, row.typedValue]));
     const general = [["display_name", "Görünen ad"], ["company_stats", "Şirket istatistikleri"], ["contact_footer", "İletişim / footer"], ["social_links", "Sosyal bağlantılar"], ["default_seo", "Varsayılan SEO"], ["content_owner_metadata", "İçerik sahipliği"]] as const;
-    return <main><PageHeading kicker="Secret içermeyen ayarlar" title="Site Ayarları">Kimlik bilgileri ve provider secret değerleri burada tutulmaz.</PageHeading><div className="admin-cards" style={{ background: "transparent", border: 0, gap: "1rem" }}>
+    return <main><PageHeading kicker="Secret içermeyen ayarlar" title="Site Ayarları">Kimlik bilgileri ve provider secret değerleri burada tutulmaz.</PageHeading><div className="admin-cards admin-cards--settings">
       {has(principal, "SiteSettings:edit-general") ? general.map(([key, label]) => <SiteSettingForm key={key} settingKey={key} label={label} initialValue={map.get(key)} />) : <div className="admin-empty">Salt okunur erişim.</div>}
       {has(principal, "DealerPortal:update") ? <SiteSettingForm settingKey="dealer_portal_url" label="Dealer Portal URL" initialValue={map.get("dealer_portal_url")} /> : null}
     </div></main>;

@@ -12,8 +12,8 @@ export default async function AdminDashboardPage() {
       {dashboard.contact ? <article className="admin-card"><span>Yeni iletişim mesajı</span><strong>{dashboard.contact.newMessages}</strong></article> : null}
       {dashboard.applications ? <article className="admin-card"><span>Yeni aday başvurusu</span><strong>{dashboard.applications.newApplications}</strong></article> : null}
     </section>
-    {dashboard.providers ? <section className="admin-panel" style={{ marginTop: "1rem" }}><span className="admin-kicker">Production readiness</span><h2>Sağlayıcı yapılandırması</h2><div className="admin-cards">
-      {Object.entries(dashboard.providers).map(([key, ready]) => <article className="admin-card" key={key}><span>{key}</span><strong style={{ fontSize: "1rem" }}>{ready ? "Hazır" : "TBD"}</strong></article>)}
+    {dashboard.providers ? <section className="admin-panel admin-panel--spaced"><span className="admin-kicker">Production readiness</span><h2>Sağlayıcı yapılandırması</h2><div className="admin-cards">
+      {Object.entries(dashboard.providers).map(([key, ready]) => <article className="admin-card" key={key}><span>{key}</span><strong className="admin-card__status">{ready ? "Hazır" : "TBD"}</strong></article>)}
     </div></section> : null}
   </main>;
 }

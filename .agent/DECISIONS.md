@@ -496,3 +496,28 @@ container/network/temporary data.
 
 This workflow does not emulate or replace Neon, S3, GuardDuty, SQS/EventBridge,
 SES, Auth0 or Sentry production decisions. No production credentials are used.
+
+## D-042 — Per-Request CSP and Milestone 8 Verification Boundary
+**Status:** Accepted
+
+Use a cryptographically random nonce generated in the Next.js proxy for every
+request and forward the same policy/nonce to the App Router render. Scripts use
+`'nonce-…'` plus `'strict-dynamic'`; script attributes are forbidden. Styles use
+the request nonce, with one exact `unsafe-hashes` SHA-256 allowance for the
+current Next Image-generated `color:transparent` style attribute. Global
+`unsafe-inline`, `unsafe-eval`, wildcard provider origins and broad `https:`
+sources are not allowed. Public media may add only a validated HTTPS origin.
+
+Admin, preview, auth, API and the synthetic E2E presentation surface receive
+`private, no-store`. Auth0 receives the same CSP nonce and callback return paths
+are restricted to same-origin absolute paths. The E2E presentation surface
+contains no session, API bypass or real data; it requires both `APP_ENV=test`
+and `E2E_UI_TEST_SURFACE=enabled`, is noindex/robots-disallowed and is otherwise
+404.
+
+Milestone 8 uses Playwright with exact versions across Chromium, Firefox,
+WebKit and mobile profiles. `pnpm test:integration` owns the disposable
+PostgreSQL 18.4 lifecycle and includes migrations, all Vitest tests, production
+build, browser/axe/responsive regression, portable backup/restore and rollback
+contract validation before guaranteed cleanup. Lab CWV values are regression
+diagnostics only; production field p75 evidence remains a launch gate.

@@ -39,6 +39,13 @@ export function assertContentLengthWithinLimit(
   }
 }
 
+export function assertJsonRequest(request: Request): void {
+  const mediaType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+  if (mediaType !== "application/json") {
+    throw new SecurityBoundaryError("unsupported_media_type", 415);
+  }
+}
+
 export async function readRequestBodyWithinLimit(
   request: Request,
   maxBytes: number,
