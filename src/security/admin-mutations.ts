@@ -10,19 +10,37 @@ import {
   userRoles,
 } from "../db/schema";
 import { appendAuditEvent } from "./audit";
-import { ResourceNotFoundError } from "./errors";
+import { InvalidSecurityInputError, ResourceNotFoundError } from "./errors";
 import {
   assertAuthorized,
   type AdminPrincipal,
 } from "./rbac/authorization";
 
-export type ApplicationStatus =
-  | "new"
-  | "in_review"
-  | "interview"
-  | "rejected"
-  | "hired"
-  | "archived";
+export const applicationStatuses = [
+  "new",
+  "in_review",
+  "interview",
+  "rejected",
+  "hired",
+  "archived",
+] as const;
+
+export type ApplicationStatus = (typeof applicationStatuses)[number];
+
+export const applicationStatusTransitions: Readonly<
+  Record<ApplicationStatus, readonly ApplicationStatus[]>
+> = {
+  new: ["in_review", "rejected", "archived"],
+  in_review: ["interview", "rejected", "archived"],
+  interview: ["hired", "rejected", "archived"],
+  rejected: ["archived"],
+  hired: ["archived"],
+  archived: [],
+};
+
+export function allowedApplicationStatusTransitions(status: ApplicationStatus) {
+  return applicationStatusTransitions[status];
+}
 
 export async function recordMfaSecurityChange(
   db: DatabaseClient,
@@ -109,8 +127,11 @@ export async function updateCandidateStatus(
   if (!application) {
     throw new ResourceNotFoundError();
   }
-  if (application.status === toStatus) {
-    return;
+  if (
+    !applicationStatuses.includes(toStatus) ||
+    !applicationStatusTransitions[application.status].includes(toStatus)
+  ) {
+    throw new InvalidSecurityInputError("application_status_transition_invalid");
   }
 
   const now = new Date();
@@ -126,7 +147,7 @@ export async function updateCandidateStatus(
       )
       .returning({ id: careerApplications.id });
     if (changed.length === 0) {
-      throw new Error("Candidate status changed concurrently.");
+      throw new InvalidSecurityInputError("application_status_changed_concurrently");
     }
     await transaction.insert(applicationStatusHistory).values({
       applicationId,

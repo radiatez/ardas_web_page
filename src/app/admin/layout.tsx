@@ -16,6 +16,7 @@ const navigation: readonly { href: string; label: string; permission: Permission
   { href: "/admin/lokasyonlar", label: "Lokasyonlar", permission: "Locations:view" },
   { href: "/admin/departmanlar", label: "Departmanlar", permission: "Departments:view" },
   { href: "/admin/kariyer-icerigi", label: "Kariyer İçeriği", permission: "CareerContent:view" },
+  { href: "/admin/basvurular", label: "Aday Başvuruları", permission: "Applications:view" },
   { href: "/admin/medya", label: "Medya", permission: "Media:view-public" },
   { href: "/admin/yasal", label: "Yasal Sayfalar", permission: "LegalPages:view" },
   { href: "/admin/seo", label: "SEO", permission: "SEO:view" },

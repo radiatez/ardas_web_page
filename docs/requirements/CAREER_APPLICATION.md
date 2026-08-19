@@ -227,6 +227,16 @@ Milestone 7 validates:
 - status,
 - retention.
 
+Implemented Milestone 7 behavior:
+
+- server-side search/filter/pagination with a minimum-PII list projection,
+- protected detail with privacy provenance, internal notes and status history,
+- forward-only `New → In Review → Interview → Hired/Rejected → Archived`
+  lifecycle with valid early reject/archive branches,
+- clean/protected/MFA/permission/application-relationship CV enforcement,
+- due/no-active-hold HR anonymization and Super Admin `all`-scope override/delete,
+- PII-safe career-scoped audit.
+
 ## Retention
 
 No indefinite retention.

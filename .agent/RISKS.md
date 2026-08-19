@@ -3,9 +3,9 @@
 | ID | Risk | Severity | Likelihood | Mitigation / Gate | Status |
 |---|---|---:|---:|---|---|
 | R-001 | Career form stores CV before protected storage/RBAC/MFA exists | Critical | Medium | Production form gate requires Auth0, retention, privacy, rate-limit, S3, GuardDuty and notification configuration; upload remains quarantined until clean | Mitigated in code; provider provisioning pending |
-| R-002 | Candidate data retained indefinitely | High | Medium | Configurable retention + deletion/anonymization + launch approval | Mitigated in code; durations TBD |
+| R-002 | Candidate data retained indefinitely | High | Medium | Configurable deadline/hold + due-only HR anonymization + Super Admin override boundary + CV cleanup + launch approval | Mitigated in code/tested on PostgreSQL; durations TBD |
 | R-003 | Malicious CV upload | Critical | Medium | PDF-only, 10 MB, signature/MIME validation, mandatory malware scan, fail-closed quarantine | Mitigated in code; AWS provisioning pending |
-| R-004 | Admin permissions too broad | Critical | Medium | Explicit RBAC matrix + negative tests | Mitigated |
+| R-004 | Admin permissions too broad | Critical | Medium | Explicit permission/scope RBAC + server service checks + named cross-domain HR/candidate negative tests | Mitigated |
 | R-005 | TR/EN added too late | High | Low | i18n in architecture milestone | Mitigated |
 | R-006 | Dealer Portal redirected to malicious host | High | Low | HTTPS validation + allowlist option + Super Admin + audit | Mitigated |
 | R-007 | PII leaks into logs | High | Medium | Structured redaction + tests | Mitigated in application; provider scrubbing pending |
@@ -33,3 +33,4 @@
 | R-029 | CMS emits an unsupported or malformed public content block | Medium | Medium | Versioned allowlist parser + server authoring validation + protected real-component preview + regression tests | Mitigated in code |
 | R-030 | Generated demo imagery is mistaken for approved/licensed production photography | Medium | Low | Local/test-only manifest, no production fallback, explicit README/decision record and mandatory replacement gate | Mitigated in code; final approved photography TBD |
 | R-031 | Scheduled content is not applied or fails silently | High | Medium | Idempotent internal worker, PostgreSQL advisory transaction lock, PII-safe failure event; production scheduler and alert provisioning required | Mitigated in code; production invocation/alerting pending |
+| R-032 | Candidate privacy action partially completes across S3 and PostgreSQL | High | Low | Delete protected/quarantine object first, then transactional DB anonymize/delete + append-only audit; fail closed and alert/retry on provider/DB error | Mitigated toward inaccessible state; production alert/reconciliation pending |

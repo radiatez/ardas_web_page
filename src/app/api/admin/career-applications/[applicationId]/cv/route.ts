@@ -5,6 +5,7 @@ import { downloadProtectedCv } from "@/security/cv/download";
 import { S3CvObjectStorage } from "@/security/cv/storage";
 import { SecurityBoundaryError } from "@/security/errors";
 import { securityLogger } from "@/security/logging";
+import { assertAuthorized } from "@/security/rbac/authorization";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,11 @@ export async function GET(
     const { db } = getRuntimeDatabase();
     const principal = await resolveAdminPrincipal(db, session);
     const { applicationId } = await context.params;
+    assertAuthorized(principal, {
+      permission: "Applications:cv-download",
+      requireMfa: true,
+      environment: process.env.APP_ENV,
+    });
     const object = await downloadProtectedCv(
       db,
       S3CvObjectStorage.fromEnvironment(),

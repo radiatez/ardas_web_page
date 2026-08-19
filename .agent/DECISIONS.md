@@ -449,3 +449,50 @@ for every admin permission check.
   Portal continues through its Super Admin-only HTTPS validator.
 - Legal-page publish/schedule requires an explicit approved-copy reference;
   actual legal wording and approval references remain TBD business inputs.
+
+## D-040 — Milestone 7 Candidate Workflow and Retention Scope
+**Status:** Accepted
+
+Candidate administration remains permission-based and server-enforced. The list
+is a paginated, server-filtered minimal projection; phone, email, salary and
+free-text introduction appear only in the protected detail view. Sensitive
+detail access, notes, status changes, clean CV download and privacy operations
+produce PII-safe audit records.
+
+The v1 forward-only status graph is:
+
+```text
+new → in_review | rejected | archived
+in_review → interview | rejected | archived
+interview → hired | rejected | archived
+rejected → archived
+hired → archived
+archived → terminal
+```
+
+Identical, reverse and skipped transitions are rejected server-side. Every
+accepted transition writes `ApplicationStatusHistory` and `AuditEvent` in the
+same PostgreSQL transaction.
+
+Permission scope, not role name, controls destructive behavior:
+
+- `Applications:anonymize` with `retention` scope may run only after
+  `retention_due_at` and when no active hold exists,
+- `all` scope may perform an explicitly audited early anonymization override,
+- hard delete requires `Applications:delete` with `all` scope.
+
+Anonymization clears candidate PII/free text, removes notes and the protected or
+quarantine CV object/Media row, archives the neutral application row and keeps
+status/audit history. Approved retention durations remain `TBD` configuration.
+
+## D-041 — Disposable Local PostgreSQL Integration Environment
+**Status:** Accepted for local/integration testing only
+
+Use the official `postgres:18.4` image through `compose.test.yaml` for repeatable
+local integration testing. `pnpm test:postgres` starts an isolated test-only
+database on localhost port `55432`, applies committed migrations, checks Drizzle
+metadata, runs the full suite with `TEST_DATABASE_URL`, and always removes the
+container/network/temporary data.
+
+This workflow does not emulate or replace Neon, S3, GuardDuty, SQS/EventBridge,
+SES, Auth0 or Sentry production decisions. No production credentials are used.

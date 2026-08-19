@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 type Notice = { type: "success" | "error"; text: string } | null;
 
@@ -12,7 +13,7 @@ async function api(url: string, init: RequestInit) {
 }
 
 function Feedback({ notice }: { notice: Notice }) {
-  return notice ? <p className={`admin-feedback admin-feedback--${notice.type}`} role="status">{notice.text}</p> : null;
+  return notice ? <p className={`admin-feedback admin-feedback--${notice.type}`} role={notice.type === "error" ? "alert" : "status"}>{notice.text}</p> : null;
 }
 
 export function AdminPageEditor({ routeKey, locale, initial, canEdit = false, canPreview = false,
@@ -175,6 +176,124 @@ export function ContactActions({ id, currentStatus }: { id: string; currentStatu
       <label>İç not<textarea name="note" rows={4} required maxLength={4000} /></label><button className="admin-button">Not ekle</button>
     </form><button className="admin-button admin-button--danger" type="button" onClick={() => send({ action: "retention" })}>Süresi dolmuş kaydı anonimleştir</button>
     <Feedback notice={notice} />
+  </div>;
+}
+
+export function CareerApplicationActions({
+  id,
+  currentStatus,
+  transitions,
+  canStatus,
+  canNotes,
+  canAnonymize,
+  canDelete,
+  retentionEligible,
+}: {
+  id: string;
+  currentStatus: string;
+  transitions: readonly { value: string; label: string }[];
+  canStatus: boolean;
+  canNotes: boolean;
+  canAnonymize: boolean;
+  canDelete: boolean;
+  retentionEligible: boolean;
+}) {
+  const router = useRouter();
+  const [notice, setNotice] = useState<Notice>(null);
+  const [busy, setBusy] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"anonymize" | "delete" | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (confirmAction) confirmRef.current?.focus();
+  }, [confirmAction]);
+
+  async function send(body: Record<string, unknown>) {
+    setBusy(true);
+    setNotice(null);
+    try {
+      await api(`/api/admin/career-applications/${id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (body.action === "anonymize" || body.action === "delete") {
+        router.push("/admin/basvurular");
+      } else {
+        setNotice({ type: "success", text: "Başvuru kaydı güvenli biçimde güncellendi." });
+        router.refresh();
+      }
+    } catch (error) {
+      setNotice({ type: "error", text: error instanceof Error ? error.message : "İşlem tamamlanamadı" });
+    } finally {
+      setBusy(false);
+      setConfirmAction(null);
+    }
+  }
+
+  function closeConfirmation() {
+    setConfirmAction(null);
+    queueMicrotask(() => triggerRef.current?.focus());
+  }
+
+  function openConfirmation(action: "anonymize" | "delete", trigger: HTMLButtonElement) {
+    triggerRef.current = trigger;
+    setConfirmAction(action);
+  }
+
+  return <div className="admin-panel">
+    <span className="admin-kicker">Yetkili işlemler</span>
+    <h2>Başvuru yönetimi</h2>
+    {canStatus ? <form onSubmit={(event) => {
+      event.preventDefault();
+      const status = new FormData(event.currentTarget).get("status");
+      void send({ action: "status", status });
+    }}>
+      <label>Yeni durum<select name="status" defaultValue="" required>
+        <option value="" disabled>{transitions.length ? "Durum seçin" : "Geçiş bulunmuyor"}</option>
+        {transitions.map((transition) => <option key={transition.value} value={transition.value}>{transition.label}</option>)}
+      </select></label>
+      <button className="admin-button" disabled={busy || transitions.length === 0}>Durumu güncelle</button>
+    </form> : null}
+    {canNotes ? <form onSubmit={(event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const body = new FormData(form).get("note");
+      void send({ action: "note", body }).then(() => form.reset());
+    }}>
+      <label>İç not<textarea name="note" rows={5} required maxLength={4000} aria-describedby="candidate-note-help" /></label>
+      <p className="admin-help" id="candidate-note-help">Not yalnızca yetkili HR kullanıcılarına görünür; genel loglara veya audit metadata’ya kopyalanmaz.</p>
+      <button className="admin-button" disabled={busy}>Not ekle</button>
+    </form> : null}
+    {(canAnonymize || canDelete) ? <section className="admin-retention-actions" aria-labelledby="candidate-retention-heading">
+      <h3 id="candidate-retention-heading">Saklama işlemleri</h3>
+      {canAnonymize && retentionEligible ? <button className="admin-button admin-button--danger" type="button" disabled={busy} onClick={(event) => openConfirmation("anonymize", event.currentTarget)}>Kaydı anonimleştir</button> : null}
+      {canAnonymize && !retentionEligible ? <p className="admin-help">Retention tarihi gelmeden veya aktif hold varken HR anonimleştirme işlemi yapamaz.</p> : null}
+      {canDelete ? <button className="admin-button admin-button--danger" type="button" disabled={busy} onClick={(event) => openConfirmation("delete", event.currentTarget)}>Kalıcı silme override</button> : null}
+    </section> : null}
+    {confirmAction ? <div className="admin-confirm" role="alertdialog" aria-modal="true" aria-labelledby="candidate-confirm-title" aria-describedby="candidate-confirm-description" onKeyDown={(event) => {
+      if (event.key === "Escape") closeConfirmation();
+      if (event.key === "Tab") {
+        if (event.shiftKey && document.activeElement === confirmRef.current) {
+          event.preventDefault();
+          cancelRef.current?.focus();
+        } else if (!event.shiftKey && document.activeElement === cancelRef.current) {
+          event.preventDefault();
+          confirmRef.current?.focus();
+        }
+      }
+    }}>
+      <h3 id="candidate-confirm-title">İşlemi onaylayın</h3>
+      <p id="candidate-confirm-description">{confirmAction === "delete" ? "Başvuru ve bağlı aktif kayıtlar kalıcı olarak silinecek; audit kaydı korunacaktır." : "Kişisel veriler anonimleştirilecek ve korumalı CV nesnesi silinecektir."}</p>
+      <div className="admin-form-actions">
+        <button ref={confirmRef} className="admin-button admin-button--danger" type="button" disabled={busy} onClick={() => send({ action: confirmAction })}>Onayla</button>
+        <button ref={cancelRef} className="admin-button admin-button--quiet" type="button" disabled={busy} onClick={closeConfirmation}>Vazgeç</button>
+      </div>
+    </div> : null}
+    <Feedback notice={notice} />
+    <p className="admin-help">Mevcut durum: {currentStatus}</p>
   </div>;
 }
 

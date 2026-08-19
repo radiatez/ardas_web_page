@@ -95,6 +95,18 @@ corepack pnpm run db:migrate
 `compose.yaml` provides the selected local database shape where Docker is
 available. CI always applies the migration to a clean PostgreSQL 18 database.
 
+For a disposable PostgreSQL 18.4 integration run, use:
+
+```text
+corepack pnpm run test:postgres
+```
+
+This command starts the isolated `compose.test.yaml` database on localhost port
+`55432`, applies committed migrations, checks migration metadata, runs the full
+test suite with `TEST_DATABASE_URL`, then removes the test container and its
+temporary data even when a test fails. The credentials are test-only and never
+replace the selected Neon production provider or production secrets.
+
 ## Agent Reading Order
 
 For substantial work:

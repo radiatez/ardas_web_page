@@ -10,7 +10,7 @@ import {
   siteSettings,
 } from "../db/schema";
 import { appendAuditEvent } from "./audit";
-import { ResourceNotFoundError } from "./errors";
+import { InvalidSecurityInputError, ResourceNotFoundError } from "./errors";
 import {
   assertAuthorized,
   type AdminPrincipal,
@@ -30,6 +30,7 @@ async function findCandidateFile(
   const [row] = await db
     .select({
       applicationId: careerApplications.id,
+      anonymizedAt: careerApplications.anonymizedAt,
       mediaId: media.id,
       storageKey: media.storageKey,
       storageClass: media.storageClass,
@@ -39,6 +40,9 @@ async function findCandidateFile(
     .where(eq(careerApplications.id, applicationId))
     .limit(1);
   if (!row) {
+    return { exists: false };
+  }
+  if (row.anonymizedAt) {
     return { exists: false };
   }
   if (!row.mediaId || !row.storageKey || !row.storageClass) {
@@ -73,7 +77,10 @@ async function anonymizeCandidateCore(
   storage: CvObjectStorage,
   applicationId: string,
   actorUserId: string | null,
-  source: "manual" | "scheduled_retention",
+  source:
+    | "approved_retention_workflow"
+    | "manual_super_admin_override"
+    | "scheduled_retention",
 ) {
   const candidate = await findCandidateFile(db, applicationId);
   if (!candidate.exists) {
@@ -134,12 +141,36 @@ export async function anonymizeCandidate(
     scope: "retention",
     environment: process.env.APP_ENV,
   });
+  const hasOverrideScope = principal.permissions["Applications:anonymize"]?.includes("all") ?? false;
+  if (!hasOverrideScope) {
+    const now = new Date();
+    const [eligible] = await db
+      .select({ id: careerApplications.id })
+      .from(careerApplications)
+      .where(
+        and(
+          eq(careerApplications.id, applicationId),
+          isNull(careerApplications.anonymizedAt),
+          lte(careerApplications.retentionDueAt, now),
+          or(
+            isNull(careerApplications.retentionHoldUntil),
+            lte(careerApplications.retentionHoldUntil, now),
+          ),
+        ),
+      )
+      .limit(1);
+    if (!eligible) {
+      throw new InvalidSecurityInputError("candidate_retention_not_due");
+    }
+  }
   return anonymizeCandidateCore(
     db,
     storage,
     applicationId,
     principal.userId,
-    "manual",
+    hasOverrideScope
+      ? "manual_super_admin_override"
+      : "approved_retention_workflow",
   );
 }
 
@@ -151,7 +182,7 @@ export async function deleteCandidate(
 ) {
   assertAuthorized(principal, {
     permission: "Applications:delete",
-    scope: "retention",
+    scope: "all",
     environment: process.env.APP_ENV,
   });
   const candidate = await findCandidateFile(db, applicationId);
@@ -171,7 +202,7 @@ export async function deleteCandidate(
       eventType: "privacy.candidate_deleted",
       resourceType: "career_application",
       resourceId: applicationId,
-      metadata: { source: "manual" },
+      metadata: { source: "manual_super_admin_override" },
     });
   });
 }

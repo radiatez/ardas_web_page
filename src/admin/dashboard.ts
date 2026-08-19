@@ -2,6 +2,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "@/db/client";
 import {
+  careerApplications,
   contactSubmissions,
   contentRevisions,
   pageLocales,
@@ -22,6 +23,7 @@ export type AdminDashboard = {
     recentRevisions: number;
   };
   contact?: { newMessages: number };
+  applications?: { newApplications: number };
   providers?: {
     database: boolean;
     auth0: boolean;
@@ -61,6 +63,13 @@ export async function loadAdminDashboard(
       .from(contactSubmissions)
       .where(and(eq(contactSubmissions.status, "new"), isNull(contactSubmissions.anonymizedAt)));
     result.contact = { newMessages: Number(row?.count ?? 0) };
+  }
+
+  if (hasPermission(principal, "Applications:view")) {
+    const [row] = await db.select({ count: sql<number>`count(*)::int` })
+      .from(careerApplications)
+      .where(and(eq(careerApplications.status, "new"), isNull(careerApplications.anonymizedAt)));
+    result.applications = { newApplications: Number(row?.count ?? 0) };
   }
 
   if (hasPermission(principal, "SiteSettings:view")) {

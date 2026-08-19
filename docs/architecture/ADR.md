@@ -719,3 +719,76 @@ rollback-as-new-draft, locale independence, redirect validation, Contact Manager
 positive/negative access, public-only media queries, audit minimization, real
 PostgreSQL migration/reproducibility, accessibility, lint, typecheck, tests,
 production build and dependency audit.
+
+### ADR-017 — Permission-Scoped HR Operations and Disposable PostgreSQL Tests
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+Milestone 5 persists candidate PII and fail-closed CV records; Milestone 7 makes
+them operationally available to HR. A browser-visible role or hidden navigation
+cannot protect those records. Retention also needs to distinguish an approved
+due cleanup from a high-risk early override without inventing retention days.
+Local development now has Docker and must exercise the same PostgreSQL 18.4
+migrations and constraints as CI without becoming a production-provider model.
+
+#### Decision
+
+- Query candidate lists on the server with bounded search/filter/pagination and
+  return only date, name, department, location, status, CV state, availability
+  and general/job-posting indication. Resolve full PII only after
+  `Applications:view` on the protected detail route.
+- Keep all authorization at atomic permission/scope level. HR and Super Admin
+  groupings are not consulted by services. Require MFA again at the protected CV
+  endpoint and join application → Media server-side with both
+  `storage_class = protected` and `scan_status = clean`.
+- Use a forward-only status transition graph. Write the status row,
+  `ApplicationStatusHistory` and PII-safe audit event transactionally. Audit
+  sensitive detail reads, note IDs, status changes, CV download and privacy
+  actions without candidate fields, note bodies, filenames or storage keys.
+- Interpret `retention` scope as due-only anonymization with no active hold.
+  Interpret `all` scope as the high-risk early anonymization/hard-delete
+  boundary. Anonymization removes PII, internal notes and CV storage/metadata
+  while retaining a neutral archived application, status history and immutable
+  audit. Hard delete retains its independent audit event.
+- Add `compose.test.yaml` with official `postgres:18.4`, test-only credentials,
+  localhost port `55432` and temporary storage. A cross-platform Node lifecycle
+  command applies migrations/checks, runs all tests, and removes containers,
+  network and data in `finally` cleanup.
+
+#### Alternatives Considered
+
+- Client-side filtering over all applications: rejected because it exposes
+  unnecessary PII, cannot bound data volume and weakens server authorization.
+- Treat the HR role name as the permission check: rejected because roles remain
+  grant groupings and cannot express the `retention` versus `all` boundary.
+- Let HR anonymize any record because it holds a delete/anonymize permission:
+  rejected because limited scope must not bypass due dates or active holds.
+- Allow non-clean/quarantine CVs to be requested and hide the button only in UI:
+  rejected because the server/file boundary must fail closed.
+- Use the persistent developer database for integration tests: rejected because
+  state leakage makes tests non-deterministic and leaves disposable PII fixtures.
+- Treat Docker services as production equivalents: rejected; selected managed
+  providers and EU-region gates remain unchanged.
+
+#### Consequences
+
+- Offset pagination is bounded to 10,000 pages; future scale/observability may
+  justify cursor pagination without changing the data-minimization boundary.
+- S3 deletion and PostgreSQL mutation cannot be one atomic transaction. Object
+  deletion occurs first so failure leaves data inaccessible rather than leaving
+  a recoverable PII object after the database is cleared; operational retry and
+  alerts remain a production concern (R-032).
+- Exact retention days, legal-hold policy wording, production provider resources
+  and credentials remain launch gates.
+
+#### Validation
+
+Validate list filters/pagination, detail minimization boundary, status graph and
+history, notes, scoped audit, due/hold behavior, anonymize/delete, clean CV
+positive access, pending/quarantine/error/infected/missing/wrong-relation and
+unauthorized CV denials, named RBAC negatives, accessible controls/dialog focus,
+clean PostgreSQL 18.4 migrations, reproducibility, lint, typecheck, all tests,
+production build and dependency audit.

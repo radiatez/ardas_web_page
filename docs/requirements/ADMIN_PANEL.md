@@ -85,6 +85,23 @@ Default access:
 
 No generic Content Editor or Viewer message-body access.
 
+## Candidate Applications
+
+Default access:
+
+- Super Admin
+- HR
+
+Content Editor, Contact Manager and Viewer have no candidate/CV access. The
+server-paginated list shows only operational minimum fields; phone, email,
+salary, free text, privacy provenance, notes and history are detail-only.
+
+Status, notes, CV download, anonymization and delete use their individual
+`Applications:*` permissions. CV download additionally requires MFA, a valid
+application/file relationship, protected storage and a clean scan. HR retention
+scope cannot bypass a future deadline or active hold; early override/hard delete
+requires `all` scope.
+
 ## Legal Pages
 
 CMS supports legal-page records/routes, but publishing final legal copy requires approved company text.

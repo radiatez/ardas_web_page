@@ -584,3 +584,19 @@ erDiagram
 - `ContentDraft` is generic across page, collection and public-media locale
   working copies. It contains public/editorial data only, never contact/candidate
   PII or secrets.
+
+## Milestone 7 Implementation Notes
+
+- No schema expansion was required: `CareerApplicationNote`,
+  `ApplicationStatusHistory`, nullable `job_posting_id`, retention/hold fields,
+  Media storage/scan state and append-only `AuditEvent` already model the HR
+  workflow.
+- Candidate list queries are server-paginated minimal projections. Full PII,
+  provenance, notes and history are loaded only behind `Applications:view`.
+- Status transitions are forward-only and each mutation writes history plus
+  audit transactionally.
+- `retention` permission scope allows only due/no-active-hold anonymization;
+  `all` scope is required for early override and hard delete.
+- Anonymization detaches/deletes CV media, clears PII/free text and notes, archives
+  the neutral application row, and preserves status/audit history. Audit metadata
+  contains IDs and safe state only.

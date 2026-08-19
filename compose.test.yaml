@@ -1,0 +1,18 @@
+name: ardas-test
+
+services:
+  postgres-test:
+    image: postgres:18.4
+    environment:
+      POSTGRES_DB: ardas_test
+      POSTGRES_PASSWORD: ardas_test
+      POSTGRES_USER: ardas_test
+    ports:
+      - "127.0.0.1:55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ardas_test -d ardas_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+    tmpfs:
+      - /var/lib/postgresql

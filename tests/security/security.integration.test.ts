@@ -380,7 +380,7 @@ describeWithDatabase("Milestone 2 PostgreSQL security boundaries", () => {
     await anonymizeCandidate(
       database.db,
       privacyStorage,
-      principal("hr"),
+      principal("super_admin"),
       anonymizeApplication,
     );
     const deleteFile = await createMedia("protected", "clean");
@@ -388,7 +388,7 @@ describeWithDatabase("Milestone 2 PostgreSQL security boundaries", () => {
     await deleteCandidate(
       database.db,
       privacyStorage,
-      principal("hr"),
+      principal("super_admin"),
       deleteApplication,
     );
 
