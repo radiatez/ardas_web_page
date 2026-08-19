@@ -1127,7 +1127,14 @@ Repeatable validation:
 
 Remote validation:
 
-- GitHub Actions result is recorded after the implementation commit is pushed.
+- implementation commit `60299fac9528e669b0290d4e66c0464b2594f2ed`,
+- GitHub Actions Ubuntu runner, Node.js `24.19.0`, pnpm `11.22.0` and
+  PostgreSQL `18.4`,
+- CI run `32249875762` passed all steps, including frozen install, migration
+  reproducibility, lint, typecheck, 139 tests, build, production audit,
+  Chromium/Firefox/WebKit installation and regression, backup/restore and
+  rollback validation:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32249875762`.
 
 Production gates intentionally retained for Milestone 9:
 
