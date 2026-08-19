@@ -791,7 +791,18 @@ Local results:
 
 Remote validation:
 
-- pending the final pushed commit and GitHub Actions PostgreSQL 18.4 run.
+- implementation commit `8794fb23abbf9fc2ebcc805c72b130c0cf07670f`
+  passed GitHub Actions `CI` run `#15` / run ID `32234755718`, attempt 1,
+- pinned Node.js 24.19.0 + PostgreSQL 18.4 passed frozen install, clean
+  migration, metadata check, regeneration/no-diff, lint and typecheck,
+- all 29 test files / 118 tests passed; 4 real PostgreSQL integration files /
+  18 PostgreSQL tests covered schema/migration constraints, locale publication,
+  RBAC/security boundaries, contact persistence, career quarantine/clean/infected
+  transitions, idempotency, notification failure retention and orphan cleanup,
+- production build passed and the production audit reported zero known
+  vulnerabilities,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32234755718`.
 
 Scope retained:
 
