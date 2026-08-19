@@ -26,7 +26,7 @@ export function DealerPortalLink({
         title={unavailableLabel}
       >
         <span>{label}</span>
-        <span className="dealer-portal-link__status">TBD</span>
+        <span aria-hidden="true" className="dealer-portal-link__status">—</span>
       </span>
     );
   }

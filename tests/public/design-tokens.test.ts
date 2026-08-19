@@ -83,16 +83,27 @@ describe("design token accessibility", () => {
     );
   });
 
-  it("gives Milestone 4 editorial layouts explicit mobile and desktop contracts", () => {
-    expect(globalCss).toMatch(/\.home-impact__copy,[\s\S]*?grid-column:\s*1 \/ -1;/);
+  it("gives Milestone 4.1 editorial layouts explicit mobile and desktop contracts", () => {
     expect(globalCss).toMatch(
-      /@media \(min-width: 64rem\)[\s\S]*?\.home-impact__copy\s*\{[\s\S]*?grid-column:\s*1 \/ span 7;/,
+      /\.home-impact__frame\s*\{[\s\S]*?position:\s*relative;[\s\S]*?min-height:/,
+    );
+    expect(globalCss).toMatch(
+      /\.home-impact__copy\s*\{[\s\S]*?position:\s*absolute;/,
+    );
+    expect(globalCss).toMatch(
+      /\.home-impact__media\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset:\s*0;/,
     );
     expect(globalCss).toMatch(
       /\.home-products__grid\s*\{[\s\S]*?display:\s*grid;/,
     );
     expect(globalCss).toMatch(
       /@media \(min-width: 64rem\)[\s\S]*?\.home-products__grid\s*\{[\s\S]*?repeat\(3,/,
+    );
+    expect(globalCss).toMatch(
+      /@media \(min-width: 40rem\)[\s\S]*?\.home-careers__panel\s*\{[\s\S]*?repeat\(2,/,
+    );
+    expect(globalCss).toMatch(
+      /@media \(max-width: 39\.99rem\)[\s\S]*?\.home-impact__frame\s*\{[\s\S]*?min-height:/,
     );
     expect(globalCss).toContain("minmax(0, 1fr)");
   });

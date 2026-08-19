@@ -12,7 +12,7 @@
 | R-008 | Content change overwrites approved version | Medium | Medium | revision/preview/rollback/audit | Open |
 | R-009 | Migration breaks production | High | Low | staging validation + backup + rollback/forward-fix | Open |
 | R-010 | Backups cannot restore | High | Medium | restore testing | Open |
-| R-011 | Heavy hero media hurts mobile CWV | Medium | Medium | budgets + responsive media + monitoring | Open |
+| R-011 | Heavy hero media hurts mobile CWV | Medium | Medium | Next Image responsive delivery + focal crops; final media budgets/CWV monitoring remain required | Partially mitigated; final media pending |
 | R-012 | Brand identity arrives late | Medium | Medium | tokenized design | Mitigated |
 | R-013 | Privacy/retention approval unresolved at launch | High | Medium | production launch gate | Open |
 | R-014 | Form spam | Medium | Medium | rate limit + honeypot + challenge if needed | Partially mitigated; later form validation pending |
@@ -31,3 +31,4 @@
 | R-027 | Monitoring or email payloads duplicate candidate/contact PII | High | Medium | Record-ID-only notifications where practical, strict Sentry scrubbing, no bodies/CV data in telemetry | Mitigated in logging; Sentry/SES validation pending |
 | R-028 | Static CSP needs inline script/style compatibility for the current Next.js runtime | High | Low | Restrictive default/object/frame/connect policy now; migrate to nonce/hash CSP when dynamic admin rendering is introduced | Open |
 | R-029 | CMS emits an unsupported or malformed public content block | Medium | Medium | Versioned allowlist parser safely drops unknown fields; Milestone 6 must add authoring validation and preview regression tests | Partially mitigated; CMS validation pending |
+| R-030 | Generated demo imagery is mistaken for approved/licensed production photography | Medium | Low | Local/test-only manifest, no production fallback, explicit README/decision record and mandatory replacement gate | Mitigated in code; final approved photography TBD |

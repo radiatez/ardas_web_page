@@ -20,6 +20,7 @@ type PublicShellCopy = {
   contactLabel: string;
   contactPlaceholder: string;
   industryLabel: string;
+  footerStatement: string;
   locationNames: readonly string[];
   legalLinks: readonly PublicNavigationItem[];
   copyrightLabel: string;
@@ -71,8 +72,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     legalNavigationLabel: "Yasal bağlantılar",
     locationsLabel: "Lokasyonlar",
     contactLabel: "İletişim",
-    contactPlaceholder: "İletişim bilgileri: TBD",
+    contactPlaceholder: "Onaylı iletişim bilgileri yayına hazırlanıyor.",
     industryLabel: "Otomotiv Yenileme Pazarı",
+    footerStatement: "Türkiye geneline uzanan yedek parça dağıtım deneyimi.",
     locationNames: ["İstanbul", "Ankara", "Diyarbakır"],
     legalLinks: [
       { routeKey: "privacy", label: "Gizlilik" },
@@ -131,8 +133,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     legalNavigationLabel: "Legal links",
     locationsLabel: "Locations",
     contactLabel: "Contact",
-    contactPlaceholder: "Contact details: TBD",
+    contactPlaceholder: "Approved contact details are being prepared for publication.",
     industryLabel: "Automotive Aftermarket",
+    footerStatement: "Aftermarket distribution experience reaching across Türkiye.",
     locationNames: ["Istanbul", "Ankara", "Diyarbakır"],
     legalLinks: [
       { routeKey: "privacy", label: "Privacy" },

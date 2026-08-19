@@ -1,6 +1,8 @@
 import type { Locale } from "@/i18n/config";
 import { routeKeys, type RouteKey } from "@/i18n/routes";
 
+import { demoMediaIds } from "./demo-media";
+
 export const publicPageRouteKeys = [
   "home",
   "corporate",
@@ -148,39 +150,45 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
-        heading: "Türkiye geneli aftermarket dağıtımı.",
+        eyebrow: "Otomotiv aftermarket dağıtımı",
+        heading: "Türkiye’nin hareketine güç veren dağıtım ağı.",
         body: [
-          "Ardaş Yedek Parça; 30+ yıllık deneyimi, 150+ marka portföyü ve 50.000+ ürün ölçeğiyle İstanbul, Ankara ve Diyarbakır’dan hizmet verir.",
+          "30+ yıllık deneyim, 150+ marka ve 50.000+ ürün ölçeği; İstanbul, Ankara ve Diyarbakır’dan Türkiye geneline uzanıyor.",
         ],
         action: { label: "Kurumsal yapımız", routeKey: "corporate" },
+        mediaId: demoMediaIds.hero,
       },
       sections: {
         capability: {
           eyebrow: "Dağıtım kabiliyeti",
-          heading: "Üç şehirden Türkiye geneline.",
+          heading: "Doğru parçayı, doğru akışla buluşturan operasyon.",
           body: [
-            "Operasyon ve hizmet ayrıntıları CMS içeriği ve yetkili onayı bekliyor. TBD.",
+            "Üç şehirdeki fiziksel varlığımızı, Türkiye geneline ulaşan dağıtım yaklaşımıyla bir araya getiriyoruz.",
           ],
           action: { label: "Depoları görüntüle", routeKey: "locations" },
+          mediaId: demoMediaIds.operations,
         },
         brands: {
           eyebrow: "Portföy",
-          heading: "150+ marka. Seçili markalar CMS yayını bekliyor.",
-          body: ["Featured marka listesi ve onaylı logolar: TBD."],
+          heading: "150+ markayı tek bir dağıtım disiplini altında buluşturuyoruz.",
+          body: ["Marka listesi ve görsel hakları, onaylı CMS yayınıyla sunulacak."],
           action: { label: "Tüm markalar", routeKey: "brands" },
+          mediaId: demoMediaIds.portfolio,
+          decorativeMedia: true,
         },
         products: {
           eyebrow: "Ürün grupları",
-          heading: "Ürün uzmanlığı için editorial bir yapı.",
-          body: ["Onaylı ürün grubu taksonomisi ve görselleri: TBD."],
+          heading: "50.000+ ürünlük ölçekte, düzenli ve anlaşılır bir portföy.",
+          body: ["Nihai ürün grubu taksonomisi, onaylı içerikle bu yapıya eklenecek."],
           action: { label: "Ürün grupları", routeKey: "product-groups" },
+          mediaId: demoMediaIds.partsDetail,
         },
         operations: {
           eyebrow: "Operasyon",
           heading: "İstanbul. Ankara. Diyarbakır.",
-          body: ["Adresler, iletişim bilgileri ve operasyon detayları: TBD."],
+          body: ["Üç lokasyon, Türkiye geneline uzanan tek bir dağıtım odağı."],
           action: { label: "Lokasyonlar", routeKey: "locations" },
+          mediaId: demoMediaIds.facility,
         },
         trust: {
           eyebrow: "Deneyim ve ölçek",
@@ -191,14 +199,15 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         },
         careers: {
           eyebrow: "İnsan ve kariyer",
-          heading: "Ardaş’ta kariyer.",
-          body: ["Kariyer içeriği ve açık pozisyon ayrıntıları: TBD."],
+          heading: "Operasyonun arkasındaki ortak akıl.",
+          body: ["Birlikte çalışan, deneyimi paylaşan ve gelişime alan açan bir yapı."],
           action: { label: "Kariyer sayfası", routeKey: "careers" },
+          mediaId: demoMediaIds.careers,
         },
         contact: {
           eyebrow: "İletişim",
           heading: "İletişime geçin.",
-          body: ["Onaylı telefon, e-posta ve adres bilgileri: TBD."],
+          body: ["Kurumsal iletişim bilgileri onaylı CMS yayınına kadar TBD olarak kalır."],
           action: { label: "İletişim sayfası", routeKey: "contact" },
         },
       },
@@ -214,36 +223,39 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
+        eyebrow: "Kurumsal yapı",
         heading: "Deneyim, ölçek ve dağıtım odağı.",
         body: [
           "Ardaş Yedek Parça, otomotiv aftermarket yedek parça dağıtımı alanında faaliyet gösterir.",
         ],
+        mediaId: demoMediaIds.operations,
       },
       sections: {
         overview: {
           eyebrow: "Genel bakış",
           heading: "Türkiye geneline uzanan kurumsal yapı.",
           body: [
-            "İstanbul, Ankara ve Diyarbakır lokasyonlarından Türkiye geneli kargo ve dağıtım sağlanır. Ayrıntılı kurumsal metin: TBD.",
+            "İstanbul, Ankara ve Diyarbakır lokasyonlarından Türkiye geneline kargo ve dağıtım sağlanır.",
           ],
         },
         operations: {
           eyebrow: "Operasyon",
           heading: "Üç şehir. Tek dağıtım odağı.",
-          body: ["Depo ve operasyon kabiliyetlerinin onaylı ayrıntıları: TBD."],
+          body: ["Fiziksel altyapı ve dağıtım yaklaşımı, üç şehirde aynı operasyon odağıyla ilerler."],
           action: { label: "Lokasyonlar", routeKey: "locations" },
+          mediaId: demoMediaIds.facility,
         },
         history: {
           eyebrow: "Tarihçe",
           heading: "30+ yıllık deneyim.",
-          body: ["Onaylı kilometre taşları ve şirket tarihçesi: TBD."],
+          body: ["Onaylı kilometre taşları, kurumsal içerik yayınıyla tamamlanacak."],
         },
         people: {
           eyebrow: "İnsan",
-          heading: "Kurum kültürü içeriği onay bekliyor.",
-          body: ["Ekip, çalışma kültürü ve insan hikâyeleri: TBD."],
+          heading: "Operasyonun merkezinde insan var.",
+          body: ["Ekip ve çalışma kültürü anlatısı, onaylı içerikle genişletilecek."],
           action: { label: "Kariyer", routeKey: "careers" },
+          mediaId: demoMediaIds.careers,
         },
       },
       legalBlocks: [],
@@ -258,9 +270,11 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
-        heading: "150+ markalık portföy.",
-        body: ["Onaylı marka listesi, açıklamalar ve logo hakları: TBD."],
+        eyebrow: "Portföy ölçeği",
+        heading: "150+ marka. Tek bir dağıtım disiplini.",
+        body: ["Nihai marka listesi ve logolar, görsel hakları onaylandıktan sonra CMS üzerinden yayımlanacak."],
+        mediaId: demoMediaIds.portfolio,
+        decorativeMedia: true,
       },
       sections: {},
       legalBlocks: [],
@@ -275,9 +289,10 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
-        heading: "Ürün uzmanlığı, kurumsal bir sunumla.",
-        body: ["Onaylı ürün grubu taksonomisi, açıklamaları ve görselleri: TBD."],
+        eyebrow: "Ürün ölçeği",
+        heading: "50.000+ ürünü anlaşılır bir yapıda sunmak.",
+        body: ["Nihai ürün grubu taksonomisi ve açıklamaları onaylı CMS içeriğiyle eklenecek."],
+        mediaId: demoMediaIds.partsDetail,
       },
       sections: {},
       legalBlocks: [],
@@ -292,9 +307,10 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
+        eyebrow: "Dağıtım ağı",
         heading: "Üç şehirden Türkiye geneline.",
-        body: ["İstanbul, Ankara ve Diyarbakır adres ve iletişim bilgileri: TBD."],
+        body: ["İstanbul, Ankara ve Diyarbakır; aynı dağıtım odağının üç fiziksel noktası."],
+        mediaId: demoMediaIds.facility,
       },
       sections: {},
       legalBlocks: [],
@@ -309,11 +325,12 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
-        heading: "Ardaş’ta kariyer.",
+        eyebrow: "İnsan ve kariyer",
+        heading: "Birlikte çalışan, birlikte gelişen bir yapı.",
         body: [
-          "Onaylı kariyer içeriği ve başvuru formu Milestone 5 yayını bekliyor. TBD.",
+          "Genel başvuru deneyimi güvenli form yayınıyla açılacak; bu sayfa şimdilik çalışma kültürümüzün görsel önizlemesini sunuyor.",
         ],
+        mediaId: demoMediaIds.careers,
       },
       sections: {},
       legalBlocks: [],
@@ -328,10 +345,10 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
     content: {
       schemaVersion: 1,
       hero: {
-        eyebrow: "Geliştirme içeriği · TBD",
-        heading: "İletişime geçin.",
+        eyebrow: "Kurumsal iletişim",
+        heading: "Doğru ekiple bağlantı kurun.",
         body: [
-          "Onaylı telefon, e-posta, adres bilgileri ve iletişim formu Milestone 5 yayını bekliyor. TBD.",
+          "Onaylı iletişim kanalları ve güvenli iletişim formu yayın hazırlığı tamamlandığında burada yer alacak.",
         ],
       },
       sections: {},
@@ -392,37 +409,43 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
-          heading: "Aftermarket distribution across Türkiye.",
+          eyebrow: "Automotive aftermarket distribution",
+          heading: "A distribution network that keeps Türkiye moving.",
           body: [
-            "Ardaş Yedek Parça operates from Istanbul, Ankara and Diyarbakır with 30+ years of experience, a portfolio of 150+ brands and a scale of 50,000+ products.",
+            "30+ years of experience, 150+ brands and 50,000+ products, extending across Türkiye from Istanbul, Ankara and Diyarbakır.",
           ],
           action: { label: "Our corporate structure", routeKey: "corporate" },
+          mediaId: demoMediaIds.hero,
         },
         sections: {
           capability: {
             eyebrow: "Distribution capability",
-            heading: "From three cities to Türkiye nationwide.",
-            body: ["Approved operational and service details are pending. TBD."],
+            heading: "An operation built to keep the right parts moving.",
+            body: ["We connect our physical presence in three cities with a distribution approach that reaches across Türkiye."],
             action: { label: "View locations", routeKey: "locations" },
+            mediaId: demoMediaIds.operations,
           },
           brands: {
             eyebrow: "Portfolio",
-            heading: "150+ brands. Featured brands await CMS publication.",
-            body: ["Featured brand list and approved logos: TBD."],
+            heading: "150+ brands, brought together by one distribution discipline.",
+            body: ["The brand directory and visual rights will be presented through approved CMS publication."],
             action: { label: "All brands", routeKey: "brands" },
+            mediaId: demoMediaIds.portfolio,
+            decorativeMedia: true,
           },
           products: {
             eyebrow: "Product groups",
-            heading: "An editorial structure for product expertise.",
-            body: ["Approved product taxonomy and imagery: TBD."],
+            heading: "A clear, organized portfolio at a scale of 50,000+ products.",
+            body: ["The final product-group taxonomy will be added to this structure with approved content."],
             action: { label: "Product groups", routeKey: "product-groups" },
+            mediaId: demoMediaIds.partsDetail,
           },
           operations: {
             eyebrow: "Operations",
             heading: "Istanbul. Ankara. Diyarbakır.",
-            body: ["Addresses, contact details and operational details: TBD."],
+            body: ["Three locations, aligned around one nationwide distribution focus."],
             action: { label: "Locations", routeKey: "locations" },
+            mediaId: demoMediaIds.facility,
           },
           trust: {
             eyebrow: "Experience and scale",
@@ -433,14 +456,15 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           },
           careers: {
             eyebrow: "People and careers",
-            heading: "Careers at Ardaş.",
-            body: ["Careers content and open-position details: TBD."],
+            heading: "The shared thinking behind the operation.",
+            body: ["A structure built around collaboration, shared experience and room to grow."],
             action: { label: "Careers", routeKey: "careers" },
+            mediaId: demoMediaIds.careers,
           },
           contact: {
             eyebrow: "Contact",
             heading: "Start a conversation.",
-            body: ["Approved phone, email and address details: TBD."],
+            body: ["Approved corporate contact details remain TBD until CMS publication."],
             action: { label: "Contact page", routeKey: "contact" },
           },
         },
@@ -456,36 +480,39 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
+          eyebrow: "Corporate structure",
           heading: "Experience, scale and distribution focus.",
           body: [
             "Ardaş Yedek Parça operates in automotive aftermarket replacement-parts distribution.",
           ],
+          mediaId: demoMediaIds.operations,
         },
         sections: {
           overview: {
             eyebrow: "Overview",
             heading: "A corporate structure reaching across Türkiye.",
             body: [
-              "Nationwide cargo and distribution are provided from Istanbul, Ankara and Diyarbakır. Detailed corporate copy: TBD.",
+              "Nationwide cargo and distribution are provided from Istanbul, Ankara and Diyarbakır.",
             ],
           },
           operations: {
             eyebrow: "Operations",
             heading: "Three cities. One distribution focus.",
-            body: ["Approved warehouse and operations details: TBD."],
+            body: ["Physical infrastructure and distribution capability share the same operational focus across three cities."],
             action: { label: "Locations", routeKey: "locations" },
+            mediaId: demoMediaIds.facility,
           },
           history: {
             eyebrow: "History",
             heading: "30+ years of experience.",
-            body: ["Approved milestones and company history: TBD."],
+            body: ["Approved milestones will complete this corporate narrative."],
           },
           people: {
             eyebrow: "People",
-            heading: "Company culture content is pending approval.",
-            body: ["Team, culture and people stories: TBD."],
+            heading: "People remain at the centre of the operation.",
+            body: ["The team and workplace narrative will expand with approved content."],
             action: { label: "Careers", routeKey: "careers" },
+            mediaId: demoMediaIds.careers,
           },
         },
         legalBlocks: [],
@@ -500,9 +527,11 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
-          heading: "A portfolio of 150+ brands.",
-          body: ["Approved brand directory, descriptions and logo rights: TBD."],
+          eyebrow: "Portfolio scale",
+          heading: "150+ brands. One distribution discipline.",
+          body: ["The final directory and logos will be published through the CMS after visual rights are approved."],
+          mediaId: demoMediaIds.portfolio,
+          decorativeMedia: true,
         },
         sections: {},
         legalBlocks: [],
@@ -517,9 +546,10 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
-          heading: "Product expertise, presented with corporate clarity.",
-          body: ["Approved taxonomy, descriptions and imagery: TBD."],
+          eyebrow: "Product scale",
+          heading: "Presenting 50,000+ products with clarity.",
+          body: ["The final product-group taxonomy and descriptions will be added through approved CMS content."],
+          mediaId: demoMediaIds.partsDetail,
         },
         sections: {},
         legalBlocks: [],
@@ -534,9 +564,10 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
+          eyebrow: "Distribution network",
           heading: "From three cities to Türkiye nationwide.",
-          body: ["Istanbul, Ankara and Diyarbakır address and contact details: TBD."],
+          body: ["Istanbul, Ankara and Diyarbakır are three physical points aligned around one distribution focus."],
+          mediaId: demoMediaIds.facility,
         },
         sections: {},
         legalBlocks: [],
@@ -551,11 +582,12 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
-          heading: "Careers at Ardaş.",
+          eyebrow: "People and careers",
+          heading: "A place to work together and grow together.",
           body: [
-            "Approved careers content and the application form await Milestone 5 publication. TBD.",
+            "The general application experience will open with the secure form release; for now, this page offers a visual preview of the workplace.",
           ],
+          mediaId: demoMediaIds.careers,
         },
         sections: {},
         legalBlocks: [],
@@ -570,10 +602,10 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
       content: {
         schemaVersion: 1,
         hero: {
-          eyebrow: "Development content · TBD",
-          heading: "Start a conversation.",
+          eyebrow: "Corporate contact",
+          heading: "Connect with the right team.",
           body: [
-            "Approved phone, email, address details and the contact form await Milestone 5 publication. TBD.",
+            "Approved contact channels and the secure contact form will appear here when publication preparation is complete.",
           ],
         },
         sections: {},

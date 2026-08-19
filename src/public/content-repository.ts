@@ -2,6 +2,11 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { cache } from "react";
 
 import {
+  developmentContentIsEnabled,
+  type DevelopmentContentEnvironment,
+} from "@/content/development-content";
+import { getDevelopmentMediaMap } from "@/content/demo-media";
+import {
   getDevelopmentPage,
   parsePublicPageContent,
   type PublicPageDocument,
@@ -24,6 +29,8 @@ import {
 } from "@/db/schema";
 import type { Locale } from "@/i18n/config";
 import { routeDefinitions } from "@/i18n/routes";
+
+export { developmentContentIsEnabled } from "@/content/development-content";
 
 export type PublicMediaPresentation = {
   id: string;
@@ -73,21 +80,9 @@ export type PublicPageBundle = {
   locations: readonly PublicLocation[];
 };
 
-type RuntimeEnvironment = {
-  APP_ENV?: string;
-  NODE_ENV?: string;
+type RuntimeEnvironment = DevelopmentContentEnvironment & {
   PUBLIC_MEDIA_BASE_URL?: string;
 };
-
-export function developmentContentIsEnabled(
-  environment: RuntimeEnvironment = process.env,
-): boolean {
-  return (
-    environment.APP_ENV === "local" ||
-    environment.APP_ENV === "test" ||
-    (!environment.APP_ENV && environment.NODE_ENV !== "production")
-  );
-}
 
 export function resolvePublicMediaUrl(
   storageKey: string,
@@ -443,7 +438,7 @@ function createDevelopmentBundle(
     : ["Istanbul", "Ankara", "Diyarbakır"];
   return {
     page: getDevelopmentPage(routeKey, locale),
-    blockMedia: {},
+    blockMedia: getDevelopmentMediaMap(locale),
     brands: [],
     productGroups: [],
     locations:

@@ -533,3 +533,63 @@ localized publication and slug denial on PostgreSQL, featured collection
 rendering, media URL/alt constraints, publication-aware canonical/hreflang and
 sitemap behavior, localized route HTTP status, axe semantics, token contrast,
 reduced motion and mobile-first overflow contracts.
+
+### ADR-014 — Local/Test Demo Media Art Direction
+
+Date: 2026-08-19
+Status: Accepted for visual prototyping; final identity and photography remain TBD
+
+#### Context
+
+Milestone 4's publication-aware pages are structurally complete, but approved
+photography, brand assets and final identity do not yet exist. Visual polish must
+be reviewable without inventing brands or allowing prototype assets to become a
+production content/storage fallback.
+
+#### Decision
+
+- Use six generated, replaceable industrial editorial images for local/test
+  review only: warehouse hero, distribution operation, parts detail, loading
+  facility, workplace/careers and a decorative portfolio rhythm.
+- Keep generated assets under workspace `demo-media/` (outside Next.js `public/`)
+  with a typed manifest and a local/test-only whitelist route that
+  mirrors the current public `Media` / `MediaLocale` presentation shape. Record
+  stable demo IDs, dimensions, TR/EN alt text, decorative semantics, intended
+  placement and focal points.
+- Load the manifest only through the existing local/test development-content
+  gate. Do not seed PostgreSQL, weaken public-storage checks or provide a
+  staging/production fallback.
+- Refine the single provisional accent to desaturated petrol `#006B63`, with
+  `#004C47` hover and `#E4F0EE` soft aliases. This supersedes the provisional
+  blue named in ADR-012 but remains replaceable and is not brand signoff.
+- Preserve the typography/grid-led Swiss corporate direction: images support
+  distribution, scale and people; they do not create a vehicle gallery,
+  ecommerce catalogue, repair-shop or SaaS-card aesthetic.
+
+#### Alternatives Considered
+
+- Seed demo rows into PostgreSQL: rejected because prototypes could be confused
+  with approved CMS publication and would cross the data/content boundary.
+- Use arbitrary remote stock-image URLs: rejected because availability, rights,
+  tracking and art-direction consistency would be uncontrolled.
+- Keep geometric placeholders only: rejected because the milestone explicitly
+  needs meaningful art-direction validation beyond a wireframe state.
+- Adopt ABB red or a direct ABB layout: rejected because ABB remains an
+  inspiration reference, not Ardaş's identity.
+
+#### Consequences
+
+- Approved launch photography can replace demo assets without component changes,
+  but content owners must complete the production Media/MediaLocale workflow.
+- Source PNGs are intentionally temporary and increase repository/build size;
+  final assets need responsive-format budgets and real CWV measurement (R-011).
+- The generated set must never be presented as real Ardaş facilities, employees
+  or product inventory; R-030 remains an explicit launch/content gate.
+
+#### Validation
+
+Validate manifest/file completeness, unique stable IDs, locale-aware alt and
+decorative contracts, local/test-only fallback, Next Image delivery, token
+contrast, axe semantics, reduced motion, responsive layout contracts, production
+routes/headers, lint, typecheck, tests, build, migration no-diff and dependency
+audit.

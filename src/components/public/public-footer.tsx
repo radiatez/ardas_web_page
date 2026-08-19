@@ -22,6 +22,7 @@ export function PublicFooter({ locale, dealerPortal }: PublicFooterProps) {
         <div className="public-footer__brand">
           <BrandWordmark inverse locale={locale} />
           <p>{copy.industryLabel}</p>
+          <p className="public-footer__statement">{copy.footerStatement}</p>
         </div>
 
         <nav aria-label={copy.footerNavigationLabel} className="public-footer__group">

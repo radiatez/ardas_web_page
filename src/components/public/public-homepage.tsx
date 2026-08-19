@@ -54,7 +54,15 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
     <main id="main-content">
       <section className="home-impact">
         <Container>
-          <Grid className="home-impact__grid">
+          <div className="home-impact__frame">
+            <EditorialMedia
+              block={content.hero}
+              className="home-impact__media motion-reveal"
+              locale={locale}
+              media={content.hero.mediaId ? blockMedia[content.hero.mediaId] : undefined}
+              preload
+              sizes="(min-width: 85rem) 85rem, 100vw"
+            />
             <EditorialCopy
               block={content.hero}
               className="home-impact__copy motion-reveal"
@@ -62,15 +70,7 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
               headingLevel="h1"
               locale={locale}
             />
-            <EditorialMedia
-              block={content.hero}
-              className="home-impact__media motion-reveal"
-              locale={locale}
-              media={content.hero.mediaId ? blockMedia[content.hero.mediaId] : undefined}
-              preload
-              sizes="(min-width: 64rem) 50vw, 100vw"
-            />
-          </Grid>
+          </div>
         </Container>
       </section>
 
@@ -104,6 +104,13 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
                 className="home-portfolio__intro"
                 locale={locale}
               />
+              <EditorialMedia
+                block={brandSection}
+                className="home-portfolio__media"
+                locale={locale}
+                media={brandSection.mediaId ? blockMedia[brandSection.mediaId] : undefined}
+                sizes="(min-width: 64rem) 58vw, 100vw"
+              />
               <div className="home-portfolio__list" data-empty={featuredBrands.length === 0 || undefined}>
                 {featuredBrands.length > 0 ? (
                   featuredBrands.map((brand) => (
@@ -124,7 +131,16 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
       {productSection ? (
         <Section className="home-products">
           <Container>
-            <EditorialCopy block={productSection} className="home-products__intro" locale={locale} />
+            <Grid className="home-products__lead">
+              <EditorialCopy block={productSection} className="home-products__intro" locale={locale} />
+              <EditorialMedia
+                block={productSection}
+                className="home-products__media"
+                locale={locale}
+                media={productSection.mediaId ? blockMedia[productSection.mediaId] : undefined}
+                sizes="(min-width: 64rem) 50vw, 100vw"
+              />
+            </Grid>
             <div className="home-products__grid">
               {productGroups.length > 0 ? (
                 productGroups.slice(0, 6).map((group, index) => (
@@ -149,14 +165,23 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
           <Container>
             <Grid>
               <EditorialCopy block={operations} className="home-operations__intro" locale={locale} />
-              <ol className="location-index">
-                {locations.map((location, index) => (
-                  <li key={location.id}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{location.name}</strong>
-                  </li>
-                ))}
-              </ol>
+              <div className="home-operations__visual">
+                <EditorialMedia
+                  block={operations}
+                  className="home-operations__media"
+                  locale={locale}
+                  media={operations.mediaId ? blockMedia[operations.mediaId] : undefined}
+                  sizes="(min-width: 64rem) 58vw, 100vw"
+                />
+                <ol className="location-index">
+                  {locations.map((location, index) => (
+                    <li key={location.id}>
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{location.name}</strong>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </Grid>
           </Container>
         </Section>
@@ -177,7 +202,14 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
         <Section className="home-careers">
           <Container>
             <div className="home-careers__panel">
-              <EditorialCopy block={careers} locale={locale} />
+              <EditorialMedia
+                block={careers}
+                className="home-careers__media"
+                locale={locale}
+                media={careers.mediaId ? blockMedia[careers.mediaId] : undefined}
+                sizes="(min-width: 64rem) 58vw, 100vw"
+              />
+              <EditorialCopy block={careers} className="home-careers__copy" locale={locale} />
             </div>
           </Container>
         </Section>
@@ -246,7 +278,7 @@ export function TbdState({ locale, subject }: { locale: Locale; subject: string 
     <div className="public-tbd" role="status">
       <span className="signature-rule" aria-hidden="true" />
       <strong>{subject}</strong>
-      <span>{locale === "tr" ? "Onaylı CMS içeriği bekleniyor · TBD" : "Approved CMS content is pending · TBD"}</span>
+      <span>{locale === "tr" ? "Geliştirme önizlemesi · Nihai içerik onaylı CMS yayınıyla eklenecek" : "Development preview · Final content will arrive through approved CMS publication"}</span>
     </div>
   );
 }

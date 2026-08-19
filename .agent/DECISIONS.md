@@ -391,3 +391,24 @@ The public boundary is:
 The contract is compatible with the existing `ContentRevision` snapshots and
 the Milestone 6 preview/publish/rollback work. CMS authoring validation and
 preview UI remain Milestone 6 scope.
+
+## D-037 — Milestone 4.1 Demo Media and Provisional Accent
+**Status:** Accepted for local/test visual prototyping; final identity/media remain TBD
+
+The provisional public accent is refined from the Milestone 3 blue to
+desaturated petrol `#006B63` (`#004C47` hover, `#E4F0EE` soft). It remains a
+replaceable token and is not final brand approval. The choice supports the
+industrial/automotive art direction without using ABB red or copying ABB's
+identity; its white-background contrast passes WCAG AA.
+
+Six generated industrial editorial images form a coherent local/test demo set:
+warehouse hero, distribution operation, parts detail, loading facility,
+workplace/careers and an abstract portfolio rhythm. They contain no intended
+brands, logos, readable labels, certifications or invented company claims.
+
+The assets are not inserted into PostgreSQL or treated as approved CMS media.
+`src/content/demo-media.ts` mirrors the public `Media` / `MediaLocale`
+presentation contract with stable demo IDs, TR/EN alt text, decorative semantics
+and focal points. It is loaded only through the existing development-content
+gate; staging/production still require published CMS media resolved from secure
+public storage. Final approved photography replaces these files before launch.

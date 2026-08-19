@@ -77,6 +77,15 @@ function CorporatePage({ bundle }: { bundle: PublicPageBundle }) {
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <EditorialCopy block={block} locale={bundle.page.locale} />
+                {block.mediaId ? (
+                  <EditorialMedia
+                    block={block}
+                    className="interior-editorial-row__media"
+                    locale={bundle.page.locale}
+                    media={bundle.blockMedia[block.mediaId]}
+                    sizes="(min-width: 64rem) 40vw, 100vw"
+                  />
+                ) : null}
               </article>
             ))}
           </div>
@@ -190,7 +199,7 @@ function LocationsPage({ bundle }: { bundle: PublicPageBundle }) {
                   {location.workingHours ? <p className="type-body">{location.workingHours}</p> : null}
                   {!location.description && !location.workingHours ? (
                     <p className="locations-directory__tbd">
-                      {locale === "tr" ? "Onaylı adres ve iletişim bilgileri · TBD" : "Approved address and contact details · TBD"}
+                      {locale === "tr" ? "Adres ve iletişim bilgileri onaylı CMS yayınıyla eklenecek." : "Address and contact details will be added through approved CMS publication."}
                     </p>
                   ) : null}
                 </div>
@@ -232,16 +241,16 @@ function CallToActionPage({ bundle }: { bundle: PublicPageBundle }) {
               <h2 className="type-h2">
                 {page.locale === "tr"
                   ? isCareer
-                    ? "Başvuru deneyimi Milestone 5’te açılacak."
-                    : "İletişim formu Milestone 5’te açılacak."
+                    ? "Genel başvuru deneyimi yayına hazırlanıyor."
+                    : "Kurumsal iletişim kanalları doğrulanıyor."
                   : isCareer
-                    ? "The application experience will open in Milestone 5."
-                    : "The contact form will open in Milestone 5."}
+                    ? "The general application experience is being prepared."
+                    : "Corporate contact channels are being verified."}
               </h2>
               <p className="type-body">
                 {page.locale === "tr"
-                  ? "Onaylı içerik ve form yayını bekleniyor · TBD"
-                  : "Approved content and form publication are pending · TBD"}
+                  ? "Geliştirme önizlemesi · Güvenli form ve onaylı bilgiler tamamlandığında bu alan güncellenecek."
+                  : "Development preview · This area will update when the secure form and approved details are ready."}
               </p>
             </div>
           </Grid>

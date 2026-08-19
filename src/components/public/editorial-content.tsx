@@ -95,8 +95,8 @@ export function EditorialMedia({
     <div
       aria-label={
         locale === "tr"
-          ? "Onaylı kurumsal medya bekleniyor"
-          : "Approved corporate media is pending"
+          ? "Kurumsal medya yayına hazırlanıyor"
+          : "Corporate media is being prepared for publication"
       }
       className={`editorial-media-placeholder ${className}`.trim()}
       role="img"
@@ -105,7 +105,7 @@ export function EditorialMedia({
         03—01
       </span>
       <span className="editorial-media-placeholder__label">
-        {locale === "tr" ? "Onaylı medya · TBD" : "Approved media · TBD"}
+        {locale === "tr" ? "Medya alanı · Geliştirme" : "Media area · Development"}
       </span>
     </div>
   );

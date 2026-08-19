@@ -587,6 +587,114 @@ Scope retained:
 
 ---
 
+# Milestone 4.1 — Visual Polish & Demo Media
+
+Status: `[ ]` — implementation validated; required screenshot artifacts blocked by Browser plugin
+
+## Scope
+
+Visual polish and demo-media art direction only. No form, admin, auth/RBAC,
+security, migration, data-model or Milestone 5 business logic changes.
+
+## Tasks
+
+- [x] Refine the provisional single accent without treating it as final identity.
+- [x] Generate at least five coherent industrial/editorial demo images.
+- [x] Keep demo assets replaceable and local/test-only.
+- [x] Add Media/MediaLocale-compatible TR/EN alt, decorative and focal metadata.
+- [x] Strengthen homepage hero, scale, portfolio, products, operations, trust,
+      careers, contact and footer rhythm.
+- [x] Polish corporate, brands, product-groups and locations page presentation.
+- [x] Remove public-facing internal milestone language and reduce raw TBD surfaces
+      without inventing business/legal facts.
+- [x] Preserve publication, locale, SEO, sitemap, Dealer Portal and security boundaries.
+- [x] Validate lint, typecheck, tests, production build, dependency audit,
+      migration no-diff, accessibility and responsive contracts.
+- [ ] Save the requested desktop/full-page/mobile and corporate/brands/locations
+      screenshots (Browser plugin trusted-code-path validation is blocking capture).
+
+## Validation Record — 2026-08-19
+
+Local environment:
+
+```text
+Windows
+Node.js 24.14.0 (host; project/CI pin is 24.19.0)
+pnpm 11.22.0
+Next.js 16.3.1 / React 19.2.8
+TypeScript 6.0.3 / Vitest 4.1.10
+Drizzle ORM 0.45.2 / Drizzle Kit 0.31.10
+```
+
+Commands / gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+production HTTP route/header/metadata/media checks
+```
+
+Results:
+
+- frozen install passed with the committed lockfile,
+- Drizzle metadata check passed; migration regeneration found no schema change
+  and produced no `drizzle/` diff,
+- ESLint passed with zero warnings; TypeScript and Next.js route generation passed,
+- Vitest passed 23 files / 85 tests; 3 PostgreSQL-dependent files / 11 tests
+  were skipped locally because this Windows host has no PostgreSQL or Docker,
+- demo-media coverage verifies 6 workspace assets, stable IDs, file presence,
+  focal bounds, local/test placement and meaningful/decorative TR/EN alt rules,
+- full-homepage axe semantics, WCAG AA token contrast, reduced-motion and
+  mobile-first overflow/responsive contracts passed,
+- production build passed and the production dependency audit reported no known
+  vulnerabilities,
+- optimized local production HTTP checks returned `200` for required TR/EN
+  homepage, corporate, brands, product-groups, locations, careers/contact and
+  legal routes; an unknown localized route returned `404`, `/` returned `307 →
+  /tr`, and the hero demo-media file returned `200 image/png`,
+- placeholder pages retained `noindex`, canonical and TR/EN/x-default hreflang;
+  public HTML contained the demo-media presentation but no internal Milestone 5
+  copy or raw pending-media TBD label,
+- a second production-mode server check denied both direct
+  `/demo-media/warehouse-hero.png` and cached `/_next/image` optimizer access
+  with empty `404` responses, proving that committed prototypes cannot become a
+  public production fallback,
+- responses retained CSP, HSTS, nosniff, Referrer-Policy, X-Frame-Options and
+  Permissions-Policy.
+
+Visual-validation limitation:
+
+- the required in-app Browser workflow is blocked before page control by the
+  installed plugin's trusted-code-path validation for `browser-service.mjs`,
+- the updated homepage was opened in the Codex browser panel and HTTP/render plus
+  automated DOM/axe/contrast/responsive checks passed, but screenshot files could
+  not be captured without substituting a browser surface forbidden by the Browser
+  skill,
+- Milestone 4.1 remains unchecked until the requested screenshot artifacts are
+  captured through the supported browser surface.
+
+Remote validation:
+
+- pending commit/push and GitHub Actions result.
+
+Scope retained:
+
+- no form persistence, admin/CMS UI, auth/RBAC, upload, retention, database schema
+  or other business/security behavior changed,
+- generated imagery is not represented as real Ardaş facilities, employees,
+  inventory, approved photography or production CMS media,
+- final logo, palette, font, imagery rights, brand list, product taxonomy,
+  exact addresses/contact information and legal content remain launch gates.
+
+---
+
 # Milestone 5 — Public Contact & Career Persistence
 
 Status: `[ ]`
