@@ -816,24 +816,24 @@ Scope retained:
 
 # Milestone 6 — Admin CMS, Contact Inbox & Publishing
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Tasks
 
-- [ ] dashboard.
-- [ ] page/homepage CMS.
-- [ ] brands/product groups/locations.
-- [ ] departments.
-- [ ] media.
-- [ ] legal pages.
-- [ ] SEO/settings.
-- [ ] Contact Manager inbox.
-- [ ] revisions.
-- [ ] preview.
-- [ ] direct editor publishing.
-- [ ] scheduling.
-- [ ] rollback.
-- [ ] slug redirect management/history.
+- [x] dashboard.
+- [x] page/homepage CMS.
+- [x] brands/product groups/locations.
+- [x] departments.
+- [x] media.
+- [x] legal pages.
+- [x] SEO/settings.
+- [x] Contact Manager inbox.
+- [x] revisions.
+- [x] preview.
+- [x] direct editor publishing.
+- [x] scheduling.
+- [x] rollback.
+- [x] slug redirect management/history.
 
 ## Acceptance
 
@@ -845,6 +845,84 @@ Status: `[ ]`
 ## Validation
 
 Run E2E-06 and E2E-07.
+
+## Validation Record — 2026-08-19
+
+Authoritative remote environment:
+
+- GitHub Actions Ubuntu runner,
+- Node.js `24.19.0`,
+- pnpm `11.22.0`,
+- PostgreSQL `18.4` service container,
+- implementation commit `9311a97a0f2a87cb2cea3f879124c3fc63931b6b`,
+- workflow run `32240506160`, job `96029784593`: passed.
+
+Local environment:
+
+- Windows / PowerShell,
+- Node.js `24.14.0` and pnpm `11.19.0`; both are below the repository-pinned
+  `24.19.x` / `11.22.x`, so the remote result is authoritative for the frozen
+  runtime gate.
+
+Commands and results:
+
+- frozen install: `pnpm install --frozen-lockfile` passed locally with the
+  expected engine warning; the pinned-runtime CI install passed without drift,
+- clean database migration: all migrations through `0004_bumpy_invaders.sql`
+  applied to a clean PostgreSQL 18.4 database in CI,
+- migration reproducibility: `pnpm db:check` passed, `pnpm db:generate`
+  reported no schema changes, and CI reproduced the expected 32-table schema,
+- lint: `pnpm lint` passed with zero warnings,
+- typecheck: `pnpm typecheck` passed,
+- test: local non-PostgreSQL run passed 104 tests and skipped 21 database tests;
+  CI passed all 125 tests in 32 files,
+- real PostgreSQL tests: 21 tests in 5 files passed, including CMS
+  draft/preview/publish/schedule/rollback, localized publication and redirect,
+  contact access/status/note/retention, migration and security integration,
+- E2E-06 CMS Publishing: the PostgreSQL-backed flow covers Editor draft → secure
+  localized preview → direct publish → schedule → rollback with revision and
+  audit assertions,
+- E2E-07 Contact Manager: the PostgreSQL-backed flow covers minimal list/detail,
+  status/note/retention mutations and positive Contact Manager plus negative
+  Viewer/Content Editor access assertions,
+- production build: `pnpm build` passed; admin, CMS mutation, preview, public
+  media and internal scheduler routes were emitted successfully,
+- dependency audit: `pnpm audit:prod` passed with no known vulnerabilities,
+- HTTP route checks after the production build: `/` returned `307` to `/tr`;
+  `/tr`, `/en` and `/tr/iletisim` returned `200`; an unknown localized route
+  returned `404`; unconfigured `/admin` and preview access failed closed with
+  `503`; an unauthorized scheduler request returned `401`,
+- security headers: CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy` and
+  `Permissions-Policy` were present in the production HTTP checks,
+- accessibility: the Turkish admin shell passed its automated axe check; public
+  accessibility, keyboard/focus and localized shell regressions remained green,
+- remote CI: every job step passed, including frozen install, clean migration,
+  schema check/reproducibility, lint, typecheck, test, production build and
+  production dependency audit.
+
+Implemented scope:
+
+- Turkish, permission-aware admin dashboard and scoped CMS modules for homepage,
+  corporate/legal pages, brands, product groups, locations, departments, careers
+  content, public media, SEO and non-secret site settings,
+- structured working drafts separated from live locale rows; secure noindex
+  preview; direct editor publishing; scheduling and scheduled archive; immutable
+  revisions; rollback as a new draft; audit-backed localized slug redirects,
+- Contact Inbox access limited to Super Admin / Contact Manager, with minimal-PII
+  list projection, protected detail, filters, status, notes and configurable
+  retention/anonymization foundation,
+- public-media-only CMS handling; protected/quarantine CV storage and all
+  Milestone 5 form/security boundaries remain unchanged,
+- no HR/candidate-management user interface and no Milestone 7 work was added.
+
+Production gates retained:
+
+- Auth0 EU tenant configuration and production MFA-policy evidence,
+- production S3, scheduler invocation, alerts/monitoring and other provider
+  resources/credentials,
+- approved legal text/reference, final contact/candidate retention durations,
+  final corporate content and licensed media,
+- nonce/hash-based CSP hardening tracked by risk `R-028`.
 
 ---
 
