@@ -171,7 +171,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         brands: {
           eyebrow: "Portföy",
           heading: "150+ markayı tek bir dağıtım disiplini altında buluşturuyoruz.",
-          body: ["Marka listesi ve görsel hakları, onaylı CMS yayınıyla sunulacak."],
+          body: ["Marka portföyümüz, kullanım onayları tamamlandıkça bu seçkide yerini alacak."],
           action: { label: "Tüm markalar", routeKey: "brands" },
           mediaId: demoMediaIds.portfolio,
           decorativeMedia: true,
@@ -179,7 +179,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         products: {
           eyebrow: "Ürün grupları",
           heading: "50.000+ ürünlük ölçekte, düzenli ve anlaşılır bir portföy.",
-          body: ["Nihai ürün grubu taksonomisi, onaylı içerikle bu yapıya eklenecek."],
+          body: ["Portföy yapısı, onaylanan ürün aileleriyle kademeli olarak tamamlanacak."],
           action: { label: "Ürün grupları", routeKey: "product-groups" },
           mediaId: demoMediaIds.partsDetail,
         },
@@ -194,7 +194,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
           eyebrow: "Deneyim ve ölçek",
           heading: "30+ yıllık sektör deneyimi.",
           body: [
-            "Kalite, sertifika, ödül ve partnerlik beyanları onaylı içerik olmadan yayımlanmayacaktır.",
+            "Kalite, sertifika, ödül ve iş ortaklığı bilgileri doğrulama süreci tamamlandıkça burada yer alacak.",
           ],
         },
         careers: {
@@ -272,7 +272,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       hero: {
         eyebrow: "Portföy ölçeği",
         heading: "150+ marka. Tek bir dağıtım disiplini.",
-        body: ["Nihai marka listesi ve logolar, görsel hakları onaylandıktan sonra CMS üzerinden yayımlanacak."],
+        body: ["Marka seçkisi, kullanım onayları tamamlandıkça burada yerini alacak."],
         mediaId: demoMediaIds.portfolio,
         decorativeMedia: true,
       },
@@ -291,7 +291,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       hero: {
         eyebrow: "Ürün ölçeği",
         heading: "50.000+ ürünü anlaşılır bir yapıda sunmak.",
-        body: ["Nihai ürün grubu taksonomisi ve açıklamaları onaylı CMS içeriğiyle eklenecek."],
+        body: ["Ürün aileleri, onaylı içerik ve görsellerle bu yapı içinde sunulacak."],
         mediaId: demoMediaIds.partsDetail,
       },
       sections: {},
@@ -428,7 +428,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           brands: {
             eyebrow: "Portfolio",
             heading: "150+ brands, brought together by one distribution discipline.",
-            body: ["The brand directory and visual rights will be presented through approved CMS publication."],
+            body: ["Our brand portfolio will take its place in this selection as usage approvals are completed."],
             action: { label: "All brands", routeKey: "brands" },
             mediaId: demoMediaIds.portfolio,
             decorativeMedia: true,
@@ -436,7 +436,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           products: {
             eyebrow: "Product groups",
             heading: "A clear, organized portfolio at a scale of 50,000+ products.",
-            body: ["The final product-group taxonomy will be added to this structure with approved content."],
+            body: ["The portfolio structure will be completed progressively with approved product families."],
             action: { label: "Product groups", routeKey: "product-groups" },
             mediaId: demoMediaIds.partsDetail,
           },
@@ -451,7 +451,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
             eyebrow: "Experience and scale",
             heading: "30+ years of industry experience.",
             body: [
-              "Quality, certification, award and partnership claims will not be published without approved content.",
+              "Quality, certification, award and partnership information will appear here as verification is completed.",
             ],
           },
           careers: {
@@ -529,7 +529,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         hero: {
           eyebrow: "Portfolio scale",
           heading: "150+ brands. One distribution discipline.",
-          body: ["The final directory and logos will be published through the CMS after visual rights are approved."],
+          body: ["The brand selection will take its place here as usage approvals are completed."],
           mediaId: demoMediaIds.portfolio,
           decorativeMedia: true,
         },
@@ -548,7 +548,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         hero: {
           eyebrow: "Product scale",
           heading: "Presenting 50,000+ products with clarity.",
-          body: ["The final product-group taxonomy and descriptions will be added through approved CMS content."],
+          body: ["Product families will be presented within this structure with approved content and imagery."],
           mediaId: demoMediaIds.partsDetail,
         },
         sections: {},

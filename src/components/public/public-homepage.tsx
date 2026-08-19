@@ -120,7 +120,7 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
                     </article>
                   ))
                 ) : (
-                  <TbdState locale={locale} subject={locale === "tr" ? "Seçili marka yayını" : "Featured brand publication"} />
+                  <TbdState locale={locale} subject={locale === "tr" ? "Marka seçkisi hazırlanıyor" : "Brand selection in preparation"} />
                 )}
               </div>
             </Grid>
@@ -153,7 +153,7 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
                   </article>
                 ))
               ) : (
-                <TbdState locale={locale} subject={locale === "tr" ? "Ürün grubu taksonomisi" : "Product group taxonomy"} />
+                <TbdState locale={locale} subject={locale === "tr" ? "Ürün grubu seçkisi hazırlanıyor" : "Product-group selection in preparation"} />
               )}
             </div>
           </Container>
@@ -278,7 +278,7 @@ export function TbdState({ locale, subject }: { locale: Locale; subject: string 
     <div className="public-tbd" role="status">
       <span className="signature-rule" aria-hidden="true" />
       <strong>{subject}</strong>
-      <span>{locale === "tr" ? "Geliştirme önizlemesi · Nihai içerik onaylı CMS yayınıyla eklenecek" : "Development preview · Final content will arrive through approved CMS publication"}</span>
+      <span>{locale === "tr" ? "Onaylı içerik seçkisi bu yapıya kademeli olarak eklenecek." : "The approved content selection will be added to this structure progressively."}</span>
     </div>
   );
 }

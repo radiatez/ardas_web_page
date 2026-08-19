@@ -286,7 +286,7 @@ button:hover .direction-icon {
   min-height: 2.75rem;
   align-items: center;
   color: var(--text-strong);
-  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+  font-size: clamp(1.05rem, 1.45vw, 1.45rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.16em;
   line-height: 1;
@@ -341,10 +341,16 @@ button:hover .direction-icon {
   min-height: 2.75rem;
   align-items: center;
   color: var(--text-default);
-  font-size: clamp(0.75rem, 0.7rem + 0.12vw, 0.875rem);
+  font-size: clamp(0.78rem, 0.73rem + 0.14vw, 0.9375rem);
   font-weight: var(--font-weight-medium);
   text-decoration: none;
+  transition: color var(--motion-fast) var(--ease-standard);
   white-space: nowrap;
+}
+
+.public-navigation a:hover,
+.public-navigation a:focus-visible {
+  color: var(--color-accent-hover);
 }
 
 .public-navigation a::after {
@@ -379,6 +385,15 @@ button:hover .direction-icon {
   letter-spacing: 0.08em;
   text-decoration: none;
   text-transform: uppercase;
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.locale-switcher:hover,
+.locale-switcher:focus-visible {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
 }
 
 .dealer-portal-link {
@@ -395,7 +410,8 @@ button:hover .direction-icon {
 }
 
 .dealer-portal-link--header {
-  padding-inline: var(--space-4);
+  min-height: 3.25rem;
+  padding-inline: var(--space-5);
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
@@ -851,9 +867,10 @@ button:hover .direction-icon {
 
 @media (min-width: 80rem) {
   .public-header__inner {
-    min-height: 5.25rem;
+    width: min(100%, 92rem);
+    min-height: 5.75rem;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: clamp(1.25rem, 2.5vw, 3rem);
+    gap: clamp(1.4rem, 2.75vw, 3.25rem);
   }
 
   .public-header__desktop-navigation,
@@ -1723,10 +1740,12 @@ button:hover .direction-icon {
 
 .home-trust {
   border-top: var(--border-subtle);
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
 }
 
 .home-trust__mark {
   color: var(--color-accent-soft);
+  font-size: clamp(7rem, 24vw, 18rem);
 }
 
 .home-careers {
@@ -1835,6 +1854,10 @@ button:hover .direction-icon {
 }
 
 @media (min-width: 64rem) {
+  .home-impact > .ds-container {
+    width: min(100%, 92rem);
+  }
+
   .home-impact__copy {
     right: auto;
     bottom: clamp(3.5rem, 6vw, 6rem);

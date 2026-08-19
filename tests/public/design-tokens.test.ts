@@ -107,4 +107,19 @@ describe("design token accessibility", () => {
     );
     expect(globalCss).toContain("minmax(0, 1fr)");
   });
+
+  it("preserves the approved visual-polish proportions and accent interactions", () => {
+    expect(globalCss).toMatch(
+      /@media \(min-width: 80rem\)[\s\S]*?\.public-header__inner\s*\{[\s\S]*?width:\s*min\(100%, 92rem\);[\s\S]*?min-height:\s*5\.75rem;/,
+    );
+    expect(globalCss).toMatch(
+      /@media \(min-width: 64rem\)[\s\S]*?\.home-impact > \.ds-container\s*\{[\s\S]*?width:\s*min\(100%, 92rem\);/,
+    );
+    expect(globalCss).toMatch(
+      /\.home-trust__mark\s*\{[\s\S]*?font-size:\s*clamp\(7rem, 24vw, 18rem\);/,
+    );
+    expect(globalCss).toMatch(
+      /\.locale-switcher:hover,[\s\S]*?background:\s*var\(--color-accent-soft\);/,
+    );
+  });
 });

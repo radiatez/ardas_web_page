@@ -172,7 +172,7 @@ function ProductGroupsPage({ bundle }: { bundle: PublicPageBundle }) {
               ))}
             </div>
           ) : (
-            <TbdState locale={locale} subject={locale === "tr" ? "Onaylı ürün grubu taksonomisi" : "Approved product group taxonomy"} />
+            <TbdState locale={locale} subject={locale === "tr" ? "Ürün grubu seçkisi hazırlanıyor" : "Product-group selection in preparation"} />
           )}
         </Container>
       </Section>
@@ -199,7 +199,7 @@ function LocationsPage({ bundle }: { bundle: PublicPageBundle }) {
                   {location.workingHours ? <p className="type-body">{location.workingHours}</p> : null}
                   {!location.description && !location.workingHours ? (
                     <p className="locations-directory__tbd">
-                      {locale === "tr" ? "Adres ve iletişim bilgileri onaylı CMS yayınıyla eklenecek." : "Address and contact details will be added through approved CMS publication."}
+                      {locale === "tr" ? "Adres ve iletişim bilgileri doğrulama süreci tamamlandığında burada yer alacak." : "Address and contact details will appear here when verification is complete."}
                     </p>
                   ) : null}
                 </div>
@@ -249,8 +249,8 @@ function CallToActionPage({ bundle }: { bundle: PublicPageBundle }) {
               </h2>
               <p className="type-body">
                 {page.locale === "tr"
-                  ? "Geliştirme önizlemesi · Güvenli form ve onaylı bilgiler tamamlandığında bu alan güncellenecek."
-                  : "Development preview · This area will update when the secure form and approved details are ready."}
+                  ? "Bu alan, güvenli form ve onaylı bilgiler tamamlandığında kullanıma açılacak."
+                  : "This area will become available when the secure form and approved details are ready."}
               </p>
             </div>
           </Grid>

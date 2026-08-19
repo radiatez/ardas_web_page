@@ -46,6 +46,18 @@ describe("Milestone 4 public content contract", () => {
     expect(serialized).not.toMatch(/ISO 9001|Bosch|Mercedes|telefon:\s*\+90/i);
   });
 
+  it("keeps provisional portfolio wording customer-facing in both locales", () => {
+    for (const locale of ["tr", "en"] as const) {
+      const sections = getDevelopmentPage("home", locale).content.sections;
+      const portfolioCopy = JSON.stringify({
+        brands: sections.brands,
+        products: sections.products,
+      });
+
+      expect(portfolioCopy).not.toMatch(/taxonomy|taksonomi|CMS|development preview/i);
+    }
+  });
+
   it("sanitizes versioned CMS blocks and accepts only known route actions", () => {
     const parsed = parsePublicPageContent(
       {
