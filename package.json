@@ -20,6 +20,7 @@
     "test:integration": "node scripts/test-postgres.mjs --full",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium firefox webkit",
+    "screenshots:final": "node scripts/capture-final-screenshots.mjs",
     "drill:recovery": "node scripts/backup-restore-drill.mjs",
     "validate:rollback": "node scripts/validate-rollback.mjs",
     "test:watch": "vitest",
@@ -27,10 +28,12 @@
     "db:check": "drizzle-kit check",
     "db:migrate": "drizzle-kit migrate",
     "db:seed:legal": "node scripts/seed-temporary-legal-content.ts",
-    "db:setup": "pnpm run db:migrate && pnpm run db:seed:legal",
+    "db:seed:production": "node scripts/seed-production-content.ts",
+    "db:setup": "drizzle-kit migrate && node scripts/seed-production-content.ts",
     "db:studio": "drizzle-kit studio",
     "audit:prod": "corepack pnpm audit --prod --audit-level=high",
-    "check": "eslint . --max-warnings=0 && next typegen && tsc --noEmit && drizzle-kit check && vitest run && next build"
+    "validate": "eslint . --max-warnings=0 && next typegen && tsc --noEmit && vitest run && next build",
+    "check": "eslint . --max-warnings=0 && next typegen && tsc --noEmit && vitest run && next build && drizzle-kit check"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "4.27.0",

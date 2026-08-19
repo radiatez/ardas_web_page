@@ -88,3 +88,17 @@ do not prove INP. Vercel field telemetry plus approved monitoring must establish
 LCP/INP/CLS p75 after staging/production provisioning. Alert destinations,
 sample rates, Sentry/CloudWatch configuration and provider-side PII scrubbing
 remain Milestone 9 gates.
+
+## Production Integration Boundary
+
+The application emits JSON structured records to standard output only after the
+tested sanitizer. Vercel log forwarding may send this stream to Sentry Germany
+or an approved destination; no form/CV payload is attached by application code.
+`SENTRY_DSN` records provider readiness in the admin dashboard. Project
+provisioning, release ownership, provider-side scrubbing, sampling and alert
+destinations remain `BLOCKED_EXTERNAL`.
+
+AWS service visibility is provider-side: GuardDuty findings flow through
+EventBridge/SQS to the application, while queue age, DLQ depth, scan failures,
+bucket events and SES delivery/bounces use CloudWatch alarms. Resource IDs and
+on-call targets must be supplied during provisioning and are not stored in Git.

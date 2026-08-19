@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getDevelopmentPage,
+  getStructuralPage,
   parsePublicPageContent,
   publicPageRouteKeys,
 } from "../../src/content/public-pages";
@@ -37,12 +38,12 @@ describe("Milestone 4 public content contract", () => {
     ]);
   });
 
-  it("uses only approved scale facts and leaves unapproved business data TBD", () => {
+  it("uses only approved scale facts without public development copy", () => {
     const serialized = JSON.stringify(getDevelopmentPage("home", "tr"));
     for (const fact of ["30+", "150+", "50.000+", "İstanbul", "Ankara", "Diyarbakır"]) {
       expect(serialized).toContain(fact);
     }
-    expect(serialized).toContain("TBD");
+    expect(serialized).not.toMatch(/TBD|hazırlanıyor|onay süreci|development/i);
     expect(serialized).not.toMatch(/ISO 9001|Bosch|Mercedes|telefon:\s*\+90/i);
   });
 
@@ -111,6 +112,22 @@ describe("Milestone 4 public content contract", () => {
         "x-default": "/tr/kurumsal",
       },
     });
+  });
+
+  it("provides an indexable bilingual production structural baseline", () => {
+    const page = getStructuralPage("corporate", "tr");
+    const metadata = buildPublicPageMetadata(page);
+    expect(page.source).toBe("structural");
+    expect(page.availableLocales).toEqual(["tr", "en"]);
+    expect(metadata.robots).toMatchObject({ index: true, follow: true });
+  });
+
+  it("keeps temporary legal and submission routes out of search indexes", () => {
+    for (const routeKey of ["privacy", "cookies", "data-protection", "contact", "career-apply"] as const) {
+      const page = getStructuralPage(routeKey, "tr");
+      expect(page.allowIndexing).toBe(false);
+      expect(buildPublicPageMetadata(page).robots).toMatchObject({ index: false, follow: false });
+    }
   });
 
   it("indexes CMS content without advertising an unpublished locale", () => {

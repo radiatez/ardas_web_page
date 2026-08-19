@@ -909,3 +909,63 @@ Validate metadata parsing, temporary/approved gates, admin-only status,
 substantive localized routes, no placeholder copy, form acknowledgement,
 historic notice-version retention, Site Setting parsing, idempotent PostgreSQL
 seed/revision creation, lint, typecheck, all tests and production build.
+
+### ADR-020 — Production Structural Availability and Replaceable Temporary Media
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+The previous public-content decision prevented staging/production fallback and
+restricted generated media to local/test. That correctly rejected accidental
+development placeholders but could leave the corporate site without content or
+imagery when CMS/provider provisioning was incomplete. Milestone 9 requires a
+presentable public shell without weakening sensitive fail-closed boundaries or
+inventing company facts.
+
+#### Decision
+
+- Keep a published CMS PageLocale as first priority. When it is unavailable,
+  permit a separate `structural` source in staging/production containing only
+  approved route slugs, verified project facts and versioned temporary legal
+  content. Keep local/test `placeholder` semantics distinct.
+- Allow indexing only for structural corporate routes. Temporary legal, contact
+  and career-application routes remain noindex.
+- Keep admin/Auth0, career submission and contact submission fail-closed on
+  their own incomplete provider/privacy/retention configuration.
+- Ship the six project-generated, unbranded images as allowlisted temporary
+  public assets. Mark every asset `temporaryMedia=true` and
+  `requiresReplacement=true`, avoid company/documentary claims, include them in
+  Next output tracing and avoid immutable caching.
+- Let published CMS Media/MediaLocale values override matching temporary media
+  placements, preserving single-record replacement without layout changes.
+- Seed missing structural content and verified company scale idempotently while
+  preserving every existing CMS locale/setting and creating no fake operational
+  or personal data.
+
+#### Alternatives Considered
+
+- Keep production blank until every provider/content input exists: rejected
+  because provider provisioning is not required to present verified corporate
+  information.
+- Reclassify local placeholders as production content unchanged: rejected
+  because development language/index rules are not a production contract.
+- Seed generated files as approved CMS media: rejected because they are
+  explicitly temporary and must remain easy to distinguish and replace.
+- Relax provider checks for forms/admin: rejected because public availability
+  must not cross the personal-data or administration security boundary.
+
+#### Consequences
+
+The public site remains useful during provider outages or initial provisioning,
+while sensitive surfaces retain fail-closed behavior. CMS content always wins.
+Final approved company media is still an external launch input, and operational
+monitoring should alert on structural fallback use.
+
+#### Validation
+
+Validate production structural indexing/noindex boundaries, localized routes,
+CMS precedence, manifest flags, allowlisted media serving/output tracing,
+idempotent clean-PostgreSQL seed, no fake data, public-copy hygiene, browser /
+responsive/axe regression, build and dependency audit.

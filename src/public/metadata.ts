@@ -51,7 +51,7 @@ export function buildPublicPageMetadata(page: PublicPageDocument): Metadata {
       },
     },
     robots:
-      page.source === "cms" && page.allowIndexing !== false
+      page.source !== "placeholder" && page.allowIndexing !== false
         ? { index: true, follow: true }
         : { index: false, follow: false, noarchive: true },
     openGraph: {

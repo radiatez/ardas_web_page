@@ -12,7 +12,7 @@ import { CorporateMedia } from "./corporate-media";
 import { EditorialCopy, EditorialMedia } from "./editorial-content";
 import { Container, Grid, Section } from "./layout-primitives";
 import { CareerApplicationForm, ContactForm } from "./public-forms";
-import { TbdState } from "./public-homepage";
+import { VerifiedScaleState } from "./public-homepage";
 
 export async function CorePublicPage({ bundle }: { bundle: PublicPageBundle }) {
   switch (bundle.page.routeKey) {
@@ -139,7 +139,10 @@ function BrandsPage({ bundle }: { bundle: PublicPageBundle }) {
               ))}
             </div>
           ) : (
-            <TbdState locale={locale} subject={locale === "tr" ? "Onaylı marka listesi ve logo hakları" : "Approved brand directory and logo rights"} />
+            <VerifiedScaleState
+              description={locale === "tr" ? "Otomotiv aftermarket ihtiyaçlarını geniş bir portföy ölçeğiyle buluşturuyoruz." : "Connecting automotive aftermarket needs with broad portfolio scale."}
+              subject={locale === "tr" ? "150+ marka" : "150+ brands"}
+            />
           )}
         </Container>
       </Section>
@@ -184,7 +187,10 @@ function ProductGroupsPage({ bundle }: { bundle: PublicPageBundle }) {
               ))}
             </div>
           ) : (
-            <TbdState locale={locale} subject={locale === "tr" ? "Ürün grubu seçkisi hazırlanıyor" : "Product-group selection in preparation"} />
+            <VerifiedScaleState
+              description={locale === "tr" ? "Portföyü açık ve düzenli bir yapı içinde ele alıyoruz." : "Organizing the portfolio within a clear, structured system."}
+              subject={locale === "tr" ? "50.000+ ürün" : "50,000+ products"}
+            />
           )}
         </Container>
       </Section>
@@ -211,7 +217,7 @@ function LocationsPage({ bundle }: { bundle: PublicPageBundle }) {
                   {location.workingHours ? <p className="type-body">{location.workingHours}</p> : null}
                   {!location.description && !location.workingHours ? (
                     <p className="locations-directory__tbd">
-                      {locale === "tr" ? "Adres ve iletişim bilgileri doğrulama süreci tamamlandığında burada yer alacak." : "Address and contact details will appear here when verification is complete."}
+                      {locale === "tr" ? "Türkiye geneline uzanan dağıtım ağının üç fiziksel noktasından biri." : "One of three physical locations supporting nationwide distribution across Türkiye."}
                     </p>
                   ) : null}
                 </div>

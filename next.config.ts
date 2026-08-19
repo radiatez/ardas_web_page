@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   typedRoutes: true,
+  outputFileTracingIncludes: {
+    "/demo-media/[asset]": ["./demo-media/*.png"],
+  },
   images: publicMediaRemotePattern
     ? { remotePatterns: [publicMediaRemotePattern] }
     : undefined,

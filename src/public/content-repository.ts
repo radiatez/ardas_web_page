@@ -5,9 +5,10 @@ import {
   developmentContentIsEnabled,
   type DevelopmentContentEnvironment,
 } from "@/content/development-content";
-import { getDevelopmentMediaMap } from "@/content/demo-media";
+import { getTemporaryMediaMap } from "@/content/demo-media";
 import {
   getDevelopmentPage,
+  getStructuralPage,
   parsePublicPageContent,
   type PublicPageDocument,
   type PublicPageRouteKey,
@@ -33,6 +34,7 @@ import {
   loadLegalControllerDetails,
   type LegalControllerDetails,
 } from "@/public/legal-controller";
+import { securityLogger } from "@/security/logging";
 
 export { developmentContentIsEnabled } from "@/content/development-content";
 
@@ -419,9 +421,10 @@ export async function loadPublishedPageBundle(
   const page = await loadPage(db, routeKey, locale, now);
   if (!page) return undefined;
 
+  const blockMediaIds = getBlockMediaIds(page);
   const [blockMediaMap, brandItems, productGroupItems, locationItems, legalController] =
     await Promise.all([
-      loadMediaMap(db, getBlockMediaIds(page), locale, now, options.mediaBaseUrl),
+      loadMediaMap(db, blockMediaIds, locale, now, options.mediaBaseUrl),
       routeKey === "home" || routeKey === "brands"
         ? loadBrands(db, locale, now, options.mediaBaseUrl)
         : Promise.resolve([]),
@@ -435,6 +438,14 @@ export async function loadPublishedPageBundle(
         ? loadLegalControllerDetails(db)
         : Promise.resolve(undefined),
     ]);
+
+  const temporaryMedia = getTemporaryMediaMap(locale);
+  for (const mediaId of blockMediaIds) {
+    const fallback = temporaryMedia[mediaId];
+    if (!blockMediaMap.has(mediaId) && fallback) {
+      blockMediaMap.set(mediaId, fallback);
+    }
+  }
 
   return {
     page: page.ogMediaId && blockMediaMap.has(page.ogMediaId)
@@ -465,13 +476,39 @@ function createDevelopmentBundle(
     : ["Istanbul", "Ankara", "Diyarbakır"];
   return {
     page: getDevelopmentPage(routeKey, locale),
-    blockMedia: getDevelopmentMediaMap(locale),
+    blockMedia: getTemporaryMediaMap(locale),
     brands: [],
     productGroups: [],
     locations:
       routeKey === "home" || routeKey === "locations"
         ? locationNames.map((name, index) => ({
             id: `development-location-${index + 1}`,
+            key: ["istanbul", "ankara", "diyarbakir"][index]!,
+            name,
+            description: null,
+            workingHours: null,
+            media: null,
+          }))
+        : [],
+  };
+}
+
+function createStructuralBundle(
+  routeKey: PublicPageRouteKey,
+  locale: Locale,
+): PublicPageBundle {
+  const locationNames = locale === "tr"
+    ? ["İstanbul", "Ankara", "Diyarbakır"]
+    : ["Istanbul", "Ankara", "Diyarbakır"];
+  return {
+    page: getStructuralPage(routeKey, locale),
+    blockMedia: getTemporaryMediaMap(locale),
+    brands: [],
+    productGroups: [],
+    locations:
+      routeKey === "home" || routeKey === "locations"
+        ? locationNames.map((name, index) => ({
+            id: `structural-location-${index + 1}`,
             key: ["istanbul", "ankara", "diyarbakir"][index]!,
             name,
             description: null,
@@ -494,12 +531,16 @@ export async function getPublicPageBundle(
     });
     if (bundle) return bundle;
   } catch (error) {
-    if (!developmentContentIsEnabled(environment)) throw error;
+    securityLogger.warn("public.content.structural-fallback", {
+      routeKey,
+      locale,
+      error,
+    });
   }
 
   return developmentContentIsEnabled(environment)
     ? createDevelopmentBundle(routeKey, locale)
-    : undefined;
+    : createStructuralBundle(routeKey, locale);
 }
 
 export const getCachedPublicPageBundle = cache(

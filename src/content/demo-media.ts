@@ -21,6 +21,8 @@ export type DemoMediaAsset = {
   focalX: number;
   focalY: number;
   role: "meaningful" | "decorative";
+  temporaryMedia: true;
+  requiresReplacement: true;
   intendedUse: readonly string[];
   locale: Record<
     Locale,
@@ -32,10 +34,10 @@ export type DemoMediaAsset = {
 };
 
 /**
- * Local/test-only visual prototypes. These files are not CMS records, approved
- * photography or a production storage fallback. Their shape mirrors the
- * Media/MediaLocale presentation contract so approved public media can replace
- * them without changing page components.
+ * Project-generated, unbranded temporary media. These files are intentionally
+ * replaceable and are not presented as documentary company photography. Their
+ * shape mirrors the Media/MediaLocale presentation contract so approved public
+ * media can replace them through CMS records without changing page components.
  */
 export const demoMediaManifest: readonly DemoMediaAsset[] = [
   {
@@ -47,6 +49,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.68,
     focalY: 0.5,
     role: "meaningful",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.hero"],
     locale: {
       tr: { altText: "Raflar ve sevkiyat hatlarıyla modern bir dağıtım deposu", caption: null },
@@ -62,6 +66,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.58,
     focalY: 0.5,
     role: "meaningful",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.capability", "corporate.hero"],
     locale: {
       tr: { altText: "Sevkiyat alanında kolileri kontrol eden depo ekibi", caption: null },
@@ -77,6 +83,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.42,
     focalY: 0.55,
     role: "meaningful",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.products", "product-groups.hero"],
     locale: {
       tr: { altText: "Depo rafında düzenlenmiş markasız otomotiv parçaları ve paketler", caption: null },
@@ -92,6 +100,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.64,
     focalY: 0.5,
     role: "meaningful",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.operations", "corporate.operations", "locations.hero"],
     locale: {
       tr: { altText: "Yükleme alanları bulunan modern bir dağıtım tesisi", caption: null },
@@ -107,6 +117,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.68,
     focalY: 0.48,
     role: "meaningful",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.careers", "careers.hero"],
     locale: {
       tr: { altText: "Depo operasyon alanında birlikte çalışan dört ekip üyesi", caption: null },
@@ -122,6 +134,8 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
     focalX: 0.52,
     focalY: 0.45,
     role: "decorative",
+    temporaryMedia: true,
+    requiresReplacement: true,
     intendedUse: ["home.brands", "brands.hero"],
     locale: {
       tr: { altText: "", caption: null },
@@ -130,7 +144,7 @@ export const demoMediaManifest: readonly DemoMediaAsset[] = [
   },
 ] as const;
 
-export function getDevelopmentMediaMap(
+export function getTemporaryMediaMap(
   locale: Locale,
 ): Readonly<Record<string, PublicMediaPresentation>> {
   return Object.fromEntries(
@@ -152,3 +166,6 @@ export function getDevelopmentMediaMap(
     ]),
   );
 }
+
+/** @deprecated Prefer getTemporaryMediaMap for the environment-neutral contract. */
+export const getDevelopmentMediaMap = getTemporaryMediaMap;

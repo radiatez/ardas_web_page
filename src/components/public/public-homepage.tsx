@@ -120,7 +120,10 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
                     </article>
                   ))
                 ) : (
-                  <TbdState locale={locale} subject={locale === "tr" ? "Marka seçkisi hazırlanıyor" : "Brand selection in preparation"} />
+                  <VerifiedScaleState
+                    description={locale === "tr" ? "Otomotiv aftermarket ihtiyaçlarını geniş bir portföy ölçeğiyle buluşturuyoruz." : "Connecting automotive aftermarket needs with broad portfolio scale."}
+                    subject={locale === "tr" ? "150+ marka" : "150+ brands"}
+                  />
                 )}
               </div>
             </Grid>
@@ -153,7 +156,10 @@ export function PublicHomepage({ bundle }: { bundle: PublicPageBundle }) {
                   </article>
                 ))
               ) : (
-                <TbdState locale={locale} subject={locale === "tr" ? "Ürün grubu seçkisi hazırlanıyor" : "Product-group selection in preparation"} />
+                <VerifiedScaleState
+                  description={locale === "tr" ? "Portföyü açık ve düzenli bir yapı içinde ele alıyoruz." : "Organizing the portfolio within a clear, structured system."}
+                  subject={locale === "tr" ? "50.000+ ürün" : "50,000+ products"}
+                />
               )}
             </div>
           </Container>
@@ -273,12 +279,18 @@ function EditorialSplit({
   );
 }
 
-export function TbdState({ locale, subject }: { locale: Locale; subject: string }) {
+export function VerifiedScaleState({
+  description,
+  subject,
+}: {
+  description: string;
+  subject: string;
+}) {
   return (
-    <div className="public-tbd" role="status">
+    <div className="public-tbd">
       <span className="signature-rule" aria-hidden="true" />
       <strong>{subject}</strong>
-      <span>{locale === "tr" ? "Onaylı içerik seçkisi bu yapıya kademeli olarak eklenecek." : "The approved content selection will be added to this structure progressively."}</span>
+      <span>{description}</span>
     </div>
   );
 }

@@ -1,169 +1,347 @@
-# Ardaş Yedek Parça — Web Application v0.3
+# Ardaş Yedek Parça Corporate Website
 
-This repository contains the Ardaş Yedek Parça corporate website application
-and its implementation source-of-truth documents.
+## 1. Project overview
 
-## Repository Root
+Production-oriented, bilingual corporate website and Turkish administration
+application for Ardaş Yedek Parça. The product presents automotive aftermarket
+distribution capability; it is not e-commerce, a B2B replacement, a repair-shop
+site, a marketplace or a vehicle showroom.
 
-The current intended application repository is:
+Verified public facts are limited to İstanbul, Ankara and Diyarbakır locations,
+Türkiye-wide distribution, 30+ years of experience, 150+ brands and 50,000+
+products. Missing legal/business information is never invented.
+
+## 2. Implementation status
+
+Milestones 0–9 cover the public TR/EN site, CMS/admin, career and contact flows,
+security controls, migrations, regression automation, deployment configuration
+and launch runbooks. Software readiness and external production provisioning are
+tracked separately in `docs/operations/PRODUCTION_READINESS.md`.
+
+Temporary legal content is versioned as `TEMP-2026-08-V1`, marked `temporary`
+and `requires_legal_review=true`. It keeps legal pages presentable but cannot
+enable production submissions.
+
+## 3. Architecture
 
 ```text
-ardas_web_page
+Browser
+  → Vercel fra1 / Next.js App Router
+    → Neon PostgreSQL 18 (pooled runtime; direct migration connection)
+    → Auth0 EU (admin identity; MFA Always in production)
+    → Amazon S3 eu-central-1 (public / quarantine / protected)
+    → GuardDuty → EventBridge → SQS → application scan processor
+    → Amazon SES eu-central-1 (record-ID-only notifications)
+    → PII-safe structured logs → Sentry Germany / CloudWatch
 ```
 
-Copy the **contents** of this package into the actual repository root.
+The public corporate shell has a verified structural fallback. Missing providers
+therefore do not close `/tr` or `/en`; only dependent sensitive functions fail
+closed. Admin requires complete Auth0 configuration. Career and contact submit
+remain unavailable until their complete privacy, retention and provider gates
+pass.
 
-Expected root:
+## 4. Tech stack
 
-```text
-ardas_web_page/
-├── AGENTS.md
-├── README.md
-├── CHANGELOG.md
-├── .agent/
-├── .agents/
-├── docs/
-├── package.json        # created during Milestone 0
-├── pnpm-lock.yaml      # created during Milestone 0
-├── src/ or app/        # created during Milestone 0
-├── public/             # created during Milestone 0
-└── ...
-```
+- Next.js App Router, React and TypeScript
+- pnpm with a frozen lockfile
+- PostgreSQL 18 and Drizzle ORM/migrations
+- Vitest, Testing Library, Playwright and axe
+- Auth0, AWS SDK for S3/SQS/SES
 
-## Technology Baseline
+Managed production providers are fixed by accepted architecture decisions:
+Vercel, Neon, AWS, Auth0 EU and Sentry Germany.
 
-Selected before scaffold:
+## 5. Exact runtime versions
 
 ```text
-Framework: Next.js
-Language: TypeScript
-Package manager: pnpm
-Database engine: PostgreSQL
-```
-
-Milestone 0 versions selected on 2026-08-18:
-
-```text
-Node.js: 24.19.0 LTS
+Node.js: 24.19.0 (project and CI pin; engines 24.19.x)
 pnpm: 11.22.0
 Next.js: 16.3.1
 React / React DOM: 19.2.8
 TypeScript: 6.0.3
-ESLint: 9.39.5
-Vitest: 4.1.10
-Drizzle ORM: 0.45.2
-Drizzle Kit: 0.31.10
+PostgreSQL test image: 18.4
 ```
 
-Use Corepack so the `packageManager` field selects the repository pnpm version.
+`.node-version`, `package.json#engines` and GitHub Actions enforce the project
+runtime. The current Windows workstation may report Node `24.14.0`; that local
+mismatch is a warning and must not be used to lower the `24.19.x` project pin.
 
-```text
+## 6. Windows setup
+
+Install Git, Docker Desktop and Node.js `24.19.0`. Enable Corepack, then confirm
+the versions from PowerShell:
+
+```powershell
+node --version
+corepack enable
+corepack pnpm --version
+docker version
+```
+
+Docker Desktop must be running before PostgreSQL integration or full regression
+commands. Copy `.env.example` to `.env.local` and fill only local credentials.
+
+## 7. Install
+
+From the repository root:
+
+```powershell
 corepack pnpm install --frozen-lockfile
+```
+
+Do not commit `.env*` secrets. The lockfile and dependency versions are exact;
+dependency upgrades are separate reviewed changes.
+
+## 8. Development
+
+Start the application:
+
+```powershell
 corepack pnpm run dev
-corepack pnpm run check
 ```
 
-The root path redirects to `/tr`; the first scaffold contains `/tr` and `/en`.
-The temporary Milestone 0 surface is `noindex` and is not approved final content.
+Open `http://localhost:3000`; `/` redirects to `/tr`. Local/test content may use
+the development source while staging/production use CMS data or the verified
+structural baseline. The design-system preview is development-only, noindex and
+absent from production navigation.
 
-Milestone 1 provider architecture:
+## 9. Environment variables
 
-```text
-Hosting: Vercel fra1
-PostgreSQL 18: Neon / AWS eu-central-1
-Object storage: Amazon S3 eu-central-1
-Authentication/MFA: Auth0 EU / MFA Always
-Malware scanning: GuardDuty Malware Protection for S3
-Transactional email: Amazon SES eu-central-1
-Monitoring: Sentry Germany + AWS CloudWatch/EventBridge
-```
+`.env.example` is the authoritative variable inventory. It labels runtime,
+migration, Auth0, AWS, GuardDuty/SQS, SES, Sentry, Dealer Portal, retention,
+feature flags and internal-job configuration, including whether values are
+secret and where they are required.
 
-Provider provisioning, commercial/legal review and production credentials remain
-launch-gated. See `docs/architecture/ADR.md`.
+Production rules:
 
-## Database Development
+- Store secrets in Vercel/provider secret management, never Site Settings.
+- Use HTTPS origins outside local development.
+- Keep both public form flags `false` until every associated launch gate passes.
+- Keep provider resources isolated between staging and production.
+- Set `CRON_SECRET` and `RATE_LIMIT_HASH_SECRET` to independent random values of
+  at least 32 characters.
 
-The schema is `src/db/schema.ts`; generated SQL is committed under `drizzle/`.
-With a developer-owned `.env` and a local PostgreSQL 18 instance:
+## 10. Database
 
-```text
-corepack pnpm run db:generate
+The canonical schema is `src/db/schema.ts`; committed SQL and Drizzle metadata
+are under `drizzle/`. PostgreSQL owns localized publication, revision history,
+RBAC, submissions, CV state, audit events, settings, retention and outbox state.
+
+In production, `DATABASE_URL` is the Neon pooled runtime URL. Keep the application
+pool bounded and use `MIGRATION_DATABASE_URL` as the direct/non-pooled release-job
+URL. Local development may point both operations at the same PostgreSQL instance.
+
+## 11. Migrations
+
+Check and generate locally:
+
+```powershell
 corepack pnpm run db:check
+corepack pnpm run db:generate
+git diff -- drizzle
+```
+
+Production release order is backup/recovery-point confirmation, migration with
+the direct URL, idempotent seed, deploy, then smoke checks:
+
+```powershell
+$env:MIGRATION_DATABASE_URL = "<NEON-DIRECT-URL>"
 corepack pnpm run db:migrate
+corepack pnpm run db:seed:production
 ```
 
-`compose.yaml` provides the selected local database shape where Docker is
-available. CI always applies the migration to a clean PostgreSQL 18 database.
+Migrations and seeds must run in a controlled release job, never automatically
+inside the Vercel build. Rehearse the same commit in staging first.
 
-For a disposable PostgreSQL 18.4 integration run, use:
+## 12. Seeds
 
-```text
+```powershell
+corepack pnpm run db:seed:production
+```
+
+The seed creates only missing structural page locales/revisions, verified scale
+settings and the versioned temporary legal/form-notice records. Migration-owned
+TR/EN departments and İstanbul/Ankara/Diyarbakır locations are verified. Existing
+CMS locale rows and settings are preserved, so repeating the command is safe.
+
+It never creates fake administrators, candidates, contact submissions, brands,
+certificates, legal identity, contact details or provider identifiers.
+
+## 13. Tests and one-command validation
+
+```powershell
+corepack pnpm run validate
+corepack pnpm run audit:prod
+```
+
+`validate` runs lint, Next route generation/TypeScript, unit/component tests and
+the production build. `audit:prod` checks production dependencies at high
+severity and above. Individual commands remain available as `lint`, `typecheck`,
+`test` and `build`.
+
+## 14. Docker integration testing
+
+```powershell
 corepack pnpm run test:postgres
+corepack pnpm run test:integration
 ```
 
-This command starts the isolated `compose.test.yaml` database on localhost port
-`55432`, applies committed migrations, checks migration metadata, runs the full
-test suite with `TEST_DATABASE_URL`, then removes the test container and its
-temporary data even when a test fails. The credentials are test-only and never
-replace the selected Neon production provider or production secrets.
+Both commands own an isolated PostgreSQL `18.4` container on localhost port
+`55432`, apply clean migrations, run the production seed twice, verify Drizzle
+metadata and execute PostgreSQL tests. `test:integration` additionally validates
+migration regeneration, build, the complete browser matrix, portable backup /
+restore and rollback documentation. A `finally` cleanup removes the disposable
+container, network and volume on success or failure.
 
-## Agent Reading Order
+## 15. E2E / Playwright
 
-For substantial work:
+Install exact browser engines once, then run:
 
-1. `AGENTS.md`
-2. `docs/PROJECT_BRIEF.md`
-3. `.agent/DECISIONS.md`
-4. `.agent/RISKS.md`
-5. `.agent/plans/WEBSITE_IMPLEMENTATION.md`
-6. relevant skill/requirement/security documents
+```powershell
+corepack pnpm run test:e2e:install
+corepack pnpm run test:e2e
+```
 
-## Important Launch Gates
+The production-build suite covers Chromium, Firefox, WebKit, Android Chrome and
+iOS Safari profiles; axe, keyboard/focus, reduced motion, localized routes,
+forms, metadata/security behavior and responsive widths from 320 to 1920 pixels
+are included. The synthetic admin test surface contains no real account, session,
+candidate, contact or API access and is enabled only when `APP_ENV=test` and
+`E2E_UI_TEST_SURFACE=enabled`.
 
-Do not enable production career submissions before:
+With a test-gated production server running at port `3100`, create the final
+synthetic public/admin artifact set with:
 
-- admin MFA is working,
-- server-side RBAC is tested,
-- protected CV storage exists,
-- PDF-only CV validation exists,
-- malware scanning is active,
-- scanner failure is fail-closed,
-- retention/deletion workflow exists,
-- privacy notice versioning exists,
-- production privacy/retention values are approved.
+```powershell
+corepack pnpm run screenshots:final
+```
 
-## v0.3 Documentation Additions
+## 16. Production build
+
+```powershell
+corepack pnpm run build
+corepack pnpm run start
+```
+
+The six project-generated, unbranded images are bundled as temporary public
+media with `temporaryMedia=true` and `requiresReplacement=true`. They do not
+claim to show Ardaş facilities or employees. A published CMS Media/MediaLocale
+record with the same placement replaces them without component/layout changes.
+
+## 17. Admin / Auth0
+
+The Turkish `/admin` application has no public registration. Authentication is
+Auth0 EU-backed; production permission checks require MFA. Roles group grants,
+but every real server service authorizes the atomic permission/scope from the
+RBAC matrix. Preview, revision, schedule, rollback, settings, user/role, audit,
+HR, contact and CV boundaries are server enforced.
+
+Until the production tenant, callback/logout/origin allowlists, claim mapping and
+MFA Always policy are verified, incomplete Auth0 configuration returns an admin
+unavailable response instead of a bypass.
+
+## 18. AWS CV pipeline
 
 ```text
-docs/
-├── architecture/
-│   ├── ARCHITECTURE.md
-│   ├── DATA_MODEL.md
-│   ├── ADR.md
-│   └── ENVIRONMENTS.md
-├── content/
-│   └── CONTENT_INVENTORY.md
-├── legal/
-│   └── PUBLIC_LEGAL_PAGES.md
-├── operations/
-│   ├── DEPLOYMENT.md
-│   ├── BACKUP_RECOVERY.md
-│   ├── LOGGING_MONITORING.md
-│   ├── ROLLBACK.md
-│   └── DOMAIN_DNS_EMAIL.md
-└── security/
-    ├── SECURITY_BASELINE.md
-    ├── RBAC_MATRIX.md
-    ├── FILE_UPLOAD_SECURITY.md
-    ├── PRIVACY_RETENTION.md
-    ├── AUDIT_POLICY.md
-    └── INCIDENT_RESPONSE.md
+PDF ≤ 10 MiB
+→ extension + MIME + PDF signature validation
+→ random key in quarantine S3
+→ GuardDuty Malware Protection for S3
+→ EventBridge
+→ SQS (retry + DLQ)
+→ application processor
+→ clean object promoted to protected S3
 ```
 
-## Current Status
+Error, timeout, unsupported or unavailable scanner states remain quarantined and
+inaccessible. CV download requires authentication, MFA,
+`Applications:cv-download`, a server-verified application/file relationship and
+`clean` scan state. Bucket encryption, versioning/lifecycle, least-privilege IAM,
+queue age, DLQ and alarm provisioning are external production tasks.
 
-Milestone 0 is complete, pushed to `origin/main`, and remotely validated by
-GitHub Actions. Milestone 1 implements provider decisions, PostgreSQL/Drizzle
-migrations, localized route identity/publication, privacy provenance, storage
-states, audit foundation and data-model tests. Public design starts only in a
-later milestone.
+## 19. Email and outbox
+
+Career/contact data and an outbox notification commit in the same database
+transaction. SES messages contain record identifiers and safe operational
+context, not candidate/contact bodies or CV content. Delivery failure never
+rolls back an accepted database submission; the internal worker records a safe
+error and retries according to its outbox state.
+
+Production requires a verified SES sender/domain, HR and Contact Manager
+recipients, SPF, DKIM, DMARC, bounce/failure visibility and scheduled worker
+invocation. No recipient is hard-coded or seeded.
+
+## 20. Security
+
+- Per-request CSP nonce, `strict-dynamic`, no global `unsafe-inline` or
+  `unsafe-eval`, HSTS and the header baseline.
+- Permission/scope RBAC, production MFA contract and private/no-store admin/API.
+- PDF-only fail-closed CV quarantine and protected download checks.
+- Same-origin, body-size, rate-limit and honeypot controls for public forms.
+- Structured PII redaction before logs leave the application.
+- Immutable content revisions and append-oriented audit events without raw PII.
+- Temporary legal notice provenance and production form fail-closed gates.
+
+Security policy details live under `docs/security/` and are regression-tested.
+
+## 21. Deployment
+
+Vercel is configured for Next.js, `fra1`, pnpm `11.22.0`, frozen install and the
+production build. A deployment promotion is:
+
+```text
+CI green
+→ staging backup/recovery point
+→ direct-URL migration
+→ idempotent production seed
+→ staging smoke/E2E
+→ production backup/recovery point
+→ production migration + seed
+→ Vercel promotion
+→ public/admin/form-provider smoke checks
+```
+
+Use secure Vercel environment variables, configure the canonical domain and
+TLS, and keep staging resources isolated. Provider credentials are never needed
+for the public structural corporate shell, but dependent sensitive features stay
+disabled until their own configuration is complete.
+
+## 22. Production gates
+
+Software completion does not assert external go-live readiness. Exact legal
+identity/contact/address data, approved legal texts and retention durations,
+Auth0/Neon/Vercel/AWS/SES/Sentry provisioning, domain/DNS/email authentication,
+provider DPA/data-region review, production backup/PITR evidence and deployed
+field CWV remain `BLOCKED_EXTERNAL`.
+
+The authoritative, actionable split is
+`docs/operations/PRODUCTION_READINESS.md`. Do not enable career/contact production
+flags until that register's relevant legal, privacy and provider gates are closed.
+
+## 23. Troubleshooting
+
+- **Node engine warning:** install `24.19.0`; do not change the project pin to the
+  local `24.14.0` workstation version.
+- **Docker cannot connect:** start Docker Desktop and confirm `docker version`.
+- **Port 55432 busy:** stop the conflicting local process/container, then rerun
+  `test:postgres`; do not edit production connection settings.
+- **Admin returns 503:** complete all Auth0 variables and the allowed Auth0 URLs.
+- **Forms show unavailable:** verify approved notice version, retention, feature
+  flag, rate-limit secret, recipient/SES/internal worker and (career) Auth0/S3 /
+  GuardDuty/SQS requirements.
+- **Public CMS media is absent:** verify a published matching MediaLocale and an
+  HTTPS `PUBLIC_MEDIA_BASE_URL`; temporary structural media remains available.
+- **Migration connection fails:** use the Neon direct URL in
+  `MIGRATION_DATABASE_URL`, not the pooled runtime endpoint.
+
+## 24. Important documentation
+
+- `AGENTS.md` — immutable project facts and working policy
+- `.agent/plans/WEBSITE_IMPLEMENTATION.md` — milestone and validation record
+- `.agent/DECISIONS.md`, `.agent/RISKS.md` — accepted decisions and risks
+- `docs/architecture/` — system, data model, environments and ADRs
+- `docs/security/` — RBAC, upload, CSP/security, audit and privacy controls
+- `docs/operations/` — deploy, domain/email, monitoring, backup and readiness
+- `docs/requirements/I18N.md` — localized route/publication contract
+- `docs/testing/TEST_MATRIX.md` — quality and browser coverage

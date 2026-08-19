@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   demoMediaManifest,
-  getDevelopmentMediaMap,
+  getTemporaryMediaMap,
 } from "../../src/content/demo-media";
-import { demoMediaRequestIsAllowed } from "../../src/content/development-content";
 import { getDevelopmentPage } from "../../src/content/public-pages";
+import { GET as getDemoMedia } from "../../src/app/demo-media/[asset]/route";
 
-describe("Milestone 4.1 demo media contract", () => {
-  it("keeps a complete replaceable local prototype set in the workspace", () => {
+describe("temporary public media contract", () => {
+  it("keeps a complete replaceable production-safe set in the workspace", () => {
     expect(demoMediaManifest.length).toBeGreaterThanOrEqual(5);
     expect(new Set(demoMediaManifest.map((asset) => asset.id)).size)
       .toBe(demoMediaManifest.length);
@@ -24,6 +24,8 @@ describe("Milestone 4.1 demo media contract", () => {
       expect(asset.focalX).toBeLessThanOrEqual(1);
       expect(asset.focalY).toBeGreaterThanOrEqual(0);
       expect(asset.focalY).toBeLessThanOrEqual(1);
+      expect(asset.temporaryMedia).toBe(true);
+      expect(asset.requiresReplacement).toBe(true);
     }
   });
 
@@ -39,10 +41,10 @@ describe("Milestone 4.1 demo media contract", () => {
     }
   });
 
-  it("maps every development homepage placement to the MediaLocale shape", () => {
+  it("maps every homepage placement to the MediaLocale shape", () => {
     for (const locale of ["tr", "en"] as const) {
       const page = getDevelopmentPage("home", locale);
-      const mediaMap = getDevelopmentMediaMap(locale);
+      const mediaMap = getTemporaryMediaMap(locale);
       const blocks = [page.content.hero, ...Object.values(page.content.sections)];
 
       for (const block of blocks.filter((candidate) => candidate.mediaId)) {
@@ -58,43 +60,17 @@ describe("Milestone 4.1 demo media contract", () => {
     }
   });
 
-  it("denies direct demo-media requests outside local/test environments", () => {
-    expect(
-      demoMediaRequestIsAllowed("/demo-media/warehouse-hero.png", {
-        APP_ENV: "local",
-      }),
-    ).toBe(true);
-    expect(
-      demoMediaRequestIsAllowed("/demo-media/warehouse-hero.png", {
-        APP_ENV: "test",
-      }),
-    ).toBe(true);
-    expect(
-      demoMediaRequestIsAllowed("/demo-media/warehouse-hero.png", {
-        APP_ENV: "staging",
-      }),
-    ).toBe(false);
-    expect(
-      demoMediaRequestIsAllowed("/demo-media/warehouse-hero.png", {
-        APP_ENV: "production",
-      }),
-    ).toBe(false);
-    expect(
-      demoMediaRequestIsAllowed("/tr", { APP_ENV: "production" }),
-    ).toBe(true);
-    expect(
-      demoMediaRequestIsAllowed(
-        "/_next/image",
-        { APP_ENV: "production" },
-        "/demo-media/warehouse-hero.png",
-      ),
-    ).toBe(false);
-    expect(
-      demoMediaRequestIsAllowed(
-        "/_next/image",
-        { APP_ENV: "production" },
-        "/approved-media/warehouse.jpg",
-      ),
-    ).toBe(true);
+  it("serves only allowlisted temporary assets with explicit replacement metadata", async () => {
+    const response = await getDemoMedia(new Request("https://ardas.example/demo-media/warehouse-hero.png"), {
+      params: Promise.resolve({ asset: "warehouse-hero.png" }),
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-ardas-media-status")).toBe("temporary-requires-replacement");
+    expect(response.headers.get("cache-control")).not.toContain("immutable");
+
+    const denied = await getDemoMedia(new Request("https://ardas.example/demo-media/secret.png"), {
+      params: Promise.resolve({ asset: "secret.png" }),
+    });
+    expect(denied.status).toBe(404);
   });
 });

@@ -105,6 +105,15 @@ Rules:
 CI validates migrations against a clean PostgreSQL 18 database. Production uses
 Neon in AWS Frankfurt; local/CI use the official PostgreSQL 18.4 image.
 
+Runtime traffic uses Neon's pooled connection as `DATABASE_URL`. Controlled
+migration/seed jobs use the direct connection as `MIGRATION_DATABASE_URL`.
+Never run migrations during a Vercel build or point staging at production data.
+
+The public structural baseline remains available without provider credentials.
+Provider/config incompleteness closes only its dependent sensitive surface:
+Auth0 closes admin; career dependencies close career submit; contact
+dependencies close contact submit.
+
 ## Environment Promotion
 
 Preferred:

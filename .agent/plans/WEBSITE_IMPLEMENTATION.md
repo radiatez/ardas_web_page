@@ -1148,31 +1148,31 @@ Production gates intentionally retained for Milestone 9:
 
 # Milestone 9 — Content, Domain/Email, Staging & Launch
 
-Status: `[ ]`
+Status: `[x]`
+
+Software implementation complete.
+External go-live provisioning remains tracked in
+`docs/operations/PRODUCTION_READINESS.md`.
 
 ## Tasks
 
 - [x] temporary TR/EN legal baseline + idempotent CMS seed
   (`TEMP-2026-08-V1`; legal approval not implied).
-- [ ] final logo/colors/fonts.
-- [ ] company/legal content.
-- [ ] real addresses/contact.
-- [ ] brand assets/product taxonomy.
-- [ ] approved imagery + rights.
-- [ ] content inventory owners/approvers.
-- [ ] approved legal pages.
-- [ ] approved candidate/contact/audit retention durations.
-- [ ] domain/DNS.
-- [ ] SPF/DKIM/DMARC.
-- [ ] email sender + recipients.
-- [ ] analytics/cookie-consent decision.
-- [ ] backups.
-- [ ] restore test.
-- [ ] monitoring.
-- [ ] migration rehearsal.
-- [ ] rollback rehearsal.
-- [ ] staging sign-off.
-- [ ] production launch.
+- [x] final public copy, visual polish, responsive review and temporary media
+  replacement contract.
+- [x] provider-independent structural public content with sensitive surfaces
+  remaining fail-closed.
+- [x] final TR/EN public route, metadata, redirects, error and Dealer Portal
+  regression.
+- [x] final admin/CMS/contact/HR/RBAC/CV/audit regression without new features.
+- [x] production environment, Vercel and Neon pooled/direct connection contract.
+- [x] idempotent production seed with verified facts and no fake operational or
+  personal data.
+- [x] Auth0/AWS/GuardDuty/EventBridge/SQS/SES/Sentry/CloudWatch/domain/backup
+  production runbooks and explicit external gates.
+- [x] final README, one-command validation and synthetic screenshot artifacts.
+- [x] clean PostgreSQL 18.4 migration/reproducibility, full browser/axe,
+  backup/restore, rollback, audit and dependency regression.
 
 Temporary legal baseline record — 2026-08-19:
 
@@ -1208,11 +1208,47 @@ Temporary legal baseline record — 2026-08-19:
 
 ## Acceptance
 
-- no launch-gate TBD remains,
-- legal/privacy/retention approved,
-- email/domain healthy,
-- restore verified,
-- monitoring active.
+- software implementation, tests, migrations, build and deployment config are
+  complete,
+- no unverified business/legal/provider value is fabricated,
+- every external launch input is explicit under READY/BLOCKED_EXTERNAL,
+- production form enablement remains fail-closed until legal/privacy/provider
+  gates are externally closed.
+
+### Final Validation Record — 2026-08-19
+
+- Runtime: local Node.js `24.14.0`; project/CI pin remains Node.js `24.19.x`.
+  pnpm `11.22.0`, Next.js `16.3.1`, PostgreSQL Docker image `18.4`.
+- Frozen install: passed and lockfile was already current.
+- One-command validation: `pnpm run validate` passed lint with zero warnings,
+  Next route generation, TypeScript, `123` non-database tests and production
+  build. Its first Windows run exposed and corrected an old global-pnpm PATH
+  dependency; the final script invokes pinned project tools directly.
+- Clean PostgreSQL: all five migrations applied; `32` tables validated; Drizzle
+  check passed and regeneration produced no migration diff.
+- Production seed: first clean run inserted `12` structural page locales after
+  the `10` temporary legal/form-notice locales and one verified stats setting;
+  second run inserted nothing and preserved all `22` locales/setting. Migration
+  owned six departments and three locations retained both locales.
+- Tests: `39` files and `156/156` tests passed on real PostgreSQL; `33` are
+  PostgreSQL-gated integration tests. E2E-01 through E2E-09, RBAC, CV fail-closed,
+  MFA/session, CSP, XSS, PII redaction, audit, SEO and legal provenance remained
+  green.
+- Browser/E2E: `29` passed and `11` expected project-matrix skips from `40`
+  registrations across Chromium, Firefox, WebKit, Android Chrome and iOS Safari
+  profiles. All `22` required localized routes plus the root redirect, axe,
+  keyboard/focus, mobile menu, reduced motion and overflow checks passed at
+  `320/390/768/1440/1920` widths.
+- Lab diagnostics: Chromium `CLS=0`, `LCP=120 ms`, delivered JavaScript
+  `150,484 bytes`; these are not production field p75 and do not prove INP.
+- Recovery: portable `pg_dump`/`pg_restore`, migration journal, verification
+  fixture and post-restore retention cleanup passed. Rollback contract passed
+  across five migrations with no database drop/truncate operation.
+- Docker cleanup: zero `ardas-test` containers, networks and volumes remained.
+- Production dependency audit: `0` known vulnerabilities.
+- Visual artifacts: seven synthetic public screenshots and four synthetic,
+  PII-free admin screenshots generated under ignored `.test-results` output.
+- Remote CI: recorded after the implementation push below.
 
 ---
 

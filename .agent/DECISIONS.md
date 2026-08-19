@@ -542,3 +542,26 @@ submissions retain the locale, version and shown/acknowledged timestamps they
 originally recorded. Verified data-controller identity/application channels
 come only from `contact_footer.legalController`; no business identity is
 invented or placed in code.
+
+## D-044 — Production Structural Baseline and Temporary Public Media
+**Status:** Accepted; narrows D-036 and supersedes D-037's environment restriction
+
+The public corporate site must not disappear solely because PostgreSQL or a
+public-media provider is unavailable. CMS-published locale content remains the
+first source. When no published row can be resolved, staging/production may use
+a bounded `structural` source containing only AGENTS-approved facts, registered
+localized route slugs and the versioned temporary legal content. This is distinct
+from the local/test `placeholder` source: indexable corporate routes may be
+served, while temporary legal and form routes remain noindex.
+
+This availability rule does not apply to sensitive surfaces. Incomplete Auth0
+closes admin; incomplete privacy/retention/notification/provider configuration
+closes career or contact submission with a localized unavailable state.
+
+The six project-generated, unbranded images may ship as production-safe
+temporary public assets. Every manifest record carries
+`temporaryMedia=true` and `requiresReplacement=true`; filenames are strictly
+allowlisted, bundled by output tracing and cached without `immutable`. They are
+not CMS records, documentary Ardaş photography or a license/brand claim.
+Published CMS Media/MediaLocale records take precedence by media ID, so final
+approved media replaces a placement without component/layout changes.

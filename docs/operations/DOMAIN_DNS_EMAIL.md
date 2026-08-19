@@ -13,6 +13,9 @@ CONTACT_NOTIFICATION_RECIPIENT
 HR_NOTIFICATION_RECIPIENT
 ```
 
+All values remain `BLOCKED_EXTERNAL`; none may be inferred from the temporary
+Dealer Portal host or repository metadata.
+
 ## DNS
 
 Maintain records for:
@@ -32,6 +35,8 @@ Configure:
 - verified sender address/domain
 - bounce/failure visibility
 - retry/queue behavior
+- SES production-access/suppression and bounce/complaint behavior
+- scheduled outbox worker authentication/invocation
 
 Examples of notification flows:
 
@@ -39,6 +44,7 @@ Examples of notification flows:
 - contact message received → Contact Manager recipient
 
 Application/message persistence remains authoritative if email fails.
+Notification payloads contain record identifiers and safe event context only.
 
 ## Secrets
 
@@ -53,6 +59,11 @@ Before launch:
 - canonical domain set,
 - redirect behavior tested,
 - rollback path documented.
+
+Set `SITE_URL` and `APP_BASE_URL` to the verified canonical HTTPS origin. Update
+Auth0 callback/logout/allowed-origin values at the same cutover. Validate `/`
+locale redirect, canonical/hreflang, sitemap and HTTP-to-HTTPS behavior before
+reducing DNS TTL recovery options.
 
 ## Monitoring
 

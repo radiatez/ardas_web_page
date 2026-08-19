@@ -160,7 +160,7 @@ const legalPages = [
           heading: "8. Haklar ve güncellemeler",
           body: [
             "İlgili kişiler, 6698 sayılı Kanun kapsamındaki bilgi alma, düzeltme, silme veya yok etme talep etme, aktarılan üçüncü kişileri bilme, otomatik analiz sonucuna itiraz etme ve kanuna aykırı işleme nedeniyle zarar doğmuşsa giderim talep etme haklarına sahiptir.",
-            `Politika değişiklikleri yeni bir CMS revizyonu ve sürüm numarasıyla yayımlanır. Form kayıtları, kendilerine gösterilen notice sürümünü korur. Mevcut sürüm: ${temporaryLegalVersion}.`,
+            `Politika değişiklikleri yeni bir içerik revizyonu ve sürüm numarasıyla yayımlanır. Form kayıtları, kendilerine gösterilen aydınlatma metni sürümünü korur. Mevcut sürüm: ${temporaryLegalVersion}.`,
           ],
         },
       ],
@@ -230,7 +230,7 @@ const legalPages = [
           heading: "8. Rights and updates",
           body: [
             "Data subjects have the rights provided by Turkish Law No. 6698, including requesting information, correction, deletion or destruction where applicable, learning the recipients of transfers, objecting to an adverse result produced exclusively by automated analysis, and seeking compensation for damage caused by unlawful processing.",
-            `Policy changes are published as a new CMS revision and version. Form records retain the notice version shown at the time of submission. Current version: ${temporaryLegalVersion}.`,
+            `Policy changes are published as a new content revision and version. Form records retain the notice version shown at the time of submission. Current version: ${temporaryLegalVersion}.`,
           ],
         },
       ],
@@ -310,7 +310,7 @@ const legalPages = [
         {
           heading: "10. Güncellemeler",
           body: [
-            `Bu metindeki değişiklikler yeni CMS revizyonu ve yeni hukuki metin sürümüyle yayımlanır. Kariyer ve iletişim kayıtları, başvuru sırasında gösterilen aydınlatma sürümünü korur. Mevcut sürüm: ${temporaryLegalVersion}.`,
+            `Bu metindeki değişiklikler yeni içerik revizyonu ve yeni hukuki metin sürümüyle yayımlanır. Kariyer ve iletişim kayıtları, başvuru sırasında gösterilen aydınlatma sürümünü korur. Mevcut sürüm: ${temporaryLegalVersion}.`,
           ],
         },
       ],
@@ -390,7 +390,7 @@ const legalPages = [
         {
           heading: "10. Updates",
           body: [
-            `Changes are published as a new CMS revision and legal version. Career and contact records retain the privacy notice version displayed when the submission was made. Current version: ${temporaryLegalVersion}.`,
+            `Changes are published as a new content revision and legal version. Career and contact records retain the privacy notice version displayed when the submission was made. Current version: ${temporaryLegalVersion}.`,
           ],
         },
       ],
@@ -444,7 +444,7 @@ const legalPages = [
         {
           heading: "6. Kontrol ve güncellemeler",
           body: [
-            "Tarayıcı ayarlarınız üzerinden çerezleri görüntüleyebilir, silebilir veya engelleyebilirsiniz. Bir çerez kategorisi ya da sağlayıcısı değişirse politika yeni CMS revizyonu ve sürümle güncellenir; zorunlu olmayan teknolojiler gerekli tercih mekanizmasından önce yüklenmez.",
+            "Tarayıcı ayarlarınız üzerinden çerezleri görüntüleyebilir, silebilir veya engelleyebilirsiniz. Bir çerez kategorisi ya da sağlayıcısı değişirse politika yeni içerik revizyonu ve sürümle güncellenir; zorunlu olmayan teknolojiler gerekli tercih mekanizmasından önce yüklenmez.",
             `Mevcut sürüm: ${temporaryLegalVersion}.`,
           ],
         },
@@ -499,7 +499,7 @@ const legalPages = [
         {
           heading: "6. Controls and updates",
           body: [
-            "You can view, delete, or block cookies through your browser settings. If a cookie category or provider changes, this policy is updated as a new CMS revision and version; non-essential technology is not loaded before the required preference mechanism is available.",
+            "You can view, delete, or block cookies through your browser settings. If a cookie category or provider changes, this policy is updated as a new content revision and version; non-essential technology is not loaded before the required preference mechanism is available.",
             `Current version: ${temporaryLegalVersion}.`,
           ],
         },

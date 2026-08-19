@@ -4,7 +4,6 @@ import {
   getAuth0Client,
   hasCompleteAuth0Configuration,
 } from "./auth/auth0";
-import { demoMediaRequestIsAllowed } from "./content/development-content";
 import {
   buildContentSecurityPolicy,
   createCspNonce,
@@ -57,16 +56,6 @@ export async function proxy(request: NextRequest) {
   const nonce = createCspNonce();
   const policy = buildContentSecurityPolicy(nonce);
   const requestHeaders = securedRequestHeaders(request, policy, nonce);
-  if (
-    !demoMediaRequestIsAllowed(
-      pathname,
-      process.env,
-      request.nextUrl.searchParams.get("url"),
-    )
-  ) {
-    return finalizeResponse(new NextResponse(null, { status: 404 }), pathname, policy);
-  }
-
   if (pathname === "/_next/image") {
     return continueWithSecurity(request, requestHeaders, pathname, policy);
   }

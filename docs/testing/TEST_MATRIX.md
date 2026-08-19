@@ -168,3 +168,24 @@ and HR controls. It contains no credentials, session bypass or personal data,
 requires two explicit test-only environment gates, is noindex/robots-disallowed
 and returns 404 when either gate is absent. Authorization and E2E-06 through
 E2E-09 remain exercised against the server services and real PostgreSQL tests.
+
+## Milestone 9 Final Regression Record — 2026-08-19
+
+| Gate | Result |
+|---|---|
+| Frozen install | Passed; exact lockfile, pnpm 11.22.0 |
+| PostgreSQL | Official 18.4 disposable service; 5 migrations, 32 tables, check/reproducibility passed |
+| Production seed | 12 structural + 10 temporary legal/form locale rows; second run preserved 22/22 |
+| Vitest | 39 files / 156 tests passed on real PostgreSQL |
+| PostgreSQL-gated subset | 9 files / 33 tests passed |
+| E2E-01 → E2E-09 | Passed together on the final migrated and seeded schema/build |
+| Browser matrix | Chromium, Firefox, WebKit, Android Chrome and iOS Safari profiles passed |
+| Playwright registrations | 29 passed; 11 intentional project-guard skips; 40 total |
+| Accessibility | axe serious/critical violations 0; keyboard, focus, reduced motion passed |
+| Responsive | 320, 390, 768, 1440 and 1920 widths; no horizontal overflow |
+| Security | 58-permission RBAC, CSP, MFA/session, CV fail-closed, XSS, PII log and audit passed |
+| SEO/public routes | All 22 required TR/EN routes plus the root redirect, canonical, hreflang, sitemap, robots, 301 and errors passed |
+| Lab diagnostic | CLS 0; LCP 120 ms; JS 150,484 bytes; not field p75 |
+| Recovery/rollback | Portable restore, retention reconciliation and 5-migration rollback contract passed |
+| Dependency audit | 0 known production vulnerabilities |
+| Cleanup | No disposable container, network or volume remained |

@@ -49,6 +49,31 @@ No fail-open mode for CVs.
 
 CVs are never placed in public static folders/CDN-public buckets.
 
+Production uses separate `eu-central-1` public, quarantine and protected S3
+buckets. Enable encryption at rest, block public access on quarantine/protected,
+version/lifecycle rules consistent with approved retention, access logging where
+approved and least-privilege IAM. The application identity may write quarantine,
+promote/delete protected files and manage only its required public-media prefix;
+it must not administer bucket policy or unrelated objects.
+
+## GuardDuty Event Flow
+
+```text
+upload
+→ quarantine S3
+→ GuardDuty Malware Protection for S3
+→ EventBridge rule
+→ SQS queue
+→ application processor
+→ clean/protected OR inaccessible quarantine
+```
+
+Provision bounded retry, a DLQ, queue-age/backlog alarms and alerts for infected,
+unsupported, access-denied, failed, timeout and protected-promotion failure. Event
+handling is idempotent. Missing/invalid/provider-error results never promote or
+expose a file. AWS resource identifiers and alarm destinations remain
+`BLOCKED_EXTERNAL` and must not be invented in source.
+
 ## Download
 
 Requires:

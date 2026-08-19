@@ -1,17 +1,17 @@
 import type { Locale } from "@/i18n/config";
-import { routeKeys, type RouteKey } from "@/i18n/routes";
+import { routeDefinitions, routeKeys, type RouteKey } from "../i18n/routes.ts";
 
-import { demoMediaIds } from "./demo-media";
+import { demoMediaIds } from "./demo-media.ts";
 import {
   readLegalContentMetadata,
   readPrivacyNotice,
   type LegalContentMetadata,
   type PrivacyNoticeContent,
-} from "./legal-content";
+} from "./legal-content.ts";
 import {
   getTemporaryLegalSeedPage,
   temporaryPrivacyNotices,
-} from "./temporary-legal-content";
+} from "./temporary-legal-content.ts";
 
 export const publicPageRouteKeys = [
   "home",
@@ -51,7 +51,7 @@ export type PublicPageContent = Partial<LegalContentMetadata> & {
   privacyNotice?: PrivacyNoticeContent;
 };
 
-export type PublicPageSource = "cms" | "placeholder";
+export type PublicPageSource = "cms" | "structural" | "placeholder";
 
 export type PublicPageDocument = {
   routeKey: PublicPageRouteKey;
@@ -197,7 +197,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         brands: {
           eyebrow: "Portföy",
           heading: "150+ markayı tek bir dağıtım disiplini altında buluşturuyoruz.",
-          body: ["Marka portföyümüz, kullanım onayları tamamlandıkça bu seçkide yerini alacak."],
+          body: ["150+ markalık portföy, otomotiv aftermarket dağıtım ölçeğimizin temel parçalarından biridir."],
           action: { label: "Tüm markalar", routeKey: "brands" },
           mediaId: demoMediaIds.portfolio,
           decorativeMedia: true,
@@ -205,7 +205,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         products: {
           eyebrow: "Ürün grupları",
           heading: "50.000+ ürünlük ölçekte, düzenli ve anlaşılır bir portföy.",
-          body: ["Portföy yapısı, onaylanan ürün aileleriyle kademeli olarak tamamlanacak."],
+          body: ["50.000+ ürün ölçeğini, düzenli ve anlaşılır bir portföy yaklaşımıyla ele alıyoruz."],
           action: { label: "Ürün grupları", routeKey: "product-groups" },
           mediaId: demoMediaIds.partsDetail,
         },
@@ -219,9 +219,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         trust: {
           eyebrow: "Deneyim ve ölçek",
           heading: "30+ yıllık sektör deneyimi.",
-          body: [
-            "Kalite, sertifika, ödül ve iş ortaklığı bilgileri doğrulama süreci tamamlandıkça burada yer alacak.",
-          ],
+          body: ["30+ yıllık sektör deneyimi, dağıtım odağı ile operasyonel birikimi bir araya getirir."],
         },
         careers: {
           eyebrow: "İnsan ve kariyer",
@@ -233,7 +231,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         contact: {
           eyebrow: "İletişim",
           heading: "İletişime geçin.",
-          body: ["Kurumsal iletişim bilgileri onaylı CMS yayınına kadar TBD olarak kalır."],
+          body: ["Kurumsal talepleriniz için iletişim sayfası üzerinden ilgili ekibe ulaşın."],
           action: { label: "İletişim sayfası", routeKey: "contact" },
         },
       },
@@ -274,12 +272,12 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
         history: {
           eyebrow: "Tarihçe",
           heading: "30+ yıllık deneyim.",
-          body: ["Onaylı kilometre taşları, kurumsal içerik yayınıyla tamamlanacak."],
+          body: ["30+ yıllık sektör deneyimi, Ardaş’ın dağıtım yaklaşımının temelini oluşturur."],
         },
         people: {
           eyebrow: "İnsan",
           heading: "Operasyonun merkezinde insan var.",
-          body: ["Ekip ve çalışma kültürü anlatısı, onaylı içerikle genişletilecek."],
+          body: ["Dağıtım operasyonu, birlikte çalışan ekiplerin deneyimi ve ortak odağıyla ilerler."],
           action: { label: "Kariyer", routeKey: "careers" },
           mediaId: demoMediaIds.careers,
         },
@@ -298,7 +296,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       hero: {
         eyebrow: "Portföy ölçeği",
         heading: "150+ marka. Tek bir dağıtım disiplini.",
-        body: ["Marka seçkisi, kullanım onayları tamamlandıkça burada yerini alacak."],
+        body: ["150+ markalık portföy, otomotiv aftermarket ihtiyaçlarını geniş bir ürün ölçeğiyle buluşturur."],
         mediaId: demoMediaIds.portfolio,
         decorativeMedia: true,
       },
@@ -317,7 +315,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       hero: {
         eyebrow: "Ürün ölçeği",
         heading: "50.000+ ürünü anlaşılır bir yapıda sunmak.",
-        body: ["Ürün aileleri, onaylı içerik ve görsellerle bu yapı içinde sunulacak."],
+        body: ["50.000+ ürün ölçeği, portföyün düzenli ve anlaşılır biçimde yönetilmesini gerektirir."],
         mediaId: demoMediaIds.partsDetail,
       },
       sections: {},
@@ -453,7 +451,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           brands: {
             eyebrow: "Portfolio",
             heading: "150+ brands, brought together by one distribution discipline.",
-            body: ["Our brand portfolio will take its place in this selection as usage approvals are completed."],
+            body: ["A portfolio of 150+ brands is a core part of our automotive aftermarket distribution scale."],
             action: { label: "All brands", routeKey: "brands" },
             mediaId: demoMediaIds.portfolio,
             decorativeMedia: true,
@@ -461,7 +459,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           products: {
             eyebrow: "Product groups",
             heading: "A clear, organized portfolio at a scale of 50,000+ products.",
-            body: ["The portfolio structure will be completed progressively with approved product families."],
+            body: ["We approach a scale of 50,000+ products through a clear and organized portfolio structure."],
             action: { label: "Product groups", routeKey: "product-groups" },
             mediaId: demoMediaIds.partsDetail,
           },
@@ -475,9 +473,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           trust: {
             eyebrow: "Experience and scale",
             heading: "30+ years of industry experience.",
-            body: [
-              "Quality, certification, award and partnership information will appear here as verification is completed.",
-            ],
+            body: ["30+ years of industry experience bring distribution focus and operational knowledge together."],
           },
           careers: {
             eyebrow: "People and careers",
@@ -489,7 +485,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           contact: {
             eyebrow: "Contact",
             heading: "Start a conversation.",
-            body: ["Approved corporate contact details remain TBD until CMS publication."],
+            body: ["Use the contact page to direct your corporate request to the relevant team."],
             action: { label: "Contact page", routeKey: "contact" },
           },
         },
@@ -530,12 +526,12 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
           history: {
             eyebrow: "History",
             heading: "30+ years of experience.",
-            body: ["Approved milestones will complete this corporate narrative."],
+            body: ["30+ years of industry experience form the foundation of Ardaş’s distribution approach."],
           },
           people: {
             eyebrow: "People",
             heading: "People remain at the centre of the operation.",
-            body: ["The team and workplace narrative will expand with approved content."],
+            body: ["The distribution operation moves through the shared experience and focus of its teams."],
             action: { label: "Careers", routeKey: "careers" },
             mediaId: demoMediaIds.careers,
           },
@@ -554,7 +550,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         hero: {
           eyebrow: "Portfolio scale",
           heading: "150+ brands. One distribution discipline.",
-          body: ["The brand selection will take its place here as usage approvals are completed."],
+          body: ["A portfolio of 150+ brands connects automotive aftermarket needs with broad product scale."],
           mediaId: demoMediaIds.portfolio,
           decorativeMedia: true,
         },
@@ -573,7 +569,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         hero: {
           eyebrow: "Product scale",
           heading: "Presenting 50,000+ products with clarity.",
-          body: ["Product families will be presented within this structure with approved content and imagery."],
+          body: ["A scale of 50,000+ products calls for a portfolio managed with clarity and structure."],
           mediaId: demoMediaIds.partsDetail,
         },
         sections: {},
@@ -685,6 +681,23 @@ export function getDevelopmentPage(
     slug: "",
     source: "placeholder",
     allowIndexing: false,
+    availableLocales: ["tr", "en"],
+  };
+}
+
+export function getStructuralPage(
+  routeKey: PublicPageRouteKey,
+  locale: Locale,
+): PublicPageDocument {
+  const page = locale === "tr" ? trPlaceholders[routeKey] : enPlaceholders[routeKey];
+  const temporaryLegal = routeKey === "privacy" || routeKey === "cookies" ||
+    routeKey === "data-protection" || routeKey === "career-apply" ||
+    routeKey === "contact";
+  return {
+    ...page,
+    slug: routeDefinitions[routeKey][locale],
+    source: "structural",
+    allowIndexing: !temporaryLegal,
     availableLocales: ["tr", "en"],
   };
 }

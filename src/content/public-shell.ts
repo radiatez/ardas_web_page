@@ -72,7 +72,7 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     legalNavigationLabel: "Yasal bağlantılar",
     locationsLabel: "Lokasyonlar",
     contactLabel: "İletişim",
-    contactPlaceholder: "Onaylı iletişim bilgileri yayına hazırlanıyor.",
+    contactPlaceholder: "Kurumsal talepleriniz için iletişim sayfasını kullanın.",
     industryLabel: "Otomotiv Yenileme Pazarı",
     footerStatement: "Türkiye geneline uzanan yedek parça dağıtım deneyimi.",
     locationNames: ["İstanbul", "Ankara", "Diyarbakır"],
@@ -84,9 +84,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     copyrightLabel: "Ardaş Yedek Parça. Tüm hakları saklıdır.",
     home: {
       eyebrow: "Ardaş Yedek Parça",
-      heading: "Yeni kurumsal web deneyimimiz hazırlanıyor.",
+      heading: "Türkiye geneline uzanan dağıtım deneyimi.",
       description:
-        "İçerikler onay süreci tamamlandıktan sonra Türkçe ve İngilizce olarak yayımlanacaktır.",
+        "30+ yıl, 150+ marka ve 50.000+ ürün ölçeği; İstanbul, Ankara ve Diyarbakır’dan Türkiye geneline ulaşır.",
     },
     system: {
       backHomeLabel: "Ana sayfaya dön",
@@ -108,9 +108,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
       privacy: { title: "Gizlilik", eyebrow: "Yasal" },
       cookies: { title: "Çerez Politikası", eyebrow: "Yasal" },
       "data-protection": { title: "KVKK", eyebrow: "Yasal" },
-      pendingHeading: "Onaylı içerik bekleniyor.",
+      pendingHeading: "Hukuki bilgiler",
       pendingDescription:
-        "Bu sayfanın hukuki metni yetkili onayı ve CMS yayını tamamlanmadan yayımlanmayacaktır. İçerik: TBD.",
+        "Güncel hukuki bilgiler bu sayfada sürümlü olarak yayımlanır.",
     },
   },
   en: {
@@ -133,7 +133,7 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     legalNavigationLabel: "Legal links",
     locationsLabel: "Locations",
     contactLabel: "Contact",
-    contactPlaceholder: "Approved contact details are being prepared for publication.",
+    contactPlaceholder: "Use the contact page for corporate enquiries.",
     industryLabel: "Automotive Aftermarket",
     footerStatement: "Aftermarket distribution experience reaching across Türkiye.",
     locationNames: ["Istanbul", "Ankara", "Diyarbakır"],
@@ -145,9 +145,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
     copyrightLabel: "Ardaş Yedek Parça. All rights reserved.",
     home: {
       eyebrow: "Ardaş Yedek Parça",
-      heading: "Our new corporate web experience is taking shape.",
+      heading: "Distribution experience reaching across Türkiye.",
       description:
-        "Content will be published in Turkish and English after the approval process is complete.",
+        "30+ years, 150+ brands and 50,000+ products, reaching across Türkiye from Istanbul, Ankara and Diyarbakır.",
     },
     system: {
       backHomeLabel: "Return home",
@@ -169,9 +169,9 @@ export const publicShellCopy: Record<Locale, PublicShellCopy> = {
       privacy: { title: "Privacy", eyebrow: "Legal" },
       cookies: { title: "Cookie Policy", eyebrow: "Legal" },
       "data-protection": { title: "Data Protection", eyebrow: "Legal" },
-      pendingHeading: "Approved content is pending.",
+      pendingHeading: "Legal information",
       pendingDescription:
-        "Legal copy will not be published before authorized approval and CMS publication are complete. Content: TBD.",
+        "Current legal information is published on this page with version history.",
     },
   },
 };

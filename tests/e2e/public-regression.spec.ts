@@ -20,6 +20,41 @@ async function expectNoSeriousAxeViolations(page: Page) {
   ).toEqual([]);
 }
 
+const requiredLocalizedRoutes = [
+  "/tr",
+  "/tr/kurumsal",
+  "/tr/markalar",
+  "/tr/urun-gruplari",
+  "/tr/depolar",
+  "/tr/kariyer",
+  "/tr/kariyer/basvuru",
+  "/tr/iletisim",
+  "/tr/gizlilik",
+  "/tr/cerez-politikasi",
+  "/tr/kvkk",
+  "/en",
+  "/en/corporate",
+  "/en/brands",
+  "/en/product-groups",
+  "/en/locations",
+  "/en/careers",
+  "/en/careers/apply",
+  "/en/contact",
+  "/en/privacy",
+  "/en/cookie-policy",
+  "/en/data-protection",
+] as const;
+
+test("all required localized public routes and root redirect stay available", async ({ request }) => {
+  for (const route of requiredLocalizedRoutes) {
+    const response = await request.get(route);
+    expect(response.status(), route).toBe(200);
+  }
+  const root = await request.get("/", { maxRedirects: 0 });
+  expect([307, 308]).toContain(root.status());
+  expect(root.headers().location).toBe("/tr");
+});
+
 test("public navigation, locale switch, CSP and accessibility", async ({ page }) => {
   const failures = collectRuntimeFailures(page);
   const response = await page.goto("/tr", { waitUntil: "networkidle" });

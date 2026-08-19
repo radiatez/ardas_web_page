@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   return bundles.flatMap(({ routeKey, locale, bundle }) => {
-    if (!bundle || bundle.page.source !== "cms" || bundle.page.allowIndexing === false) return [];
+    if (!bundle || bundle.page.source === "placeholder" || bundle.page.allowIndexing === false) return [];
     const url = new URL(getLocalizedPath(routeKey, locale), baseUrl);
     const languages = Object.fromEntries(
       bundle.page.availableLocales.map((availableLocale) => [

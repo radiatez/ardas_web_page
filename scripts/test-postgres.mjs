@@ -91,7 +91,8 @@ try {
   run(docker, [...compose, "up", "--detach", "--wait", "postgres-test"]);
   started = true;
   runPnpm(["run", "db:migrate"], testEnvironment);
-  runPnpm(["run", "db:seed:legal"], testEnvironment);
+  runPnpm(["run", "db:seed:production"], testEnvironment);
+  runPnpm(["run", "db:seed:production"], testEnvironment);
   runPnpm(["run", "db:check"], testEnvironment);
   if (fullIntegration) {
     runPnpm(["run", "db:generate"], testEnvironment);

@@ -29,6 +29,9 @@ Exact backup frequency, restore window, object version retention and cross-regio
 disaster-recovery policy remain `TBD` until business RPO/RTO and legal data-region
 requirements are approved. No cross-region replication is enabled implicitly.
 
+The responsible production backup/recovery owner is `TBD` and is tracked as
+`BLOCKED_EXTERNAL`; software completion does not imply an operational schedule.
+
 ## Restore Tests
 
 A backup is not considered reliable until restored successfully.
@@ -42,6 +45,16 @@ Required:
 
 Also verify that a standard `pg_dump` export can be restored with `pg_restore`
 without Neon-specific tooling. Provider PITR alone is not the portability test.
+
+Production rehearsal order:
+
+1. Record the deployment, migration journal and Neon recovery point.
+2. Restore into an isolated staging/recovery branch, never over production.
+3. Validate route/content/revision, audit and application/file relationships.
+4. Reconcile retention deadlines and remove expired restored records.
+5. Validate protected/quarantine/public object relationships and access policy.
+6. Record elapsed recovery against approved RTO and newest durable record against
+   approved RPO.
 
 ## Candidate Data
 

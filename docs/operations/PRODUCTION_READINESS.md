@@ -1,82 +1,141 @@
-# Production Readiness — External & Legal Inputs
+# Production Readiness
 
-This register lists inputs that the application must not invent. Temporary
-legal content is suitable for review and non-production presentation only; it
-does not close these launch gates.
+This is the final source of truth for the distinction between completed software
+implementation and external go-live provisioning. An item in
+`BLOCKED_EXTERNAL` does not reopen Milestone 9; it prevents only the affected
+production capability or launch approval.
 
-## Legal identity and contact
+# READY
 
-- Exact legal company name/title: `TBD`
-- Registered address and any legally required identifiers (including MERSİS,
-  tax, KEP where applicable): `TBD`
-- Verified data-controller application channels: `TBD`
-- Approved legal/contact email, if used: `TBD`
-- Responsible legal approver and traceable approval reference: `TBD`
+- **Next.js application:** production build, pinned Node/pnpm contract, Vercel
+  `fra1` configuration and frozen install/build commands.
+- **PostgreSQL:** PostgreSQL 18-compatible Drizzle schema, five committed
+  migrations, clean-database application, reproducibility check, pooled runtime /
+  direct migration URL split and bounded application pool.
+- **Production seed:** idempotent, preservation-first structural/temporary legal
+  seed; no fake admin, candidate, contact, brand, certificate or legal identity.
+- **Docker integration:** isolated PostgreSQL `18.4` migration/seed/test/recovery
+  lifecycle with guaranteed container/network/volume cleanup.
+- **Internationalization:** localized stable routes, `/tr` and `/en`, localized
+  publication, language switching, 301 slug redirects, 404/error states,
+  canonical and hreflang behavior.
+- **Public site:** responsive corporate shell and all required TR/EN routes,
+  localized metadata, sitemap/robots, Dealer Portal resolution and verified
+  structural fallback when public providers are unavailable.
+- **Design/media:** tokenized `#006B63` accent, replaceable ARDAŞ wordmark,
+  accessible responsive media and six project-generated unbranded temporary
+  assets explicitly marked `temporaryMedia=true` and
+  `requiresReplacement=true`.
+- **CMS:** pages, homepage, corporate content, brands, product groups, locations,
+  departments, careers, legal pages, SEO, MediaLocale and Site Settings.
+- **Publishing:** protected preview, working copies, immutable revisions, direct
+  publish, scheduled transitions, rollback-as-new-revision and slug redirect.
+- **Contact:** localized form, privacy provenance, server validation, body/rate
+  controls, transactionally persisted outbox and permission-separated inbox.
+- **Career/HR:** localized general application, department/location options,
+  privacy provenance, candidate workflow, notes/status history, retention /
+  anonymization/delete mechanisms and protected CV relation.
+- **RBAC:** 58 atomic permission/scope expectations and named positive/negative
+  domain boundaries enforced server-side; roles are grant groupings only.
+- **Authentication/MFA contract:** Auth0 EU adapter, no public registration,
+  secure/private session boundary and mandatory production MFA checks; incomplete
+  provider configuration fails closed.
+- **CV security:** PDF-only, 10 MiB, extension/MIME/signature validation, random
+  key, quarantine, GuardDuty/SQS event handling, clean/protected promotion and
+  authenticated + MFA + permission + relation-checked download.
+- **Security headers:** per-request CSP nonce, `strict-dynamic`, no global
+  `unsafe-inline`/`unsafe-eval`, HSTS, frame, referrer, MIME and permissions
+  policies. Risk R-028 remains mitigated.
+- **Audit/logging:** real security/admin mutations linked to PII-safe audit;
+  application structured logs redact personal data, free text, tokens,
+  credentials, filenames and CV content before output.
+- **Temporary legal lifecycle:** substantive TR/EN public pages and form notices
+  at `TEMP-2026-08-V1`, `temporary`, `requires_legal_review=true`; admin warning,
+  noindex, immutable revision/provenance and approved-version production gate.
+- **Accessibility/responsive:** WCAG 2.2 AA target, axe, keyboard/focus,
+  reduced-motion, overflow and 320/390/768/1440/1920 regression automation.
+- **SEO:** canonical, hreflang, robots, sitemap, localized metadata and redirect
+  contracts covered by tests.
+- **Browser matrix:** Chromium, Firefox, WebKit, Android Chrome profile and iOS
+  Safari profile through Playwright production-build tests.
+- **Backup/restore contract:** portable PostgreSQL `pg_dump`/`pg_restore`,
+  migration-journal verification and post-restore retention reconciliation
+  validated locally; production expectations documented.
+- **Deployment/runbooks:** release order, migration, seed, smoke, rollback,
+  domain/email, monitoring, AWS file flow and fail-closed feature gates are
+  documented. Application software implementation is complete.
 
-Only verified controller identity and channels may be entered under the
-non-secret Site Setting below:
+# BLOCKED_EXTERNAL
 
-```json
-{
-  "legalController": {
-    "identity": "verified value",
-    "contactChannels": ["verified channel"]
-  }
-}
-```
+## Business and brand inputs
 
-The setting key is `contact_footer`. Missing values remain absent on the public
-page; there is no fabricated fallback.
+- Optional final logo, approved palette/font identity and replacement of the
+  current tokenized ARDAŞ wordmark.
+- Exact verified contact details and exact addresses.
+- Final approved brand list, logo usage rights and product taxonomy/content.
+- Final real company photography/media and usage rights. Current generated,
+  unbranded images remain explicitly temporary and must not be described as
+  documentary Ardaş imagery.
 
-## Approved legal content
+## Legal and privacy inputs
 
-- Lawyer-approved TR/EN Privacy Policy: `TBD`
-- Lawyer-approved TR/EN KVKK/Data Protection Notice: `TBD`
-- Lawyer-approved TR/EN Cookie Policy: `TBD`
-- Lawyer-approved TR/EN career short notice: `TBD`
-- Lawyer-approved TR/EN contact short notice: `TBD`
-- Confirmed processing purposes, legal grounds and recipient/transfer wording:
-  `TBD`
+- Lawyer-approved TR/EN Privacy Policy, KVKK/Data Protection text, Cookie Policy,
+  candidate notice and contact notice, each with a traceable approval reference
+  and a new non-`TEMP` version.
+- Approved candidate, contact and audit retention durations.
+- Exact legal/data-controller identity, registered details and official
+  application/contact channels.
+- Approved deletion/anonymization/legal-hold operating policy and responsible
+  owner.
+- Provider DPA/subprocessor/data-region and any international-transfer approval.
 
-Approved copy must be added through CMS as a new immutable revision and a new,
-non-`TEMP` legal version with an approval reference. It must not overwrite
-`TEMP-2026-08-V1` or change historic submission provenance.
+The existing temporary legal version must never be overwritten. Final content
+is a new immutable CMS revision/version; historic submissions keep their
+original notice provenance. Until approved versions and retention/provider gates
+exist, production career/contact submission remains fail-closed. The public
+corporate and legal pages remain available.
 
-## Retention and privacy operations
+## Identity, hosting and database provisioning
 
-- Approved candidate retention days: `TBD`
-- Approved contact retention days: `TBD`
-- Approved audit retention days: `TBD`
-- Legal-hold, deletion/anonymization and data-subject request operating policy:
-  `TBD`
+- Auth0 EU production tenant/application, client credentials, callback/logout /
+  allowed-origin configuration, no-registration evidence, MFA Always proof and
+  role/claim mapping verification.
+- Neon production PostgreSQL 18 project/branch in AWS Frankfurt, pooled and
+  direct connection secrets, access controls and operational owner.
+- Vercel production project, canonical domain, secure environment variables,
+  access ownership and deployment permission.
+- Production domain, DNS provider/access, canonical origin and TLS certificate /
+  redirect validation.
 
-No default duration may be inferred from the temporary legal copy.
+## AWS, email and monitoring provisioning
 
-## Providers and international transfers
+- AWS `eu-central-1` public, quarantine, protected and backup S3 buckets;
+  encryption, versioning/lifecycle and least-privilege IAM evidence.
+- GuardDuty Malware Protection for S3, EventBridge rule, SQS queue/retry/DLQ,
+  queue-age/backlog alarms and end-to-end clean/infected/error/timeout evidence.
+- SES verified sender/domain, official HR and Contact Manager recipients, outbox
+  scheduler, delivery/bounce/failure monitoring, SPF, DKIM and DMARC.
+- Sentry Germany project/DSN/release ownership and provider-side PII scrubbing
+  proof; CloudWatch dashboards/alarms and on-call destinations.
 
-- Provider contracts, DPA/subprocessor lists and processing regions: `TBD`
-- Legal assessment of any transfer outside Türkiye: `TBD`
-- Any required safeguards or transfer instrument: `TBD`
-- Auth0, Neon, AWS, SES and monitoring production-account evidence: `TBD`
+## Recovery and post-deployment evidence
 
-The temporary notice deliberately makes no claim that a DPA, SCC or other
-transfer mechanism is complete.
+- Business-approved RPO/RTO and responsible backup/recovery owner.
+- Neon production PITR history, encrypted logical-export schedule and restore
+  rehearsal evidence.
+- Protected/public/quarantine object lifecycle/restore rehearsal and post-restore
+  retention reconciliation.
+- Staging sign-off, production smoke evidence and rollback of a known-good hosted
+  deployment.
+- Production field Core Web Vitals p75 for LCP, INP and CLS after deployment.
+  Existing `CLS=0`, lab `LCP=136 ms` and `150,554` delivered JS bytes are local
+  regression diagnostics, not field p75.
 
-## Cookies and tracking
+## Information required from the owner
 
-The current code has no public analytics/advertising tracker and no public
-browser-storage preference mechanism. Auth0 admin session/security cookies are
-strictly necessary. Before adding any non-essential cookie, analytics, pixel or
-tracking technology:
-
-- update and approve the cookie inventory/policy,
-- complete the legal assessment,
-- implement and verify the required preference/consent mechanism,
-- prevent the technology from loading before that mechanism permits it.
-
-## Production form gate
-
-Career and contact forms remain disabled unless the active locale notice is
-published, matches the configured version, is marked approved, no longer
-requires legal review and contains a traceable approval reference. All other
-security, retention, provider and notification gates remain in force.
+Provide only verified values/evidence for the items above: final identity/media,
+legal copy and approval reference, legal/controller/contact/address data,
+retention durations, domain/DNS access, provider project/resource identifiers
+and credentials through secret management, official email sender/recipients,
+provider/legal approvals, backup ownership and go-live sign-off. No value may be
+guessed or committed to Git.
