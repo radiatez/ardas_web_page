@@ -1248,7 +1248,11 @@ Temporary legal baseline record — 2026-08-19:
 - Production dependency audit: `0` known vulnerabilities.
 - Visual artifacts: seven synthetic public screenshots and four synthetic,
   PII-free admin screenshots generated under ignored `.test-results` output.
-- Remote CI: recorded after the implementation push below.
+- Remote CI: GitHub Actions run `#24` / `32259130626` passed for implementation
+  commit `9a10df74cd9a3af0666af16729f859684eb5532e`; migration, production seed and
+  idempotence, Drizzle reproducibility, lint, typecheck, `156` tests, build,
+  dependency audit, five-browser E2E/accessibility, backup/restore and rollback
+  validation were all green.
 
 ---
 
