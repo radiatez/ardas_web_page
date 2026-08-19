@@ -682,7 +682,13 @@ Visual-validation limitation:
 
 Remote validation:
 
-- pending commit/push and GitHub Actions result.
+- implementation commit `a9c6b706948a272fe633ca4bfa6b8da063654bd1`
+  passed GitHub Actions `CI` run `#12` / run ID `32228443044`, attempt 1,
+- the pinned Node.js 24.19.0 + PostgreSQL 18.4 job passed frozen install,
+  clean migration, regeneration/no-diff, lint, typecheck, all 96 tests,
+  production build and dependency audit,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32228443044`.
 
 Scope retained:
 
