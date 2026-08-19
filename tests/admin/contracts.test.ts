@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { validatePageDraftInput, validateSlugRedirect } from "../../src/admin/cms";
 import { validatePublicMediaUpload } from "../../src/admin/public-media";
+import { getTemporaryLegalSeedPage } from "../../src/content/temporary-legal-content";
 
 function png(width = 1200, height = 800) {
   const bytes = new Uint8Array(24);
@@ -44,6 +45,23 @@ describe("Milestone 6 CMS contracts", () => {
       .toThrowError("slug_redirect_invalid");
     expect(() => validateSlugRedirect({ locale: "tr", oldPath: "/tr/same", newPath: "/tr/same" }))
       .toThrowError("slug_redirect_invalid");
+  });
+
+  it("requires versioned temporary or approval-backed legal metadata", () => {
+    expect(() => validatePageDraftInput({
+      routeKey: "privacy", locale: "tr", title: "Gizlilik",
+      content: { hero: { heading: "Gizlilik" }, sections: {}, legalBlocks: [] },
+    })).toThrowError("legal_metadata_invalid");
+
+    const temporary = getTemporaryLegalSeedPage("privacy", "tr");
+    expect(validatePageDraftInput({
+      routeKey: "privacy", locale: "tr", title: temporary.title,
+      content: temporary.content,
+    }).content).toMatchObject({
+      legal_status: "temporary",
+      legal_version: "TEMP-2026-08-V1",
+      requires_legal_review: true,
+    });
   });
 
   it("validates public media by extension, MIME, signature, size and measured dimensions", () => {

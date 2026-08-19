@@ -521,3 +521,24 @@ PostgreSQL 18.4 lifecycle and includes migrations, all Vitest tests, production
 build, browser/axe/responsive regression, portable backup/restore and rollback
 contract validation before guaranteed cleanup. Lab CWV values are regression
 diagnostics only; production field p75 evidence remains a launch gate.
+
+## D-043 — Temporary Legal Content Lifecycle
+**Status:** Accepted; supersedes D-039 only for temporary legal publication
+
+Legal pages and the career/contact short notices use explicit content metadata.
+`TEMP-2026-08-V1` is publishable for review and public presentation only when
+`legal_status=temporary` and `requires_legal_review=true`. The admin shows
+`Geçici metin — hukuk onayı bekleniyor`; the public page has no development
+warning and temporary seed pages are noindex.
+
+Final content requires a new non-temporary version, `legal_status=approved`,
+`requires_legal_review=false` and a traceable approval reference. Any legal
+body, metadata or embedded notice change must change the version. CMS revisions
+remain immutable; the idempotent seed creates missing records only.
+
+Form acknowledgement means “notice read”, not explicit consent. Production
+forms fail closed on temporary/review-required notices, while historic
+submissions retain the locale, version and shown/acknowledged timestamps they
+originally recorded. Verified data-controller identity/application channels
+come only from `contact_footer.legalController`; no business identity is
+invented or placed in code.

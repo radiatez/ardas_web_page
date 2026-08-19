@@ -1152,6 +1152,8 @@ Status: `[ ]`
 
 ## Tasks
 
+- [x] temporary TR/EN legal baseline + idempotent CMS seed
+  (`TEMP-2026-08-V1`; legal approval not implied).
 - [ ] final logo/colors/fonts.
 - [ ] company/legal content.
 - [ ] real addresses/contact.
@@ -1171,6 +1173,38 @@ Status: `[ ]`
 - [ ] rollback rehearsal.
 - [ ] staging sign-off.
 - [ ] production launch.
+
+Temporary legal baseline record — 2026-08-19:
+
+- Substantive TR/EN Privacy, Cookie and KVKK/Data Protection pages plus
+  career/contact short notices were added to the versioned CMS seed.
+- Admin exposes temporary/review-required status; public pages remain
+  presentable and noindex without a development warning.
+- Approved replacement copy must be a new version/revision with an approval
+  reference. Historic form provenance is immutable and production forms fail
+  closed on temporary notices.
+- Exact legal identity, controller channels, lawyer-approved wording, retention
+  durations and provider transfer evidence remain open launch gates in
+  `docs/operations/PRODUCTION_READINESS.md`.
+
+### Validation Record — 2026-08-19 (temporary legal baseline)
+
+- Runtime: local Node `24.14.0` (project/CI pin remains `24.19.x`), pnpm
+  `11.22.0`, Next.js `16.3.1`, PostgreSQL `18.4` in the disposable Docker test
+  environment.
+- Frozen install: passed (`pnpm install --frozen-lockfile`; Node pin mismatch
+  reported as a non-fatal local warning).
+- Lint: passed with zero warnings.
+- Typecheck: Next route generation and TypeScript passed.
+- Unit/component tests: `121` passed; `30` database tests skipped without a
+  database as designed.
+- Real PostgreSQL: clean migrations, legal CMS seed (`10` inserted), idempotent
+  seed coverage and all `151/151` tests passed; container/network removed.
+- Schema: Drizzle check passed; regeneration reported no schema changes.
+- Production build: passed.
+- Production dependency audit: no known vulnerabilities.
+- Scope note: this validates the temporary content lifecycle, not lawyer
+  approval or the remaining Milestone 9 production gates.
 
 ## Acceptance
 

@@ -14,9 +14,11 @@ Use this inventory before launch.
 | Diyarbakır location | TBD | TBD | TBD | TBD | TBD | Missing |
 | Careers intro | HR | TBD | TBD | TBD | TBD | Missing |
 | Contact info | TBD | TBD | TBD | TBD | N/A | Missing |
-| Privacy page | Legal/TBD | TBD | TBD | TBD | N/A | Missing |
-| Cookie policy | Legal/TBD | TBD | TBD | TBD | N/A | Missing |
-| KVKK/Data Protection | Legal/TBD | TBD | TBD | TBD | N/A | Missing |
+| Privacy page | Legal/TBD | TBD | Temporary V1 | Temporary V1 | N/A | Legal review required |
+| Cookie policy | Legal/TBD | TBD | Temporary V1 | Temporary V1 | N/A | Legal review required |
+| KVKK/Data Protection | Legal/TBD | TBD | Temporary V1 | Temporary V1 | N/A | Legal review required |
+| Career short notice | HR + Legal/TBD | TBD | Temporary V1 | Temporary V1 | N/A | Legal review required |
+| Contact short notice | Contact + Legal/TBD | TBD | Temporary V1 | Temporary V1 | N/A | Legal review required |
 
 ## Required Metadata
 

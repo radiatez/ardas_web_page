@@ -22,11 +22,13 @@ describe("localized public system states", () => {
     expect(html).toContain('href="/en"');
   });
 
-  it("keeps legal copy explicitly approval-gated", () => {
+  it("renders substantive temporary legal copy without a public development warning", () => {
     const html = renderToStaticMarkup(
       <LegalPageShell page={getDevelopmentPage("privacy", "en")} />,
     );
-    expect(html).toContain("Approved legal copy is pending.");
-    expect(html).toContain("Content: TBD.");
+    expect(html).toContain("Categories of data");
+    expect(html).toContain("Turkish Law No. 6698");
+    expect(html).not.toContain("TBD");
+    expect(html).not.toContain("Geçici metin — hukuk onayı bekleniyor");
   });
 });

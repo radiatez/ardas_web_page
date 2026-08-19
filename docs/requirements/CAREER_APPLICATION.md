@@ -177,9 +177,11 @@ privacy_notice_shown_at
 privacy_acknowledged_at
 ```
 
-If acknowledgement is legally not a "consent" but only confirmation of notice display, field naming/UI must match approved legal language.
-
-Do not invent legal semantics.
+The checkbox confirms that the applicable KVKK/Data Protection Notice was read;
+it is not explicit consent. The locale-specific CMS notice, version shown and
+acknowledgement timestamp are persisted. Later wording must use a new version
+and revision so historic submission provenance remains unchanged. Production
+rejects a temporary or review-required active notice.
 
 ## Submission Flow
 

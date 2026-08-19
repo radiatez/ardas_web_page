@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/config";
+import type { PrivacyNoticeContent } from "@/content/legal-content";
 
 export const contactFieldNames = [
   "submission_id",
@@ -60,6 +61,7 @@ export type FormFieldErrors = Record<string, FormErrorCode>;
 export type PublicFormConfiguration = {
   locale: Locale;
   privacyNoticeVersion: string;
+  privacyNotice: PrivacyNoticeContent;
   privacyAcknowledgementRequired: boolean;
   approvalGatedCareerFieldsEnabled: boolean;
 };
@@ -93,4 +95,3 @@ export function approvalGatedCareerFieldErrors(
   }
   return errors;
 }
-

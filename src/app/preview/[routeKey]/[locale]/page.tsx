@@ -22,5 +22,5 @@ export default async function AdminPreviewPage({ params }: { params: Promise<{ r
   const published = await loadPublishedPageBundle(db, routeKey, rawLocale).catch(() => undefined);
   const bundle: PublicPageBundle = published ? { ...published, page } : { page, blockMedia: {}, brands: [], productGroups: [], locations: [] };
   const legal = routeKey === "privacy" || routeKey === "cookies" || routeKey === "data-protection";
-  return routeKey === "home" ? <PublicHomepage bundle={bundle} /> : legal ? <LegalPageShell page={page} /> : <CorePublicPage bundle={bundle} />;
+  return routeKey === "home" ? <PublicHomepage bundle={bundle} /> : legal ? <LegalPageShell controllerDetails={bundle.legalController} page={page} /> : <CorePublicPage bundle={bundle} />;
 }

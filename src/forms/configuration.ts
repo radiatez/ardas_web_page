@@ -1,8 +1,17 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
+import { parsePublicPageContent } from "@/content/public-pages";
+import {
+  privacyNoticeCanEnableProduction,
+  readPrivacyNotice,
+  type PrivacyNoticeContent,
+} from "@/content/legal-content";
+import { temporaryPrivacyNotices } from "@/content/temporary-legal-content";
+import { isPubliclyAvailable } from "@/content/publication";
 import type { DatabaseClient } from "@/db/client";
-import { siteSettings } from "@/db/schema";
+import { pageLocales, pages, siteSettings } from "@/db/schema";
 import type { Locale } from "@/i18n/config";
+import { routeDefinitions } from "@/i18n/routes";
 import { developmentContentIsEnabled } from "@/content/development-content";
 import { hasCompleteAuth0Configuration } from "@/auth/auth0";
 import { resolveRetentionDays } from "@/security/privacy-retention";
@@ -24,6 +33,37 @@ function enabled(value: string | undefined): boolean {
 function nonEmpty(value: string | undefined): string | undefined {
   const normalized = value?.trim();
   return normalized || undefined;
+}
+
+async function resolvePublishedPrivacyNotice(
+  db: DatabaseClient,
+  kind: PublicFormKind,
+  locale: Locale,
+  now: Date,
+): Promise<PrivacyNoticeContent | undefined> {
+  const routeKey = kind === "career" ? "career-apply" : "contact";
+  const [row] = await db
+    .select({
+      title: pageLocales.title,
+      content: pageLocales.contentJson,
+      locale: pageLocales.locale,
+      slug: pageLocales.slug,
+      publishStatus: pageLocales.publishStatus,
+      publishedAt: pageLocales.publishedAt,
+      scheduledArchiveAt: pageLocales.scheduledArchiveAt,
+    })
+    .from(pages)
+    .innerJoin(pageLocales, eq(pageLocales.pageId, pages.id))
+    .where(and(eq(pages.routeKey, routeKey), eq(pageLocales.locale, locale)))
+    .limit(1);
+  if (
+    !row ||
+    row.slug !== routeDefinitions[routeKey][locale] ||
+    !isPubliclyAvailable(row, now)
+  ) return undefined;
+  return readPrivacyNotice(
+    parsePublicPageContent(row.content, row.title).privacyNotice,
+  );
 }
 
 async function settingString(
@@ -58,6 +98,7 @@ export async function resolveSubmissionRuntimeConfiguration(
   locale: Locale,
   environment: FormEnvironment = process.env,
 ): Promise<SubmissionRuntimeConfiguration | undefined> {
+  const now = new Date();
   const development = developmentContentIsEnabled(environment);
   const featureEnabled =
     kind === "career"
@@ -74,9 +115,29 @@ export async function resolveSubmissionRuntimeConfiguration(
   );
   if (!retentionDays) return undefined;
 
-  const configuredNoticeVersion = nonEmpty(environment.FORM_PRIVACY_NOTICE_VERSION);
-  const privacyNoticeVersion = configuredNoticeVersion ?? (development ? "TBD" : undefined);
-  if (!privacyNoticeVersion || (!development && privacyNoticeVersion.toUpperCase() === "TBD")) {
+  const publishedNotice = await resolvePublishedPrivacyNotice(
+    db,
+    kind,
+    locale,
+    now,
+  );
+  const privacyNotice = publishedNotice ??
+    (development ? temporaryPrivacyNotices[kind][locale] : undefined);
+  if (!privacyNotice) {
+    return undefined;
+  }
+  const configuredNoticeVersion = nonEmpty(
+    kind === "career"
+      ? environment.CAREER_PRIVACY_NOTICE_VERSION ?? environment.FORM_PRIVACY_NOTICE_VERSION
+      : environment.CONTACT_PRIVACY_NOTICE_VERSION ?? environment.FORM_PRIVACY_NOTICE_VERSION,
+  );
+  if (!development && configuredNoticeVersion !== privacyNotice.legal_version) {
+    return undefined;
+  }
+  if (
+    environment.APP_ENV === "production" &&
+    !privacyNoticeCanEnableProduction(privacyNotice)
+  ) {
     return undefined;
   }
 
@@ -108,8 +169,9 @@ export async function resolveSubmissionRuntimeConfiguration(
   return {
     locale,
     retentionDays,
-    privacyNoticeVersion,
-    privacyAcknowledgementRequired: privacyNoticeVersion !== "TBD",
+    privacyNoticeVersion: privacyNotice.legal_version,
+    privacyNotice,
+    privacyAcknowledgementRequired: true,
     approvalGatedCareerFieldsEnabled:
       kind === "career" && enabled(environment.CAREER_APPROVAL_GATED_FIELDS_ENABLED),
   };

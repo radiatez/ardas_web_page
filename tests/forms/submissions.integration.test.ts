@@ -4,6 +4,7 @@ import { eq, inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { createDatabase } from "../../src/db/client";
+import { temporaryPrivacyNotices } from "../../src/content/temporary-legal-content";
 import {
   careerApplications,
   contactSubmissions,
@@ -123,17 +124,21 @@ describeWithDatabase("Milestone 5 PostgreSQL submission persistence", () => {
     await database.pool.end();
   });
 
-  function configuration(): SubmissionRuntimeConfiguration {
+  function configuration(version = "test-v1"): SubmissionRuntimeConfiguration {
     return {
       locale: "tr",
       retentionDays: 30,
-      privacyNoticeVersion: "test-v1",
+      privacyNoticeVersion: version,
+      privacyNotice: {
+        ...temporaryPrivacyNotices.contact.tr,
+        legal_version: version,
+      },
       privacyAcknowledgementRequired: true,
       approvalGatedCareerFieldsEnabled: false,
     };
   }
 
-  function contactRaw(now: Date, submissionId = randomUUID()) {
+  function contactRaw(now: Date, submissionId = randomUUID(), version = "test-v1") {
     return {
       submissionId,
       locale: "tr",
@@ -143,7 +148,7 @@ describeWithDatabase("Milestone 5 PostgreSQL submission persistence", () => {
       phone: "+90 (555) 111 22 33",
       subject: `Milestone 5 ${submissionId}`,
       message: "Bu kayıt persistence ve notification dayanıklılık testi içindir.",
-      privacyNoticeVersion: "test-v1",
+      privacyNoticeVersion: version,
       privacyNoticeShownAt: new Date(now.getTime() - 60_000).toISOString(),
       privacyAcknowledged: true,
     };
@@ -240,6 +245,35 @@ describeWithDatabase("Milestone 5 PostgreSQL submission persistence", () => {
     );
     createdContactIds.push(second.recordId!);
     expect(second.duplicate).toBe(false);
+  });
+
+  it("keeps the notice version shown to an earlier submission after a new version is introduced", async () => {
+    const now = new Date();
+    const sender = new TestSender();
+    const first = await persistContactSubmission(
+      database.db,
+      sender,
+      contactRaw(now, randomUUID(), "TEMP-2026-08-V1"),
+      configuration("TEMP-2026-08-V1"),
+      now,
+    );
+    createdContactIds.push(first.recordId!);
+    const second = await persistContactSubmission(
+      database.db,
+      sender,
+      contactRaw(now, randomUUID(), "LEGAL-2026-09-V1"),
+      configuration("LEGAL-2026-09-V1"),
+      now,
+    );
+    createdContactIds.push(second.recordId!);
+    const stored = await database.db
+      .select({ id: contactSubmissions.id, version: contactSubmissions.privacyNoticeVersion })
+      .from(contactSubmissions)
+      .where(inArray(contactSubmissions.id, [first.recordId!, second.recordId!]));
+    expect(stored).toEqual(expect.arrayContaining([
+      { id: first.recordId, version: "TEMP-2026-08-V1" },
+      { id: second.recordId, version: "LEGAL-2026-09-V1" },
+    ]));
   });
 
   it("persists a null-job general application with quarantined pending CV metadata", async () => {

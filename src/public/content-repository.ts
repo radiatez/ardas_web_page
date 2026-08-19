@@ -29,6 +29,10 @@ import {
 } from "@/db/schema";
 import type { Locale } from "@/i18n/config";
 import { routeDefinitions } from "@/i18n/routes";
+import {
+  loadLegalControllerDetails,
+  type LegalControllerDetails,
+} from "@/public/legal-controller";
 
 export { developmentContentIsEnabled } from "@/content/development-content";
 
@@ -78,6 +82,7 @@ export type PublicPageBundle = {
   brands: readonly PublicBrand[];
   productGroups: readonly PublicProductGroup[];
   locations: readonly PublicLocation[];
+  legalController?: LegalControllerDetails;
 };
 
 type RuntimeEnvironment = DevelopmentContentEnvironment & {
@@ -414,7 +419,7 @@ export async function loadPublishedPageBundle(
   const page = await loadPage(db, routeKey, locale, now);
   if (!page) return undefined;
 
-  const [blockMediaMap, brandItems, productGroupItems, locationItems] =
+  const [blockMediaMap, brandItems, productGroupItems, locationItems, legalController] =
     await Promise.all([
       loadMediaMap(db, getBlockMediaIds(page), locale, now, options.mediaBaseUrl),
       routeKey === "home" || routeKey === "brands"
@@ -426,6 +431,9 @@ export async function loadPublishedPageBundle(
       routeKey === "home" || routeKey === "locations"
         ? loadLocations(db, locale, now, options.mediaBaseUrl)
         : Promise.resolve([]),
+      routeKey === "data-protection"
+        ? loadLegalControllerDetails(db)
+        : Promise.resolve(undefined),
     ]);
 
   return {
@@ -444,6 +452,7 @@ export async function loadPublishedPageBundle(
     brands: brandItems,
     productGroups: productGroupItems,
     locations: locationItems,
+    legalController,
   };
 }
 

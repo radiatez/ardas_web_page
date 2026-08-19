@@ -57,6 +57,9 @@ jobs:
       - name: Apply migrations to clean PostgreSQL
         run: pnpm run db:migrate
 
+      - name: Seed temporary legal CMS content
+        run: pnpm run db:seed:legal
+
       - name: Verify migration metadata
         run: pnpm run db:check
 

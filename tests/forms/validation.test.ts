@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { PublicFormConfiguration } from "../../src/forms/contracts";
+import { temporaryPrivacyNotices } from "../../src/content/temporary-legal-content";
 import { PublicFormValidationError } from "../../src/forms/errors";
 import { parseContactRequestBody } from "../../src/forms/parsing";
 import {
@@ -13,6 +14,10 @@ import {
 const configuration: PublicFormConfiguration = {
   locale: "tr",
   privacyNoticeVersion: "test-v1",
+  privacyNotice: {
+    ...temporaryPrivacyNotices.contact.tr,
+    legal_version: "test-v1",
+  },
   privacyAcknowledgementRequired: true,
   approvalGatedCareerFieldsEnabled: false,
 };
@@ -198,4 +203,3 @@ describe("Milestone 5 authoritative form validation", () => {
     ).not.toThrow();
   });
 });
-

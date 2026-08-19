@@ -81,41 +81,42 @@ function FormStatus({ state }: { state: SubmitState }) {
 
 function PrivacyFields({
   configuration,
+  kind,
   noticeShownAt,
-}: Pick<CommonFormProps, "configuration" | "noticeShownAt">) {
+}: Pick<CommonFormProps, "configuration" | "noticeShownAt"> & {
+  kind: "career" | "contact";
+}) {
   const { locale } = configuration;
+  const notice = configuration.privacyNotice;
   return (
-    <div className="public-form__privacy">
+    <section
+      aria-labelledby={`${kind}-privacy-notice-heading`}
+      className="public-form__privacy"
+    >
       <input
         name="privacy_notice_version"
         type="hidden"
         value={configuration.privacyNoticeVersion}
       />
       <input name="privacy_notice_shown_at" type="hidden" value={noticeShownAt} />
+      <h3 className="type-label" id={`${kind}-privacy-notice-heading`}>
+        {notice.heading}
+      </h3>
+      {notice.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
       <p>
-        {configuration.privacyNoticeVersion === "TBD"
-          ? locale === "tr"
-            ? "Gizlilik bildirimi sürümü onay bekliyor; bu form production ortamında kapalı kalır."
-            : "The privacy notice version is pending approval; this form remains disabled in production."
-          : locale === "tr"
-            ? `Gizlilik bildirimi sürümü: ${configuration.privacyNoticeVersion}`
-            : `Privacy notice version: ${configuration.privacyNoticeVersion}`}
-        {" "}
-        <Link href={getLocalizedPath("privacy", locale)}>
-          {locale === "tr" ? "Gizlilik sayfası" : "Privacy page"}
-        </Link>
+        {locale === "tr" ? "Aydınlatma sürümü" : "Notice version"}: {configuration.privacyNoticeVersion}
       </p>
       {configuration.privacyAcknowledgementRequired ? (
         <label className="public-form__checkbox" htmlFor="privacy_acknowledged">
           <input id="privacy_acknowledged" name="privacy_acknowledged" required type="checkbox" />
           <span>
-            {locale === "tr"
-              ? "Gizlilik bildirimini görüntülediğimi onaylıyorum."
-              : "I confirm that I have viewed the privacy notice."}
+            <Link href={getLocalizedPath(notice.related_route_key, locale)}>
+              {notice.acknowledgement_label}
+            </Link>
           </span>
         </label>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -246,7 +247,7 @@ export function ContactForm({
           <textarea aria-describedby={errors.message ? fieldErrorId("message") : undefined} aria-invalid={Boolean(errors.message)} id="message" maxLength={5000} minLength={10} name="message" required rows={8} />
         </FormField>
       </div>
-      <PrivacyFields configuration={configuration} noticeShownAt={noticeShownAt} />
+      <PrivacyFields configuration={configuration} kind="contact" noticeShownAt={noticeShownAt} />
       <FormStatus state={state} />
       <button className="button-primary public-form__submit" disabled={state.status === "submitting" || state.status === "success"} type="submit">
         {state.status === "submitting"
@@ -441,7 +442,7 @@ export function CareerApplicationForm({
           </FormField>
         </div>
       </fieldset>
-      <PrivacyFields configuration={configuration} noticeShownAt={noticeShownAt} />
+      <PrivacyFields configuration={configuration} kind="career" noticeShownAt={noticeShownAt} />
       <FormStatus state={state} />
       <button className="button-primary public-form__submit" disabled={state.status === "submitting" || Boolean(state.locked)} type="submit">
         {state.status === "submitting"

@@ -29,8 +29,13 @@ Store:
 locale
 privacy_notice_version
 privacy_notice_shown_at
-privacy_acknowledged_at nullable/according to approved wording
+privacy_acknowledged_at
 ```
+
+The form renders the locale-specific CMS notice and an acknowledgement that it
+was read. This is not explicit consent. Historic submissions keep the version
+shown even after a new CMS notice is published. Production rejects a temporary
+or review-required active notice.
 
 ## Validation
 

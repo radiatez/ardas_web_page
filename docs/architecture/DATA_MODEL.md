@@ -107,6 +107,12 @@ updated_at
 currently published locale row. Publish applies it atomically; rollback writes a
 new working copy and revision.
 
+Legal page `content_json` includes `legal_status`, `legal_version`,
+`requires_legal_review` and, for approved copy, an approval reference. The
+career/contact page content embeds its locale-specific short `privacyNotice`
+with the same lifecycle metadata and acknowledgement label. Legal or notice
+changes require a new version and immutable revision.
+
 ### SlugRedirect
 
 ```text
@@ -600,3 +606,15 @@ erDiagram
 - Anonymization detaches/deletes CV media, clears PII/free text and notes, archives
   the neutral application row, and preserves status/audit history. Audit metadata
   contains IDs and safe state only.
+
+## Temporary Legal Content Implementation Notes
+
+- The seed creates missing Page/PageLocale rows and revision 1 for six public
+  legal variants and four career/contact short-notice variants; existing locale
+  rows are never overwritten.
+- `TEMP-2026-08-V1` is temporary, review-required and cannot enable production
+  forms. Approved content uses a new non-temporary version/reference.
+- Submission tables keep the exact notice version and timestamps recorded at
+  acceptance; later CMS revisions do not rewrite those values.
+- Verified controller identity/application channels are non-secret structured
+  content under the existing `contact_footer` SiteSetting.

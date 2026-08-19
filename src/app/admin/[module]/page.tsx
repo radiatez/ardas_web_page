@@ -8,6 +8,7 @@ import { listPublicMedia } from "@/admin/public-media";
 import { requireAdminPagePermission } from "@/admin/request-access";
 import { CatalogCreateForm, CatalogInlineEditor, MediaDeleteButton, MediaLocaleEditor, PublicMediaUploadForm, SiteSettingForm } from "@/components/admin/admin-controls";
 import { publicPageRouteKeys, type PublicPageRouteKey } from "@/content/public-pages";
+import { readLegalContentMetadata } from "@/content/legal-content";
 import { getRuntimeDatabase } from "@/db/runtime";
 import { contentRevisions, siteSettings, slugRedirects } from "@/db/schema";
 import type { PermissionKey } from "@/security/rbac/catalog";
@@ -47,10 +48,11 @@ export default async function AdminModulePage({ params }: { params: Promise<{ mo
   if (pageModule) {
     const principal = await requireAdminPagePermission(pageModule.permission, { returnTo: `/admin/${module}` });
     const rows = await listPageWorkspace(db, principal);
-    return <main><PageHeading kicker="Yapılandırılmış yayın" title={pageModule.title}>Taslaklar TR ve EN için ayrı yönetilir. Yasal içerikte onay referansı bulunmadan yayın kapalıdır.</PageHeading>
+    return <main><PageHeading kicker="Yapılandırılmış yayın" title={pageModule.title}>Taslaklar TR ve EN için ayrı yönetilir. Geçici hukuk metni açık statüyle izlenir; onaylı metin için hukuk referansı zorunludur.</PageHeading>
       <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Sayfa</th><th>Dil</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>
         {pageModule.routes.flatMap((route) => (["tr", "en"] as const).map((locale) => { const row = rows.find((item) => item.routeKey === route && item.locale === locale);
-          return <tr key={`${route}-${locale}`}><td>{route}</td><td>{locale.toUpperCase()}</td><td>{row?.publishStatus ?? "Oluşturulmadı"}</td><td><Link href={`/admin/icerik/${route}/${locale}`}>Aç</Link></td></tr>; }))}
+          const legalMetadata = row?.content ? readLegalContentMetadata(row.content) : undefined;
+          return <tr key={`${route}-${locale}`}><td>{route}</td><td>{locale.toUpperCase()}</td><td>{row?.publishStatus ?? "Oluşturulmadı"}{legalMetadata?.legal_status === "temporary" ? <span className="admin-table-status-note">Geçici metin — hukuk onayı bekleniyor<br />{legalMetadata.legal_version}</span> : null}</td><td><Link href={`/admin/icerik/${route}/${locale}`}>Aç</Link></td></tr>; }))}
       </tbody></table></div>
     </main>;
   }
@@ -66,7 +68,7 @@ export default async function AdminModulePage({ params }: { params: Promise<{ mo
   if (module === "ayarlar") {
     const principal = await requireAdminPagePermission("SiteSettings:view", { returnTo: "/admin/ayarlar" });
     const values = await db.select().from(siteSettings); const map = new Map(values.map((row) => [row.key, row.typedValue]));
-    const general = [["display_name", "Görünen ad"], ["company_stats", "Şirket istatistikleri"], ["contact_footer", "İletişim / footer"], ["social_links", "Sosyal bağlantılar"], ["default_seo", "Varsayılan SEO"], ["content_owner_metadata", "İçerik sahipliği"]] as const;
+    const general = [["display_name", "Görünen ad"], ["company_stats", "Şirket istatistikleri"], ["contact_footer", "İletişim / footer / veri sorumlusu"], ["social_links", "Sosyal bağlantılar"], ["default_seo", "Varsayılan SEO"], ["content_owner_metadata", "İçerik sahipliği"]] as const;
     return <main><PageHeading kicker="Secret içermeyen ayarlar" title="Site Ayarları">Kimlik bilgileri ve provider secret değerleri burada tutulmaz.</PageHeading><div className="admin-cards admin-cards--settings">
       {has(principal, "SiteSettings:edit-general") ? general.map(([key, label]) => <SiteSettingForm key={key} settingKey={key} label={label} initialValue={map.get(key)} />) : <div className="admin-empty">Salt okunur erişim.</div>}
       {has(principal, "DealerPortal:update") ? <SiteSettingForm settingKey="dealer_portal_url" label="Dealer Portal URL" initialValue={map.get("dealer_portal_url")} /> : null}

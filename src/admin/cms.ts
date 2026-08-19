@@ -6,6 +6,12 @@ import {
   type PublicPageDocument,
   type PublicPageRouteKey,
 } from "@/content/public-pages";
+import {
+  isLegalPageRouteKey,
+  legalContentCanPublish,
+  readLegalContentMetadata,
+  readPrivacyNotice,
+} from "@/content/legal-content";
 import type { DatabaseClient } from "@/db/client";
 import {
   contentRevisions,
@@ -33,6 +39,7 @@ const legalRoutes = new Set<PublicPageRouteKey>([
   "data-protection",
 ]);
 const careerRoutes = new Set<PublicPageRouteKey>(["careers", "career-apply"]);
+const formNoticeRoutes = new Set<PublicPageRouteKey>(["contact", "career-apply"]);
 
 export type PagePublicationAction =
   | "publish"
@@ -137,14 +144,13 @@ export function validatePageDraftInput(input: PageDraftInput): PageDraftInput & 
   if (!input.content.hero || parsed.hero.heading === title && !(input.content.hero as Record<string, unknown>).heading) {
     throw new InvalidSecurityInputError("content_hero_heading_required");
   }
-  const rawApproval = input.content.approval;
-  const approval = rawApproval && typeof rawApproval === "object" && !Array.isArray(rawApproval)
-    ? rawApproval as Record<string, unknown>
-    : undefined;
-  const normalizedContent: Record<string, unknown> = parsed as unknown as Record<string, unknown>;
-  if (legalRoutes.has(input.routeKey) && approval?.status === "approved" && typeof approval.reference === "string") {
-    normalizedContent.approval = { status: "approved", reference: approval.reference.trim().slice(0, 160) };
+  if (isLegalPageRouteKey(input.routeKey) && !readLegalContentMetadata(parsed)) {
+    throw new InvalidSecurityInputError("legal_metadata_invalid");
   }
+  if (formNoticeRoutes.has(input.routeKey) && !parsed.privacyNotice) {
+    throw new InvalidSecurityInputError("privacy_notice_required");
+  }
+  const normalizedContent: Record<string, unknown> = parsed as unknown as Record<string, unknown>;
   return {
     ...input,
     title,
@@ -156,6 +162,51 @@ export function validatePageDraftInput(input: PageDraftInput): PageDraftInput & 
     ogMediaId: validateUuid(input.ogMediaId),
     allowIndexing: input.allowIndexing !== false,
   };
+}
+
+function assertLegalVersionChanged(
+  routeKey: PublicPageRouteKey,
+  previousValue: Record<string, unknown> | undefined,
+  nextValue: Record<string, unknown>,
+) {
+  if (!previousValue) return;
+  const previous = parsePublicPageContent(previousValue, "Previous");
+  const next = parsePublicPageContent(nextValue, "Next");
+
+  if (legalRoutes.has(routeKey)) {
+    const previousMetadata = readLegalContentMetadata(previous);
+    const nextMetadata = readLegalContentMetadata(next);
+    if (
+      previousMetadata &&
+      nextMetadata &&
+      previousMetadata.legal_version === nextMetadata.legal_version &&
+      JSON.stringify({
+        hero: previous.hero,
+        legalBlocks: previous.legalBlocks,
+        metadata: previousMetadata,
+      }) !==
+        JSON.stringify({
+          hero: next.hero,
+          legalBlocks: next.legalBlocks,
+          metadata: nextMetadata,
+        })
+    ) {
+      throw new InvalidSecurityInputError("legal_version_must_change");
+    }
+  }
+
+  if (formNoticeRoutes.has(routeKey)) {
+    const previousNotice = readPrivacyNotice(previous.privacyNotice);
+    const nextNotice = readPrivacyNotice(next.privacyNotice);
+    if (
+      previousNotice &&
+      nextNotice &&
+      previousNotice.legal_version === nextNotice.legal_version &&
+      JSON.stringify(previousNotice) !== JSON.stringify(nextNotice)
+    ) {
+      throw new InvalidSecurityInputError("privacy_notice_version_must_change");
+    }
+  }
 }
 
 function snapshotFromRow(row: {
@@ -221,6 +272,7 @@ export async function savePageDraft(
   const [current] = await db
     .select({
       pageId: pages.id,
+      contentJson: pageLocales.contentJson,
       seoTitle: pageLocales.seoTitle,
       seoDescription: pageLocales.seoDescription,
       ogTitle: pageLocales.ogTitle,
@@ -239,6 +291,17 @@ export async function savePageDraft(
   const [existingDraft] = current ? await db.select({ snapshot: contentDrafts.snapshot }).from(contentDrafts)
     .where(and(eq(contentDrafts.entityType, "page"), eq(contentDrafts.entityId, current.pageId), eq(contentDrafts.locale, input.locale))).limit(1) : [];
   const comparison = existingDraft ? parseRevisionSnapshot(existingDraft.snapshot) : current;
+  assertLegalVersionChanged(
+    input.routeKey,
+    comparison &&
+      "contentJson" in comparison &&
+      comparison.contentJson &&
+      typeof comparison.contentJson === "object" &&
+      !Array.isArray(comparison.contentJson)
+      ? comparison.contentJson as Record<string, unknown>
+      : undefined,
+    input.content,
+  );
   const seoChanged = (comparison &&
     (comparison.seoTitle !== input.seoTitle ||
       comparison.seoDescription !== input.seoDescription ||
@@ -332,16 +395,6 @@ export async function savePageDraft(
   });
 }
 
-function legalContentHasApprovalReference(content: Record<string, unknown>) {
-  const approval = content.approval;
-  if (!approval || typeof approval !== "object" || Array.isArray(approval)) return false;
-  const record = approval as Record<string, unknown>;
-  return record.status === "approved" &&
-    typeof record.reference === "string" &&
-    record.reference.trim().length >= 3 &&
-    record.reference.trim().length <= 160;
-}
-
 export async function transitionPagePublication(
   db: DatabaseClient,
   principal: AdminPrincipal | null,
@@ -374,9 +427,9 @@ export async function transitionPagePublication(
   if (
     legalRoutes.has(input.routeKey) &&
     (input.action === "publish" || input.action === "schedule") &&
-    !legalContentHasApprovalReference(draftSnapshot?.contentJson ?? current.localeRow.contentJson)
+    !legalContentCanPublish(draftSnapshot?.contentJson ?? current.localeRow.contentJson)
   ) {
-    throw new InvalidSecurityInputError("legal_approval_reference_required");
+    throw new InvalidSecurityInputError("legal_metadata_or_approval_required");
   }
   const now = new Date();
   const scheduledAt = input.scheduledAt;
@@ -524,6 +577,7 @@ export async function listPageWorkspace(
     publishedAt: pageLocales.publishedAt,
     scheduledPublishAt: pageLocales.scheduledPublishAt,
     scheduledArchiveAt: pageLocales.scheduledArchiveAt,
+    content: pageLocales.contentJson,
   }).from(pages).leftJoin(pageLocales, eq(pageLocales.pageId, pages.id))
     .orderBy(asc(pages.routeKey), asc(pageLocales.locale));
 }

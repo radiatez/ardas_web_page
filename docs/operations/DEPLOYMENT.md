@@ -33,6 +33,10 @@ Actual script names follow scaffolded `package.json`.
 - backup before risky production migration,
 - compatibility/rollback plan.
 
+After migrations, run `pnpm db:seed:legal` (or `pnpm db:setup`). The idempotent
+seed creates missing TR/EN temporary legal and form-notice records with their
+initial immutable revisions; it does not overwrite existing CMS locale rows.
+
 ## Production Gates
 
 Block deploy for:
@@ -43,6 +47,9 @@ Block deploy for:
 - MFA disabled,
 - malware scan unavailable for career flow,
 - staging validation failure.
+- temporary/review-required career or contact privacy notice while that public
+  form is enabled in production,
+- missing lawyer-approved legal copy/controller identity/application channels.
 
 ## Secrets
 

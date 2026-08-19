@@ -855,3 +855,57 @@ Playwright/axe across three engines and mobile profiles, five-width overflow and
 reduced-motion checks, CSP/header/Auth/session/RBAC/CV/form/XSS/log/SEO
 regressions, `pg_dump`/`pg_restore` with post-restore retention, rollback contract
 validation and post-run Docker orphan inspection. Require the same checks in CI.
+
+### ADR-019 — Versioned Temporary Legal Content and Fail-Closed Form Notices
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+Public legal routes must contain presentable TR/EN information before final
+lawyer copy and exact corporate/legal inputs are available. Treating temporary
+copy as final would be unsafe; leaving placeholders prevents realistic review.
+Submission records must continue to identify the exact notice shown.
+
+#### Decision
+
+- Store legal status/version/review metadata inside the existing versioned CMS
+  content contract. Seed substantive `TEMP-2026-08-V1` content and immutable
+  initial revisions without overwriting an existing locale row.
+- Show temporary status only in admin, keep the public layout professional and
+  noindex seeded temporary legal pages.
+- Require a new non-temporary version and approval reference for approved copy.
+  Reject body, status or notice changes that reuse the prior version.
+- Model the form checkbox as notice acknowledgement, not explicit consent, and
+  preserve version/timestamps on each historic submission.
+- Fail production form configuration closed unless its published locale notice
+  is approved, version-matched and no longer review-required.
+- Read verified controller identity/application channels from the non-secret
+  `contact_footer.legalController` Site Setting only.
+
+#### Alternatives Considered
+
+- Public TBD/empty pages: rejected because they are not reviewable or
+  presentable.
+- Hard-coded final legal/business details: rejected because required inputs are
+  unverified.
+- Mutating the temporary revision when lawyer copy arrives: rejected because it
+  breaks history and submission provenance.
+- Treating acknowledgement as broad consent: rejected because notice and
+  explicit-consent semantics must remain separate.
+
+#### Consequences
+
+- Temporary content is not legal approval and cannot enable production forms.
+- Legal reviewers must supply final TR/EN copy, verified controller channels,
+  approved retention periods and a traceable approval reference.
+- Existing temporary revisions and historic submission provenance remain
+  available after final copy is published.
+
+#### Validation
+
+Validate metadata parsing, temporary/approved gates, admin-only status,
+substantive localized routes, no placeholder copy, form acknowledgement,
+historic notice-version retention, Site Setting parsing, idempotent PostgreSQL
+seed/revision creation, lint, typecheck, all tests and production build.

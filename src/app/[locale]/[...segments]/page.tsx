@@ -67,7 +67,7 @@ export default async function CatchAllPage(props: CatchAllPageProps) {
   if (!bundle) notFound();
 
   return legalRouteKeys.has(route.routeKey) ? (
-    <LegalPageShell page={bundle.page} />
+    <LegalPageShell controllerDetails={bundle.legalController} page={bundle.page} />
   ) : (
     <CorePublicPage bundle={bundle} />
   );

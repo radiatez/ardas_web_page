@@ -9,13 +9,18 @@ import {
   CareerApplicationForm,
   ContactForm,
 } from "../../src/components/public/public-forms";
+import { temporaryPrivacyNotices } from "../../src/content/temporary-legal-content";
 
-const configuration = {
-  locale: "tr" as const,
-  privacyNoticeVersion: "TBD",
-  privacyAcknowledgementRequired: false,
+function configuration(kind: "career" | "contact", locale: "tr" | "en" = "tr") {
+  const privacyNotice = temporaryPrivacyNotices[kind][locale];
+  return {
+  locale,
+  privacyNoticeVersion: privacyNotice.legal_version,
+  privacyNotice,
+  privacyAcknowledgementRequired: true,
   approvalGatedCareerFieldsEnabled: false,
-};
+  };
+}
 
 afterEach(() => {
   cleanup();
@@ -27,7 +32,7 @@ describe("public form accessibility and interaction", () => {
     const user = userEvent.setup();
     const { container } = render(
       <CareerApplicationForm
-        configuration={configuration}
+        configuration={configuration("career")}
         noticeShownAt="2026-08-19T08:00:00.000Z"
         options={{
           departments: [{ id: "00000000-0000-4000-8000-000000000001", key: "sales", label: "Satış Temsilcisi" }],
@@ -62,7 +67,7 @@ describe("public form accessibility and interaction", () => {
     );
     render(
       <ContactForm
-        configuration={configuration}
+        configuration={configuration("contact")}
         noticeShownAt="2026-08-19T08:00:00.000Z"
         submissionId="00000000-0000-4000-8000-000000000004"
       />,
@@ -71,6 +76,7 @@ describe("public form accessibility and interaction", () => {
     await user.type(screen.getByLabelText(/^E-posta/), "test@example.com");
     await user.type(screen.getByLabelText(/^Konu/), "Kurumsal talep");
     await user.type(screen.getByLabelText(/^Mesaj/), "Kurumsal iletişim talebi hakkında bilgi almak istiyorum.");
+    await user.click(screen.getByLabelText("KVKK Aydınlatma Metni'ni okudum."));
     await user.click(screen.getByRole("button", { name: "Mesajı gönder" }));
 
     await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText(/^E-posta/)));
@@ -89,7 +95,7 @@ describe("public form accessibility and interaction", () => {
     );
     render(
       <ContactForm
-        configuration={configuration}
+        configuration={configuration("contact")}
         noticeShownAt="2026-08-19T08:00:00.000Z"
         submissionId="00000000-0000-4000-8000-000000000005"
       />,
@@ -98,6 +104,7 @@ describe("public form accessibility and interaction", () => {
     await user.type(screen.getByLabelText(/^E-posta/), "test@example.com");
     await user.type(screen.getByLabelText(/^Konu/), "Kurumsal talep");
     await user.type(screen.getByLabelText(/^Mesaj/), "Kurumsal iletişim talebi hakkında bilgi almak istiyorum.");
+    await user.click(screen.getByLabelText("KVKK Aydınlatma Metni'ni okudum."));
     await user.click(screen.getByRole("button", { name: "Mesajı gönder" }));
 
     expect((await screen.findByRole("status")).textContent).toContain("Mesajınız güvenli şekilde alındı.");
@@ -108,7 +115,7 @@ describe("public form accessibility and interaction", () => {
     const user = userEvent.setup();
     render(
       <CareerApplicationForm
-        configuration={{ ...configuration, approvalGatedCareerFieldsEnabled: true }}
+        configuration={{ ...configuration("career"), approvalGatedCareerFieldsEnabled: true }}
         noticeShownAt="2026-08-19T08:00:00.000Z"
         options={{
           departments: [{ id: "00000000-0000-4000-8000-000000000001", key: "sales", label: "Satış Temsilcisi" }],
@@ -126,5 +133,27 @@ describe("public form accessibility and interaction", () => {
     expect(
       (screen.getByLabelText(/^Tecil Tarihi/) as HTMLInputElement).required,
     ).toBe(true);
+  });
+
+  it("uses notice acknowledgement rather than treating it as explicit consent", () => {
+    const { rerender } = render(
+      <ContactForm
+        configuration={configuration("contact")}
+        noticeShownAt="2026-08-19T08:00:00.000Z"
+        submissionId="00000000-0000-4000-8000-000000000007"
+      />,
+    );
+    expect(screen.getByLabelText("KVKK Aydınlatma Metni'ni okudum.")).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/açık rıza veriyorum/i);
+
+    rerender(
+      <ContactForm
+        configuration={configuration("contact", "en")}
+        noticeShownAt="2026-08-19T08:00:00.000Z"
+        submissionId="00000000-0000-4000-8000-000000000008"
+      />,
+    );
+    expect(screen.getByLabelText(/I have read the Data Protection Notice/)).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/I consent/i);
   });
 });

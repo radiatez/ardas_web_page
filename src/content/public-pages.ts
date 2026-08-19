@@ -2,6 +2,16 @@ import type { Locale } from "@/i18n/config";
 import { routeKeys, type RouteKey } from "@/i18n/routes";
 
 import { demoMediaIds } from "./demo-media";
+import {
+  readLegalContentMetadata,
+  readPrivacyNotice,
+  type LegalContentMetadata,
+  type PrivacyNoticeContent,
+} from "./legal-content";
+import {
+  getTemporaryLegalSeedPage,
+  temporaryPrivacyNotices,
+} from "./temporary-legal-content";
 
 export const publicPageRouteKeys = [
   "home",
@@ -33,11 +43,12 @@ export type EditorialBlock = {
   decorativeMedia?: boolean;
 };
 
-export type PublicPageContent = {
+export type PublicPageContent = Partial<LegalContentMetadata> & {
   schemaVersion: 1;
   hero: EditorialBlock;
   sections: Readonly<Record<string, EditorialBlock>>;
   legalBlocks: readonly EditorialBlock[];
+  privacyNotice?: PrivacyNoticeContent;
 };
 
 export type PublicPageSource = "cms" | "placeholder";
@@ -141,8 +152,17 @@ export function parsePublicPageContent(
         .map(readBlock)
         .filter((block): block is EditorialBlock => Boolean(block))
     : [];
+  const legalMetadata = readLegalContentMetadata(value);
+  const privacyNotice = readPrivacyNotice(value.privacyNotice);
 
-  return { schemaVersion: 1, hero, sections, legalBlocks };
+  return {
+    schemaVersion: 1,
+    hero,
+    sections,
+    legalBlocks,
+    ...(legalMetadata ?? {}),
+    ...(privacyNotice ? { privacyNotice } : {}),
+  };
 }
 
 const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
@@ -358,6 +378,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       },
       sections: {},
       legalBlocks: [],
+      privacyNotice: temporaryPrivacyNotices.career.tr,
     },
   },
   contact: {
@@ -377,6 +398,7 @@ const trPlaceholders: Record<PublicPageRouteKey, PlaceholderPage> = {
       },
       sections: {},
       legalBlocks: [],
+      privacyNotice: temporaryPrivacyNotices.contact.tr,
     },
   },
   privacy: createLegalPlaceholder("tr", "privacy", "Gizlilik"),
@@ -389,35 +411,14 @@ function createLegalPlaceholder(
   routeKey: "privacy" | "cookies" | "data-protection",
   title: string,
 ): PlaceholderPage {
-  const isTurkish = locale === "tr";
+  const page = getTemporaryLegalSeedPage(routeKey, locale);
   return {
     routeKey,
     locale,
-    title,
-    seoTitle: title,
-    content: {
-      schemaVersion: 1,
-      hero: {
-        eyebrow: isTurkish
-          ? "Yasal · Geliştirme içeriği"
-          : "Legal · Development content",
-        heading: title,
-        body: [],
-      },
-      sections: {},
-      legalBlocks: [
-        {
-          heading: isTurkish
-            ? "Onaylı hukuki metin bekleniyor."
-            : "Approved legal copy is pending.",
-          body: [
-            isTurkish
-              ? "Yetkili onayı ve CMS yayını tamamlanmadan hukuki metin yayımlanmayacaktır. İçerik: TBD."
-              : "Legal copy will not be published before authorized approval and CMS publication are complete. Content: TBD.",
-          ],
-        },
-      ],
-    },
+    title: page.title || title,
+    seoTitle: page.seoTitle,
+    seoDescription: page.seoDescription,
+    content: page.content,
   };
 }
 
@@ -633,6 +634,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         },
         sections: {},
         legalBlocks: [],
+        privacyNotice: temporaryPrivacyNotices.career.en,
       },
     },
     contact: {
@@ -652,6 +654,7 @@ function translatePlaceholder(page: PlaceholderPage): PlaceholderPage {
         },
         sections: {},
         legalBlocks: [],
+        privacyNotice: temporaryPrivacyNotices.contact.en,
       },
     },
     privacy: createLegalPlaceholder("en", "privacy", "Privacy"),

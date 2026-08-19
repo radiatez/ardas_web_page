@@ -48,6 +48,13 @@ WCAG 2.2 AA.
 | Career | knows-company Yes → source |
 | Career | null `job_posting_id` accepted |
 | Privacy | locale + notice version/timestamps persisted |
+| Legal content | temporary metadata/version/admin status enforced |
+| Legal content | substantive TR/EN pages have no public placeholder/banner |
+| Legal content | approved copy requires new version + approval reference |
+| Legal seed | idempotent PostgreSQL seed + immutable revision |
+| Privacy | acknowledgement is not explicit consent |
+| Privacy | historic submission retains the notice version shown |
+| Privacy | temporary/review-required notice cannot enable production form |
 | CV | non-PDF rejected |
 | CV | over 10MB rejected |
 | CV | MIME/signature mismatch rejected |

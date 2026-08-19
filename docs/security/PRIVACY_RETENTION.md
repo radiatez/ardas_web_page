@@ -23,6 +23,9 @@ Store:
 - privacy_notice_shown_at
 - privacy_acknowledged_at where applicable
 
+The current UI wording is acknowledgement of reading, not explicit consent.
+The same distinction applies to contact records.
+
 ## Contact Record Provenance
 
 Store equivalent fields.
@@ -76,4 +79,8 @@ Document before production:
 
 ## Legal Copy
 
-Legal/privacy text lives in CMS/public legal pages but publishing requires approved wording.
+Legal/privacy text and the short career/contact notices live in versioned CMS
+content. Temporary `TEMP-2026-08-V1` content is review-required and may support
+non-production review, but production form enablement fails closed until the
+active notice has a new approved version and approval reference. New wording is
+a new immutable revision/version; historic submission provenance is retained.

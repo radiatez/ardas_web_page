@@ -104,7 +104,10 @@ requires `all` scope.
 
 ## Legal Pages
 
-CMS supports legal-page records/routes, but publishing final legal copy requires approved company text.
+CMS supports temporary and approved legal-page versions. Temporary content is
+clearly labeled `Geçici metin — hukuk onayı bekleniyor` with its version in the
+admin UI. Approved text requires a non-temporary new version and an approval
+reference; changes cannot reuse the prior legal version.
 
 ## Site Settings
 
@@ -119,6 +122,8 @@ At minimum:
 - approved retention values
 - notification recipients (non-secret configuration)
 - content-owner metadata if stored centrally
+- verified data-controller identity/application channels under
+  `contact_footer.legalController`
 
 Secrets remain outside general CMS settings.
 

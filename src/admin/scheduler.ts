@@ -1,5 +1,6 @@
 import { and, eq, lte, ne, sql } from "drizzle-orm";
 
+import { isLegalPageRouteKey, legalContentCanPublish } from "@/content/legal-content";
 import type { DatabaseClient } from "@/db/client";
 import {
   auditEvents,
@@ -11,6 +12,7 @@ import {
   locationLocales,
   mediaLocales,
   pageLocales,
+  pages,
   productGroupLocales,
 } from "@/db/schema";
 import { securityLogger } from "@/security/logging";
@@ -59,7 +61,9 @@ export async function runScheduledContentTransitions(
     }
 
     const pageDue = await transaction.select({ id: pageLocales.id, entityId: pageLocales.pageId,
-      locale: pageLocales.locale }).from(pageLocales).where(lte(pageLocales.scheduledPublishAt, now));
+      locale: pageLocales.locale, routeKey: pages.routeKey, currentContent: pageLocales.contentJson })
+      .from(pageLocales).innerJoin(pages, eq(pages.id, pageLocales.pageId))
+      .where(lte(pageLocales.scheduledPublishAt, now));
     const pagePublished: { entityId: string; locale: "tr" | "en" }[] = [];
     for (const due of pageDue) {
       const [draft] = await transaction.select({ snapshot: contentDrafts.snapshot, updatedBy: contentDrafts.updatedBy })
@@ -67,6 +71,21 @@ export async function runScheduledContentTransitions(
       const snapshot = draft?.snapshot;
       const contentJson = snapshot?.contentJson;
       const validSnapshot = snapshot && typeof snapshot.title === "string" && contentJson && typeof contentJson === "object" && !Array.isArray(contentJson);
+      const publishableContent = validSnapshot
+        ? contentJson as Record<string, unknown>
+        : due.currentContent;
+      if (
+        isLegalPageRouteKey(due.routeKey) &&
+        !legalContentCanPublish(publishableContent)
+      ) {
+        securityLogger.error("content.legal_schedule_blocked", {
+          resourceId: due.entityId,
+          routeKey: due.routeKey,
+          locale: due.locale,
+          errorCode: "LEGAL_METADATA_INVALID",
+        });
+        continue;
+      }
       const [saved] = await transaction.update(pageLocales).set({
         ...(validSnapshot ? {
           title: snapshot.title as string,

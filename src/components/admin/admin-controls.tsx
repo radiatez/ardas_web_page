@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
+import {
+  readLegalContentMetadata,
+  readPrivacyNotice,
+} from "@/content/legal-content";
+
 type Notice = { type: "success" | "error"; text: string } | null;
 
 async function api(url: string, init: RequestInit) {
@@ -43,6 +48,8 @@ export function AdminPageEditor({ routeKey, locale, initial, canEdit = false, ca
   const [busy, setBusy] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const endpoint = `/api/admin/cms/pages/${routeKey}/${locale}`;
+  const legalMetadata = readLegalContentMetadata(initial?.content) ??
+    readPrivacyNotice(initial?.content.privacyNotice);
   async function execute(body: Record<string, unknown>) {
     setBusy(true); setNotice(null);
     try {
@@ -80,6 +87,10 @@ export function AdminPageEditor({ routeKey, locale, initial, canEdit = false, ca
   const defaultContent = initial?.content ?? { schemaVersion: 1, hero: { heading: "TBD", body: [] }, sections: {}, legalBlocks: [] };
   return <div className="admin-editor-grid">
     <form className="admin-panel" id="admin-page-form" onSubmit={save} ref={formRef}>
+      {legalMetadata?.legal_status === "temporary" ? <div className="admin-legal-status" role="status">
+        <strong>Geçici metin — hukuk onayı bekleniyor</strong>
+        <span>Legal version: {legalMetadata.legal_version}</span>
+      </div> : null}
       <div className="admin-panel__heading"><div><span className="admin-kicker">{locale.toUpperCase()} içerik</span><h2>Sayfa taslağı</h2></div><span className="admin-status">{initial?.publishStatus ?? "yeni"}{initial?.hasDraft ? " · değişiklik var" : ""}</span></div>
       <label>Sayfa başlığı<input name="title" defaultValue={initial?.title ?? ""} required maxLength={255} readOnly={!canEdit} /></label>
       <label>Yapılandırılmış içerik<textarea name="content" rows={22} defaultValue={JSON.stringify(defaultContent, null, 2)} spellCheck={false} readOnly={!canEdit} /></label>
