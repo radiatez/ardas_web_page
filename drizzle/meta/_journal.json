@@ -15,6 +15,13 @@
       "when": 1787064972165,
       "tag": "0001_crazy_karnak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787128251677,
+      "tag": "0002_square_firelord",
+      "breakpoints": true
     }
   ]
 }

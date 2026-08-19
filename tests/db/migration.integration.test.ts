@@ -23,7 +23,7 @@ describeWithDatabase("generated PostgreSQL migration", () => {
     expect(result.rows[0]?.server_version).toMatch(/^18\./);
   });
 
-  it("creates the complete Milestone 2 table set on a clean database", async () => {
+  it("creates the complete Milestone 5 table set on a clean database", async () => {
     const result = await pool.query<{ table_name: string }>(
       `select table_name
          from information_schema.tables
@@ -62,9 +62,34 @@ describeWithDatabase("generated PostgreSQL migration", () => {
         "role_permission",
         "site_setting",
         "slug_redirect",
+        "submission_notification",
         "user_role",
       ]),
     );
+  });
+
+  it("seeds managed bilingual career departments and stable locations", async () => {
+    const departments = await pool.query<{ key: string; locales: string[] }>(
+      `select d.key, array_agg(dl.locale::text order by dl.locale::text) as locales
+         from department d
+         join department_locale dl on dl.department_id = d.id
+        where d.key = any($1::text[])
+        group by d.key`,
+      [["sales", "finance", "accounting", "it", "import-export", "warehouse-shipping"]],
+    );
+    const locations = await pool.query<{ key: string; locales: string[] }>(
+      `select l.key, array_agg(ll.locale::text order by ll.locale::text) as locales
+         from location l
+         join location_locale ll on ll.location_id = l.id
+        where l.key = any($1::text[])
+        group by l.key`,
+      [["istanbul", "ankara", "diyarbakir"]],
+    );
+    expect(departments.rows).toHaveLength(6);
+    expect(locations.rows).toHaveLength(3);
+    for (const row of [...departments.rows, ...locations.rows]) {
+      expect(row.locales).toEqual(["en", "tr"]);
+    }
   });
 
   it("records the committed Drizzle migration", async () => {

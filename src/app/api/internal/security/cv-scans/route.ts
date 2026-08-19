@@ -1,4 +1,5 @@
 import { getRuntimeDatabase } from "@/db/runtime";
+import { cleanupOrphanedCareerUploads } from "@/forms/submissions";
 import {
   markTimedOutCvScans,
   parseGuardDutyScanEvent,
@@ -54,8 +55,9 @@ export async function POST(request: Request) {
       }
     }
     const retried = await retryDueCvScans(db, storage);
+    const orphanedCleaned = await cleanupOrphanedCareerUploads(db, storage);
 
-    return Response.json({ processed, retried });
+    return Response.json({ processed, retried, orphanedCleaned });
   } catch (error) {
     securityLogger.error("security.cv_scan_worker_failed", { error });
     return Response.json({ error: "service_unavailable" }, { status: 503 });

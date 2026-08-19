@@ -55,6 +55,14 @@ export const contactStatusEnum = pgEnum("contact_status", [
   "replied",
   "archived",
 ]);
+export const submissionNotificationPurposeEnum = pgEnum(
+  "submission_notification_purpose",
+  ["career", "contact"],
+);
+export const submissionNotificationStatusEnum = pgEnum(
+  "submission_notification_status",
+  ["pending", "sent", "failed", "cancelled"],
+);
 export const storageClassEnum = pgEnum("storage_class", [
   "public",
   "protected",
@@ -556,6 +564,7 @@ export const careerApplications = pgTable(
     jobPostingId: uuid("job_posting_id").references(() => jobPostings.id, {
       onDelete: "set null",
     }),
+    idempotencyKeyHash: varchar("idempotency_key_hash", { length: 64 }),
     firstName: varchar("first_name", { length: 120 }),
     lastName: varchar("last_name", { length: 120 }),
     phoneNormalized: varchar("phone_normalized", { length: 32 }),
@@ -612,6 +621,9 @@ export const careerApplications = pgTable(
       table.createdAt,
     ),
     index("career_application_retention_idx").on(table.retentionDueAt),
+    uniqueIndex("career_application_idempotency_key_unique").on(
+      table.idempotencyKeyHash,
+    ),
     uniqueIndex("career_application_cv_file_unique").on(table.cvFileId),
     check(
       "career_application_company_source_consistent",
@@ -620,6 +632,10 @@ export const careerApplications = pgTable(
     check(
       "career_application_salary_nonnegative",
       sql`${table.expectedSalaryTry} IS NULL OR ${table.expectedSalaryTry} >= 0`,
+    ),
+    check(
+      "career_application_salary_upper_bound",
+      sql`${table.expectedSalaryTry} IS NULL OR ${table.expectedSalaryTry} <= 100000000`,
     ),
     check(
       "career_application_required_unless_anonymized",
@@ -674,6 +690,7 @@ export const contactSubmissions = pgTable(
   "contact_submission",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    idempotencyKeyHash: varchar("idempotency_key_hash", { length: 64 }),
     name: varchar("name", { length: 240 }),
     company: varchar("company", { length: 255 }),
     emailNormalized: varchar("email_normalized", { length: 320 }),
@@ -708,9 +725,64 @@ export const contactSubmissions = pgTable(
       table.createdAt,
     ),
     index("contact_submission_retention_idx").on(table.retentionDueAt),
+    uniqueIndex("contact_submission_idempotency_key_unique").on(
+      table.idempotencyKeyHash,
+    ),
     check(
       "contact_submission_required_unless_anonymized",
       sql`${table.anonymizedAt} IS NOT NULL OR (${table.name} IS NOT NULL AND ${table.emailNormalized} IS NOT NULL AND ${table.subject} IS NOT NULL AND ${table.message} IS NOT NULL)`,
+    ),
+  ],
+);
+
+export const submissionNotifications = pgTable(
+  "submission_notification",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    purpose: submissionNotificationPurposeEnum("purpose").notNull(),
+    careerApplicationId: uuid("career_application_id").references(
+      () => careerApplications.id,
+      { onDelete: "cascade" },
+    ),
+    contactSubmissionId: uuid("contact_submission_id").references(
+      () => contactSubmissions.id,
+      { onDelete: "cascade" },
+    ),
+    locale: localeEnum("locale").notNull(),
+    status: submissionNotificationStatusEnum("status")
+      .default("pending")
+      .notNull(),
+    attemptCount: integer("attempt_count").default(0).notNull(),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    lastErrorCode: varchar("last_error_code", { length: 120 }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("submission_notification_delivery_idx").on(
+      table.status,
+      table.nextAttemptAt,
+    ),
+    uniqueIndex("submission_notification_career_unique").on(
+      table.careerApplicationId,
+    ),
+    uniqueIndex("submission_notification_contact_unique").on(
+      table.contactSubmissionId,
+    ),
+    check(
+      "submission_notification_resource_consistent",
+      sql`(${table.purpose} = 'career' AND ${table.careerApplicationId} IS NOT NULL AND ${table.contactSubmissionId} IS NULL) OR (${table.purpose} = 'contact' AND ${table.contactSubmissionId} IS NOT NULL AND ${table.careerApplicationId} IS NULL)`,
+    ),
+    check(
+      "submission_notification_attempt_count_nonnegative",
+      sql`${table.attemptCount} >= 0`,
     ),
   ],
 );
@@ -781,3 +853,6 @@ export type NewCareerApplication = typeof careerApplications.$inferInsert;
 export type CareerApplication = typeof careerApplications.$inferSelect;
 export type NewContactSubmission = typeof contactSubmissions.$inferInsert;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+export type NewSubmissionNotification =
+  typeof submissionNotifications.$inferInsert;
+export type SubmissionNotification = typeof submissionNotifications.$inferSelect;

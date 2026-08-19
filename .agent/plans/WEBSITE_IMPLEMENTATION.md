@@ -589,7 +589,7 @@ Scope retained:
 
 # Milestone 4.1 — Visual Polish & Demo Media
 
-Status: `[ ]` — implementation validated; required screenshot artifacts blocked by Browser plugin
+Status: `[x]` — implementation and requested manual desktop/mobile review completed
 
 ## Scope
 
@@ -610,8 +610,8 @@ security, migration, data-model or Milestone 5 business logic changes.
 - [x] Preserve publication, locale, SEO, sitemap, Dealer Portal and security boundaries.
 - [x] Validate lint, typecheck, tests, production build, dependency audit,
       migration no-diff, accessibility and responsive contracts.
-- [ ] Save the requested desktop/full-page/mobile and corporate/brands/locations
-      screenshots (Browser plugin trusted-code-path validation is blocking capture).
+- [x] Complete the requested manual desktop/mobile visual review; screenshot
+      artifacts are not a production blocker for this milestone.
 
 ## Validation Record — 2026-08-19
 
@@ -669,16 +669,14 @@ Results:
 - responses retained CSP, HSTS, nosniff, Referrer-Policy, X-Frame-Options and
   Permissions-Policy.
 
-Visual-validation limitation:
+Manual visual validation and retained backlog:
 
-- the required in-app Browser workflow is blocked before page control by the
-  installed plugin's trusted-code-path validation for `browser-service.mjs`,
-- the updated homepage was opened in the Codex browser panel and HTTP/render plus
-  automated DOM/axe/contrast/responsive checks passed, but screenshot files could
-  not be captured without substituting a browser surface forbidden by the Browser
-  skill,
-- Milestone 4.1 remains unchecked until the requested screenshot artifacts are
-  captured through the supported browser surface.
+- desktop/mobile visual review was completed and accepted after the implementation
+  validation; screenshot artifacts are not a production blocker,
+- small mobile typography refinements, footer polish, header/navigation ratios,
+  final logo/font/color and real approved Ardaş photography remain explicitly in
+  the post-implementation visual-polish backlog and were not reopened in
+  Milestone 5.
 
 Remote validation:
 
@@ -703,25 +701,25 @@ Scope retained:
 
 # Milestone 5 — Public Contact & Career Persistence
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Contact
 
-- [ ] fields/validation.
-- [ ] privacy provenance.
-- [ ] anti-abuse.
-- [ ] persistence.
-- [ ] notification/retry.
+- [x] fields/validation.
+- [x] privacy provenance.
+- [x] anti-abuse.
+- [x] persistence.
+- [x] notification/retry.
 
 ## Career
 
-- [ ] required core fields incl. email.
-- [ ] approval-gated fields/config.
-- [ ] privacy provenance.
-- [ ] PDF-only CV.
-- [ ] quarantine/scan.
-- [ ] protected persistence.
-- [ ] notification/retry.
+- [x] required core fields incl. email.
+- [x] approval-gated fields/config.
+- [x] privacy provenance.
+- [x] PDF-only CV.
+- [x] quarantine/scan.
+- [x] protected persistence.
+- [x] notification/retry.
 
 ## Important Scope
 
@@ -739,6 +737,69 @@ It proves secure public submission/persistence.
 ## Validation
 
 Run E2E-02 through E2E-05 only.
+
+## Validation Record — 2026-08-19
+
+Local environment:
+
+```text
+Windows
+Node.js 24.14.0 (host; project/CI pin is 24.19.0)
+pnpm 11.22.0
+Next.js 16.3.1 / React 19.2.8
+TypeScript 6.0.3 / Vitest 4.1.10
+PostgreSQL 18.4 (GitHub Actions service; no local PostgreSQL/Docker)
+Drizzle ORM 0.45.2 / Drizzle Kit 0.31.10
+```
+
+Commands / gates:
+
+```text
+pnpm install --frozen-lockfile
+pnpm run db:check
+pnpm run db:generate
+git diff --exit-code -- drizzle
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
+pnpm run audit:prod
+production HTTP route/header/unavailable-state checks
+```
+
+Local results:
+
+- frozen install passed with the committed lockfile; Drizzle metadata check passed
+  and regeneration reported no schema changes,
+- ESLint passed with zero warnings; Next.js route generation and TypeScript passed,
+- Vitest passed 25 files / 100 tests; 4 PostgreSQL-dependent files / 18 tests
+  were skipped locally because this Windows host has no PostgreSQL or Docker,
+- automated axe form/shell semantics, label/required/error associations, failed
+  submit focus, success announcement, conditional input behavior, WCAG AA token
+  contrast, reduced motion and mobile overflow contracts passed,
+- E2E-02 through E2E-05 are covered by the form, security and PostgreSQL
+  integration suites: clean CV promotion, unauthorized/unscanned denial,
+  conditional fields and contact persistence/notification attempt,
+- production build passed; the production dependency audit reported zero known
+  vulnerabilities,
+- local production HTTP checks returned `200` for TR/EN home, contact, careers
+  and career-apply routes, `404` for an unknown localized path and `307 → /tr`
+  for `/`; security headers remained present,
+- with form/provider settings intentionally absent, contact and career form routes
+  rendered their localized unavailable shell while `/tr` and `/en` remained
+  available, confirming the independent fail-closed production gate.
+
+Remote validation:
+
+- pending the final pushed commit and GitHub Actions PostgreSQL 18.4 run.
+
+Scope retained:
+
+- no HR management screen, Contact Manager inbox, admin CMS module or Milestone 6
+  work was added,
+- approved legal text, retention durations, production recipient addresses and
+  provider credentials/resources remain configuration/launch gates,
+- the Milestone 4.1 visual-polish backlog remains unchanged.
 
 ---
 

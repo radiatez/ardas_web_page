@@ -593,3 +593,70 @@ decorative contracts, local/test-only fallback, Next Image delivery, token
 contrast, axe semantics, reduced motion, responsive layout contracts, production
 routes/headers, lint, typecheck, tests, build, migration no-diff and dependency
 audit.
+
+### ADR-015 — Transactional Submission Persistence and Durable Notification Outbox
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+Public contact and career submissions contain personal data and must not be lost
+when SES is unavailable. Career persistence also crosses PostgreSQL and S3, which
+cannot share one atomic transaction, while CV access must remain fail-closed
+through asynchronous GuardDuty scanning. Fast double submits must not create
+duplicate records, but legitimate later submissions must remain possible.
+
+#### Decision
+
+- Treat PostgreSQL as authoritative. Persist each accepted submission, one
+  `SubmissionNotification` outbox row and its PII-minimized audit event in one
+  database transaction. Attempt SES only after commit; store failure as a safe
+  retryable outbox state without rolling back or reporting a persisted record as
+  lost.
+- Send record-ID, purpose and locale only. Do not include contact/candidate PII,
+  message body, salary or CV content in email or operational events.
+- Use a client-generated submission UUID as a narrow double-submit token. Store
+  only its SHA-256 hash under a unique constraint; a deliberate later submission
+  receives a new token and is not subject to broad email/phone deduplication.
+- Validate the career payload, referenced published department/location and PDF
+  before persistence. Upload to a random-key quarantine object, then bind its
+  `Media` row, application, outbox and audit event transactionally. If the
+  transaction loses a race or fails, run compensating object/metadata cleanup;
+  the scan worker also removes aged unattached quarantine objects.
+- Defer career notification while scan state is not clean/protected. Scanner
+  pending/error/timeout remains inaccessible and retryable; infected files stay
+  quarantined, cancel notification and produce only a safe localized public
+  status. A rate-limited same-origin status endpoint resolves the hashed
+  submission token without returning PII or scanner details.
+
+#### Alternatives Considered
+
+- Send email before or inside record creation: rejected because provider failure
+  could lose the only durable record or hold a database transaction open.
+- Store the original idempotency token or deduplicate on candidate identity:
+  rejected because the token need not be recoverable and identity deduplication
+  would block legitimate applications.
+- Promote or notify before GuardDuty is clean: rejected because it violates the
+  fail-closed CV boundary.
+- Assume PostgreSQL and S3 can commit atomically: rejected; compensating cleanup
+  and scheduled orphan recovery make the real cross-system boundary explicit.
+
+#### Consequences
+
+- Notification delivery is eventually consistent and requires the authenticated
+  internal retry job plus SES monitoring.
+- An infected attempt remains an auditable/retention-managed application record
+  with an inaccessible quarantine object; a new safe file requires a new public
+  submission token.
+- Production forms remain independently disabled when their required privacy,
+  retention, origin, provider or security configuration is incomplete; the rest
+  of the corporate site remains available.
+
+#### Validation
+
+Validate strict TR/EN server contracts, provenance/retention, unique idempotency,
+notification-failure persistence, record-ID-only payloads, quarantine cleanup,
+pending/error/infected denial, clean promotion, public scan-status minimization,
+real PostgreSQL constraints/migrations, logging redaction, accessibility, HTTP
+behavior, lint, typecheck, full tests, build and dependency audit.

@@ -260,6 +260,7 @@ scheduled_archive_at nullable
 ```text
 id
 job_posting_id nullable
+idempotency_key_hash unique nullable after anonymization
 
 first_name
 last_name
@@ -323,6 +324,7 @@ changed_at
 
 ```text
 id
+idempotency_key_hash unique nullable after anonymization
 name
 company nullable
 email_normalized
@@ -341,6 +343,31 @@ retention_due_at
 retention_hold_until nullable
 anonymized_at nullable
 ```
+
+### SubmissionNotification
+
+Durable notification outbox. PostgreSQL submission records remain authoritative;
+email is a retryable notification channel and never contains form PII.
+
+```text
+id
+purpose                 # career | contact
+career_application_id nullable
+contact_submission_id nullable
+locale
+status                  # pending | sent | failed | cancelled
+attempt_count
+next_attempt_at
+last_error_code nullable
+sent_at nullable
+created_at
+updated_at
+```
+
+Exactly one resource relation matches `purpose`. One notification row exists per
+accepted submission. Career delivery remains pending until its CV is both
+`scan_status = clean` and `storage_class = protected`; infected/missing files
+cancel delivery without exposing scanner output.
 
 ---
 

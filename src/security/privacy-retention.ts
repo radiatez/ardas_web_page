@@ -89,6 +89,7 @@ async function anonymizeCandidateCore(
     await transaction
       .update(careerApplications)
       .set({
+        idempotencyKeyHash: null,
         firstName: null,
         lastName: null,
         phoneNormalized: null,
@@ -228,6 +229,7 @@ export async function runRetentionCleanup(
       await transaction
         .update(contactSubmissions)
         .set({
+          idempotencyKeyHash: null,
           name: null,
           company: null,
           emailNormalized: null,

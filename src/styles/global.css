@@ -1988,3 +1988,241 @@ button:hover .direction-icon {
     font-size: 1rem;
   }
 }
+
+/* Milestone 5 — public contact and career forms. */
+.public-form-section {
+  border-top: var(--border-subtle);
+  background: var(--surface-primary);
+}
+
+.public-form-section__intro,
+.public-form-section__form {
+  grid-column: 1 / -1;
+}
+
+.public-form-section__intro {
+  margin-bottom: var(--space-12);
+}
+
+.public-form-section__intro .type-body {
+  max-width: 38rem;
+  margin: var(--space-8) 0 0;
+}
+
+.public-form {
+  position: relative;
+  border-top: var(--border-strong);
+  padding-top: var(--space-8);
+}
+
+.public-form__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+.public-form__field {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.public-form__field > label,
+.public-form__group > legend {
+  color: var(--text-strong);
+  font-size: var(--type-label);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.055em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.public-form input:not([type="hidden"]):not([type="checkbox"]),
+.public-form textarea,
+.public-form select {
+  width: 100%;
+  min-height: 3.5rem;
+  border: var(--border-subtle);
+  border-radius: var(--radius-small);
+  background: var(--surface-primary);
+  color: var(--text-strong);
+  padding: var(--space-4);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background var(--motion-fast) var(--ease-standard);
+}
+
+.public-form textarea {
+  min-height: 11rem;
+  resize: vertical;
+}
+
+.public-form input[type="file"] {
+  padding: var(--space-3);
+  background: var(--surface-subtle);
+}
+
+.public-form input[type="file"]::file-selector-button {
+  min-height: 2.75rem;
+  margin-right: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-small);
+  background: var(--text-strong);
+  color: var(--text-on-inverse);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  padding-inline: var(--space-4);
+}
+
+.public-form input:hover,
+.public-form textarea:hover,
+.public-form select:hover {
+  border-color: var(--color-line-strong);
+}
+
+.public-form [aria-invalid="true"] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0.25rem 0 0 var(--color-accent);
+}
+
+.public-form__field-error,
+.public-form__help {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.public-form__field-error {
+  color: var(--color-accent-hover);
+  font-weight: var(--font-weight-semibold);
+}
+
+.public-form__help {
+  color: var(--text-muted);
+}
+
+.public-form__group {
+  display: grid;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0 0 var(--space-12);
+  border: 0;
+}
+
+.public-form__group + .public-form__group {
+  padding-top: var(--space-10);
+  border-top: var(--border-subtle);
+}
+
+.public-form__group > legend {
+  margin-bottom: var(--space-8);
+  padding: 0;
+}
+
+.public-form__privacy {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-10);
+  padding-block: var(--space-6);
+  border-top: var(--border-subtle);
+  border-bottom: var(--border-subtle);
+}
+
+.public-form__privacy p {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.public-form__privacy a {
+  color: var(--color-accent-hover);
+  font-weight: var(--font-weight-semibold);
+}
+
+.public-form__checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.public-form__checkbox input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  accent-color: var(--color-accent);
+}
+
+.public-form__status,
+.public-form-unavailable {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  border-left: 0.25rem solid var(--color-accent);
+  background: var(--surface-subtle);
+}
+
+.public-form__status strong {
+  color: var(--text-strong);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.public-form__submit {
+  margin-top: var(--space-8);
+}
+
+.public-form__submit:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.public-form__honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.public-form-unavailable {
+  margin-top: 0;
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.public-form-unavailable .type-body {
+  margin: 0;
+}
+
+@media (min-width: 40rem) {
+  .public-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .public-form__field[data-wide] {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64rem) {
+  .public-form-section__intro {
+    position: sticky;
+    top: 8rem;
+    grid-column: 1 / span 4;
+    align-self: start;
+    margin-bottom: 0;
+  }
+
+  .public-form-section__form {
+    grid-column: 6 / -1;
+  }
+}

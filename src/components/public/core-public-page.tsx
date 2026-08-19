@@ -1,11 +1,20 @@
+import { randomUUID } from "node:crypto";
+
+import Link from "next/link";
+
+import { resolveSubmissionRuntimeConfiguration } from "@/forms/configuration";
+import { loadCareerFormOptions } from "@/forms/options";
+import { getRuntimeDatabase } from "@/db/runtime";
+import { getLocalizedPath } from "@/i18n/routes";
 import type { PublicPageBundle } from "@/public/content-repository";
 
 import { CorporateMedia } from "./corporate-media";
 import { EditorialCopy, EditorialMedia } from "./editorial-content";
 import { Container, Grid, Section } from "./layout-primitives";
+import { CareerApplicationForm, ContactForm } from "./public-forms";
 import { TbdState } from "./public-homepage";
 
-export function CorePublicPage({ bundle }: { bundle: PublicPageBundle }) {
+export async function CorePublicPage({ bundle }: { bundle: PublicPageBundle }) {
   switch (bundle.page.routeKey) {
     case "brands":
       return <BrandsPage bundle={bundle} />;
@@ -16,8 +25,11 @@ export function CorePublicPage({ bundle }: { bundle: PublicPageBundle }) {
     case "corporate":
       return <CorporatePage bundle={bundle} />;
     case "careers":
+      return <CareerLandingPage bundle={bundle} />;
+    case "career-apply":
+      return <CareerApplicationPage bundle={bundle} />;
     case "contact":
-      return <CallToActionPage bundle={bundle} />;
+      return <ContactPage bundle={bundle} />;
     default:
       return <EditorialPage bundle={bundle} />;
   }
@@ -224,9 +236,8 @@ function LocationsPage({ bundle }: { bundle: PublicPageBundle }) {
   );
 }
 
-function CallToActionPage({ bundle }: { bundle: PublicPageBundle }) {
+function CareerLandingPage({ bundle }: { bundle: PublicPageBundle }) {
   const { page } = bundle;
-  const isCareer = page.routeKey === "careers";
   return (
     <main id="main-content">
       <InteriorHero bundle={bundle} />
@@ -234,29 +245,153 @@ function CallToActionPage({ bundle }: { bundle: PublicPageBundle }) {
         <Container>
           <Grid>
             <div className="cta-status__number" aria-hidden="true">
-              {isCareer ? "01" : "02"}
+              01
             </div>
-            <div className="cta-status__content" role="status">
+            <div className="cta-status__content">
               <span className="signature-rule" aria-hidden="true" />
               <h2 className="type-h2">
                 {page.locale === "tr"
-                  ? isCareer
-                    ? "Genel başvuru deneyimi yayına hazırlanıyor."
-                    : "Kurumsal iletişim kanalları doğrulanıyor."
-                  : isCareer
-                    ? "The general application experience is being prepared."
-                    : "Corporate contact channels are being verified."}
+                  ? "Genel başvurunuzu güvenli form üzerinden iletin."
+                  : "Submit your general application through the secure form."}
               </h2>
               <p className="type-body">
                 {page.locale === "tr"
-                  ? "Bu alan, güvenli form ve onaylı bilgiler tamamlandığında kullanıma açılacak."
-                  : "This area will become available when the secure form and approved details are ready."}
+                  ? "Başvurular yalnız yetkili İK erişimine açık olan veri ve dosya güvenliği sınırları içinde işlenir."
+                  : "Applications are processed within data and file-security boundaries accessible only to authorized HR staff."}
               </p>
+              <Link className="action-link" href={getLocalizedPath("career-apply", page.locale)}>
+                {page.locale === "tr" ? "Genel başvuru formu" : "General application form"}
+              </Link>
             </div>
           </Grid>
         </Container>
       </Section>
     </main>
+  );
+}
+
+async function ContactPage({ bundle }: { bundle: PublicPageBundle }) {
+  const { locale } = bundle.page;
+  let configuration;
+  try {
+    const { db } = getRuntimeDatabase();
+    configuration = await resolveSubmissionRuntimeConfiguration(db, "contact", locale);
+  } catch {
+    configuration = undefined;
+  }
+
+  return (
+    <main id="main-content">
+      <InteriorHero bundle={bundle} />
+      <Section className="public-form-section">
+        <Container>
+          <Grid className="public-form-section__layout">
+            <FormIntroduction
+              eyebrow={locale === "tr" ? "İletişim formu" : "Contact form"}
+              heading={locale === "tr" ? "Mesajınızı ilgili ekibe iletin." : "Send your message to the right team."}
+              text={locale === "tr" ? "Zorunlu alanları doldurun. Kişisel bilgileriniz yalnız iletişim talebinin değerlendirilmesi amacıyla işlenir." : "Complete the required fields. Your personal data is processed only to evaluate your contact request."}
+            />
+            <div className="public-form-section__form">
+              {configuration ? (
+                <ContactForm
+                  configuration={configuration}
+                  noticeShownAt={new Date().toISOString()}
+                  submissionId={randomUUID()}
+                />
+              ) : (
+                <PublicFormUnavailable locale={locale} />
+              )}
+            </div>
+          </Grid>
+        </Container>
+      </Section>
+    </main>
+  );
+}
+
+async function CareerApplicationPage({ bundle }: { bundle: PublicPageBundle }) {
+  const { locale } = bundle.page;
+  let configuration;
+  let options;
+  try {
+    const { db } = getRuntimeDatabase();
+    [configuration, options] = await Promise.all([
+      resolveSubmissionRuntimeConfiguration(db, "career", locale),
+      loadCareerFormOptions(db, locale),
+    ]);
+  } catch {
+    configuration = undefined;
+    options = undefined;
+  }
+  const ready =
+    configuration &&
+    options &&
+    options.departments.length > 0 &&
+    options.locations.length === 3
+      ? { configuration, options }
+      : undefined;
+
+  return (
+    <main id="main-content">
+      <InteriorHero bundle={bundle} />
+      <Section className="public-form-section public-form-section--career">
+        <Container>
+          <Grid className="public-form-section__layout">
+            <FormIntroduction
+              eyebrow={locale === "tr" ? "Genel başvuru" : "General application"}
+              heading={locale === "tr" ? "Deneyiminizi bizimle paylaşın." : "Share your experience with us."}
+              text={locale === "tr" ? "Başvuru formu ve CV yalnız yetkili İK süreçleri için kullanılır. CV dosyanız temiz güvenlik sonucu alınana kadar erişime kapalı kalır." : "The application form and CV are used only for authorized HR processes. Your CV remains inaccessible until a clean security result is received."}
+            />
+            <div className="public-form-section__form">
+              {ready ? (
+                <CareerApplicationForm
+                  configuration={ready.configuration}
+                  noticeShownAt={new Date().toISOString()}
+                  options={ready.options}
+                  submissionId={randomUUID()}
+                />
+              ) : (
+                <PublicFormUnavailable locale={locale} />
+              )}
+            </div>
+          </Grid>
+        </Container>
+      </Section>
+    </main>
+  );
+}
+
+function FormIntroduction({
+  eyebrow,
+  heading,
+  text,
+}: {
+  eyebrow: string;
+  heading: string;
+  text: string;
+}) {
+  return (
+    <div className="public-form-section__intro">
+      <p className="type-eyebrow">{eyebrow}</p>
+      <h2 className="type-h2">{heading}</h2>
+      <p className="type-body">{text}</p>
+    </div>
+  );
+}
+
+function PublicFormUnavailable({ locale }: { locale: "tr" | "en" }) {
+  return (
+    <div className="public-form-unavailable" role="status">
+      <span className="signature-rule" aria-hidden="true" />
+      <h2 className="type-h3">
+        {locale === "tr" ? "Form geçici olarak kullanılamıyor." : "The form is temporarily unavailable."}
+      </h2>
+      <p className="type-body">
+        {locale === "tr"
+          ? "Gerekli gizlilik, saklama veya sağlayıcı yapılandırması tamamlanmadan veri kabul edilmeyecektir."
+          : "No data will be accepted until the required privacy, retention, and provider configuration is complete."}
+      </p>
+    </div>
   );
 }
 

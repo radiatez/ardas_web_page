@@ -1,5 +1,5 @@
 const blockedKeyPattern =
-  /(?:authorization|cookie|token|secret|password|email|phone|first.?name|last.?name|display.?name|message|body|about|cv|file.?content|filename|salary|birth|gender|marital|military)/i;
+  /(?:authorization|cookie|token|secret|password|credential|api.?key|access.?key|private.?key|email|phone|first.?name|last.?name|display.?name|message|body|about|cv|file.?content|filename|salary|birth|gender|marital|military)/i;
 const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
 const bearerPattern = /\bbearer\s+[a-z0-9._~+/-]+=*/i;
 const jwtPattern = /\beyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\b/;

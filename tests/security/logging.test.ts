@@ -19,6 +19,10 @@ describe("PII-safe structured logging", () => {
         harmlessId: "00000000-0000-4000-8000-000000000001",
       },
       accidental: "person@example.com",
+      expectedSalaryTry: "50000",
+      aboutText: "candidate biography",
+      cvContent: "%PDF private candidate data",
+      providerCredential: "secret-provider-value",
       url: "https://example.com/path?token=secret#fragment",
     });
 
@@ -29,6 +33,10 @@ describe("PII-safe structured logging", () => {
       "private contact message",
       "secret-token",
       "?token=secret",
+      "50000",
+      "candidate biography",
+      "%PDF private candidate data",
+      "secret-provider-value",
     ]) {
       expect(serialized).not.toContain(forbidden);
     }

@@ -26,6 +26,7 @@
   "dependencies": {
     "@auth0/nextjs-auth0": "4.27.0",
     "@aws-sdk/client-s3": "3.1112.0",
+    "@aws-sdk/client-sesv2": "3.1112.0",
     "@aws-sdk/client-sqs": "3.1112.0",
     "drizzle-orm": "0.45.2",
     "next": "16.3.1",
