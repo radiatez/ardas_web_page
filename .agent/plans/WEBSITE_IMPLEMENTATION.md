@@ -928,18 +928,18 @@ Production gates retained:
 
 # Milestone 7 — HR Application Management
 
-Status: `[ ]`
+Status: `[x]`
 
 ## Tasks
 
-- [ ] application list/detail.
-- [ ] search/filter.
-- [ ] protected clean-PDF download.
-- [ ] notes.
-- [ ] status/history.
-- [ ] HR audit scope.
-- [ ] retention/delete/anonymize.
-- [ ] future job-posting scaffold.
+- [x] application list/detail.
+- [x] search/filter.
+- [x] protected clean-PDF download.
+- [x] notes.
+- [x] status/history.
+- [x] HR audit scope.
+- [x] retention/delete/anonymize.
+- [x] future job-posting scaffold.
 
 ## Acceptance
 
@@ -951,6 +951,101 @@ Status: `[ ]`
 ## Validation
 
 Run E2E-08 and E2E-09.
+
+## Validation Record — 2026-08-19
+
+Local environment:
+
+- Windows / PowerShell,
+- Node.js `24.14.0` host runtime; repository/CI pin remains `24.19.x`,
+- pnpm `11.22.0` through Corepack,
+- Docker Engine client/server `29.7.2`, Docker Compose `5.4.0`,
+- official PostgreSQL `18.4` image through disposable `compose.test.yaml`.
+
+Commands and results:
+
+- frozen install: `corepack pnpm install --frozen-lockfile` passed with the
+  committed lockfile; the expected local Node engine warning was retained,
+- repeatable database test lifecycle: `corepack pnpm run test:postgres` started
+  isolated `ardas-test-postgres-test-1` on `127.0.0.1:55432`, waited for health,
+  applied migrations, checked metadata, ran the complete suite and removed the
+  container, network and temporary database data,
+- migration validation: all committed migrations through
+  `0004_bumpy_invaders.sql` applied to clean PostgreSQL 18.4 and produced the
+  expected 32-table schema,
+- migration reproducibility: `pnpm db:check` passed, `pnpm db:generate` reported
+  no schema change and `git diff --check` passed,
+- lint: `pnpm lint` passed with zero warnings,
+- typecheck: `pnpm typecheck` and Next.js route generation passed,
+- tests: 34 files / 130 tests passed; 6 files / 25 tests exercised real
+  PostgreSQL integration,
+- PostgreSQL coverage includes server-filtered/paginated list queries, minimal
+  projection, protected detail, notes, allowed/denied status transitions,
+  history, career-scoped audit, due/hold retention, anonymization, hard-delete
+  override, protected Media/application relation and existing migrations,
+- E2E-08 passed: HR list → detail → clean protected CV download → internal note
+  → valid status/history → retention/anonymization → PII-safe audit,
+- E2E-09 passed: Content Editor, Contact Manager and Viewer list/detail/CV
+  access denied; HR Dealer Portal, users/roles and Contact Inbox access denied;
+  Super Admin HR operations allowed,
+- CV fail-closed matrix passed: authorized HR + clean/protected allowed;
+  pending, quarantine, error, infected, missing result, unrelated clean file,
+  non-MFA and unauthorized-role access denied,
+- retention passed: HR `retention` scope cannot bypass a future deadline or
+  active hold; due anonymization clears PII/notes, deletes the CV object/Media,
+  archives the neutral row and preserves status/audit history; hard delete and
+  early override require `all` scope,
+- accessibility: the HR action controls passed axe semantics; labels, status and
+  note controls, destructive alert-dialog focus entry, Tab containment, Escape
+  close and focus return passed automated checks,
+- production build: `pnpm build` passed and emitted `/admin/basvurular`, its
+  protected detail route, HR mutation API and existing clean-CV endpoint,
+- dependency audit: `pnpm audit:prod` passed with no known vulnerabilities,
+- production HTTP smoke: `/` returned `307 → /tr`, `/tr` returned `200`, and
+  both HR list/detail routes failed closed with `503` while Auth0 configuration
+  was intentionally absent; CSP, HSTS, nosniff, Referrer-Policy,
+  frame-ancestor/X-Frame-Options and Permissions-Policy remained present.
+
+Authoritative remote environment:
+
+- GitHub Actions Ubuntu runner,
+- Node.js `24.19.0`, pnpm `11.22.0`, PostgreSQL `18.4`,
+- implementation commit `119ccdb9e784b50a26ec68adf2c6dd6f9c704da7`,
+- workflow `CI` run `#19`, run ID `32245084620`, attempt 1, job
+  `96043753945`: success,
+- every step passed: frozen install, clean migration, metadata check,
+  migration regeneration/no-diff, lint, typecheck, 34 files / 130 tests,
+  production build and dependency audit,
+- 6 PostgreSQL files / 25 PostgreSQL tests passed remotely, matching the local
+  Docker database behavior,
+- run URL:
+  `https://github.com/radiatez/ardas_web_page/actions/runs/32245084620`.
+
+Implemented scope:
+
+- Turkish, responsive and keyboard-oriented HR list/detail UI using the existing
+  Milestone 6 admin visual language,
+- server-side bounded name/date/status/department/location/application-kind
+  filters and pagination; the list omits phone, email, salary and free text,
+- explicit permission/scope authorization, forward-only status graph,
+  note/history/audit, clean protected CV download, privacy provenance and
+  due/hold-aware retention operations,
+- nullable `job_posting_id` and General Application remain supported without
+  introducing a full recruitment/job-posting system,
+- Milestone 6 CMS/Contact Inbox, public forms, Auth0/MFA, S3/GuardDuty and
+  production provider decisions remain unchanged; Milestone 8 was not started.
+
+Production gates retained:
+
+- Auth0 EU tenant provisioning and MFA Always evidence,
+- S3/GuardDuty/EventBridge/SQS resources, IAM, alarms and protected-object
+  deletion/reconciliation monitoring,
+- approved candidate retention days, legal-hold/override operating policy and
+  approved privacy/legal text,
+- Neon/Vercel/SES/Sentry/CloudWatch provisioning, DPA/subprocessor review,
+  owners, alert recipients and credentials,
+- nonce/hash CSP hardening (`R-028`), provider-side PII scrubbing, backups and
+  restore/retention rehearsals.
 
 ---
 
