@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 import type { Locale } from "./config";
 
 export const routeKeys = [
@@ -32,9 +34,9 @@ export const routeDefinitions = {
   "data-protection": { tr: "kvkk", en: "data-protection" },
 } as const satisfies Record<RouteKey, RouteDefinition>;
 
-export function getLocalizedPath(routeKey: RouteKey, locale: Locale): string {
+export function getLocalizedPath(routeKey: RouteKey, locale: Locale): Route {
   const slug = routeDefinitions[routeKey][locale];
-  return slug ? `/${locale}/${slug}` : `/${locale}`;
+  return (slug ? `/${locale}/${slug}` : `/${locale}`) as Route;
 }
 
 export function getRouteByPath(
@@ -55,7 +57,7 @@ export function getLanguageSwitchTarget(
   routeKey: RouteKey,
   targetLocale: Locale,
   equivalentIsPublished: boolean,
-): string {
+): Route {
   return equivalentIsPublished
     ? getLocalizedPath(routeKey, targetLocale)
     : getLocalizedPath("home", targetLocale);

@@ -40,6 +40,7 @@ export const securityHeaders = [
 ] as const;
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   poweredByHeader: false,
   reactStrictMode: true,
   typedRoutes: true,

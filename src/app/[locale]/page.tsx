@@ -1,13 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { scaffoldCopy } from "@/content/scaffold";
-import {
-  getAlternateLocale,
-  isLocale,
-  locales,
-  type Locale,
-} from "@/i18n/config";
+import { Container, Eyebrow, Section } from "@/components/public/layout-primitives";
+import { publicShellCopy } from "@/content/public-shell";
+import { isLocale, locales } from "@/i18n/config";
 
 type LocaleHomePageProps = {
   params: Promise<{ locale: string }>;
@@ -24,35 +19,19 @@ export default async function LocaleHomePage({ params }: LocaleHomePageProps) {
     notFound();
   }
 
-  const locale: Locale = rawLocale;
-  const copy = scaffoldCopy[locale];
-  const alternateLocale = getAlternateLocale(locale);
+  const copy = publicShellCopy[rawLocale].home;
 
   return (
-    <main className="scaffold-shell">
-      <header className="scaffold-header">
-        <span className="wordmark" aria-label="Ardaş Yedek Parça">
-          ARDAŞ
-        </span>
-        <Link className="language-link" href={`/${alternateLocale}`}>
-          {copy.languageLabel}
-        </Link>
-      </header>
-
-      <section className="scaffold-hero" aria-labelledby="scaffold-heading">
-        <p className="eyebrow">{copy.eyebrow}</p>
-        <h1 id="scaffold-heading">{copy.heading}</h1>
-        <p className="lead">{copy.description}</p>
-      </section>
-
-      <dl className="metric-grid" aria-label={locale === "tr" ? "Şirket ölçeği" : "Company scale"}>
-        {copy.metrics.map((metric) => (
-          <div className="metric" key={metric.label}>
-            <dt>{metric.label}</dt>
-            <dd>{metric.value}</dd>
+    <main className="shell-placeholder" id="main-content">
+      <Section spacing="large">
+        <Container>
+          <div className="shell-placeholder__content motion-reveal">
+            <Eyebrow>{copy.eyebrow}</Eyebrow>
+            <h1 className="type-display">{copy.heading}</h1>
+            <p className="type-lead">{copy.description}</p>
           </div>
-        ))}
-      </dl>
+        </Container>
+      </Section>
     </main>
   );
 }

@@ -408,3 +408,60 @@ Official references:
 - https://docs.aws.amazon.com/guardduty/latest/ug/monitor-with-eventbridge-s3-malware-protection.html
 - https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html
 - https://www.postgresql.org/docs/current/sql-insert.html
+
+### ADR-012 — Tokenized Server-First Public Design System
+
+Date: 2026-08-19
+Status: Accepted; final brand identity remains TBD
+
+#### Context
+
+Milestone 3 needs a production public shell before the final logo, palette,
+typeface, photography and CMS content are approved. It must express the accepted
+Swiss-inspired corporate direction without copying ABB or introducing a generic
+UI-library visual language. The existing locale, Dealer Portal and security
+boundaries must remain authoritative.
+
+#### Decision
+
+- Own the presentation layer through CSS custom-property token families for
+  color/surfaces, typography, spacing, grid, radius, border, motion, z-index and
+  breakpoints. Use mobile-first 4/8/12-column layout primitives.
+- Use provisional `#0057B8` as the single accent and a Helvetica/Arial-compatible
+  system stack. Both are replaceable tokens and explicitly are not final brand
+  approvals.
+- Represent the temporary `ARDAŞ` mark through a replaceable text-wordmark
+  component rather than an embedded final logo asset.
+- Keep the shell server-first. Client JavaScript is limited to mobile-menu focus
+  management and the current-path locale switch.
+- Pass the existing server-side Dealer Portal resolution into presentation
+  components. Components never read settings/environment values or hard-code the
+  portal URL.
+- Keep the design-system preview outside production navigation, mark it `noindex`,
+  and return 404 for it in production.
+
+#### Alternatives Considered
+
+- ABB red and a visual clone: rejected because ABB is a design-language reference,
+  not Ardaş's brand identity.
+- A component library with default tokens and card patterns: rejected because it
+  would add weight and conflict with the typography/grid-led corporate direction.
+- An externally hosted webfont before approval: rejected because licensing,
+  identity choice and an additional rendering dependency are still unresolved.
+- A client-rendered shell: rejected because navigation/footer do not need client
+  state and minimal JavaScript better supports accessibility and performance.
+
+#### Consequences
+
+- Final identity adoption is localized to tokens, wordmark and approved font/media
+  assets instead of requiring a shell rewrite.
+- The provisional palette and font must not be treated as production brand signoff;
+  the existing launch-gate TBD remains.
+- Mobile focus trapping, focus return, localized navigation, reduced motion,
+  contrast and overflow require explicit regression validation.
+
+#### Validation
+
+Validate with lint/typecheck/build, component and route tests, axe semantic checks,
+token contrast tests, keyboard focus-trap tests, reduced-motion checks and
+mobile/tablet/desktop HTTP/render review.

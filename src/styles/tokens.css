@@ -1,0 +1,107 @@
+:root {
+  color-scheme: light;
+
+  /* Provisional identity: replace these aliases when the brand palette is approved. */
+  --brand-wordmark: "ARDAŞ";
+  --color-accent: #0057b8;
+  --color-accent-hover: #003f87;
+  --color-accent-soft: #e8f1fb;
+
+  --color-white: #ffffff;
+  --color-ink: #121416;
+  --color-text: #292e33;
+  --color-text-muted: #59616a;
+  --color-line: #d5dade;
+  --color-line-strong: #9ca5ad;
+  --color-surface-subtle: #f3f5f6;
+  --color-surface-quiet: #e7ebee;
+  --color-surface-inverse: #121416;
+
+  --surface-primary: var(--color-white);
+  --surface-subtle: var(--color-surface-subtle);
+  --surface-quiet: var(--color-surface-quiet);
+  --surface-accent: var(--color-accent);
+  --surface-inverse: var(--color-surface-inverse);
+
+  --text-strong: var(--color-ink);
+  --text-default: var(--color-text);
+  --text-muted: var(--color-text-muted);
+  --text-on-accent: var(--color-white);
+  --text-on-inverse: var(--color-white);
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, "Noto Sans", sans-serif;
+  --font-display: var(--font-sans);
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 550;
+  --font-weight-semibold: 650;
+  --font-weight-bold: 720;
+
+  --type-display: clamp(3rem, 9vw, 6.5rem);
+  --type-h1: clamp(2.5rem, 6.8vw, 5rem);
+  --type-h2: clamp(2rem, 4.5vw, 3.5rem);
+  --type-h3: clamp(1.5rem, 2.5vw, 2rem);
+  --type-lead: clamp(1.125rem, 2vw, 1.5rem);
+  --type-body: clamp(1rem, 0.9rem + 0.2vw, 1.125rem);
+  --type-label: 0.75rem;
+  --type-stat: clamp(3.25rem, 8vw, 7rem);
+
+  --leading-display: 0.96;
+  --leading-heading: 1.06;
+  --leading-lead: 1.48;
+  --leading-body: 1.65;
+
+  --tracking-display: -0.045em;
+  --tracking-heading: -0.035em;
+  --tracking-label: 0.1em;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-30: 7.5rem;
+  --space-40: 10rem;
+
+  --content-max: 85rem;
+  --content-readable: 46rem;
+  --grid-columns-mobile: 4;
+  --grid-columns-tablet: 8;
+  --grid-columns-desktop: 12;
+  --grid-gap: clamp(1rem, 2vw, 2rem);
+  --page-gutter: clamp(1.25rem, 4vw, 5rem);
+
+  --radius-none: 0;
+  --radius-small: 0.125rem;
+  --radius-medium: 0.25rem;
+  --radius-pill: 999px;
+
+  --border-subtle: 1px solid var(--color-line);
+  --border-strong: 1px solid var(--color-line-strong);
+  --border-accent: 2px solid var(--color-accent);
+
+  --motion-instant: 100ms;
+  --motion-fast: 220ms;
+  --motion-default: 350ms;
+  --motion-reveal: 650ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --z-base: 0;
+  --z-header: 40;
+  --z-overlay: 80;
+  --z-modal: 90;
+  --z-skip-link: 100;
+
+  /* CSS custom properties document breakpoints; media queries use the same values. */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 64rem;
+  --breakpoint-lg: 80rem;
+  --breakpoint-xl: 96rem;
+}

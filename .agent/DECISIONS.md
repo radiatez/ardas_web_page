@@ -341,3 +341,24 @@ optional holds drive an authenticated internal cleanup job. Anonymization clears
 personal/free-text fields and deletes CV objects; database checks allow nullable
 required fields only after `anonymized_at` is set. Approved duration values remain
 configurable/TBD before production form enablement.
+
+## D-035 — Milestone 3 Public Design System Boundary
+**Status:** Accepted; final brand identity remains TBD
+
+The public shell uses project-owned CSS custom-property tokens and small
+Next.js/React primitives instead of adopting a UI library aesthetic. The system
+is mobile-first with 4/8/12-column grid contracts, architectural 0–4 px radii,
+border/surface hierarchy instead of card shadows, and reduced-motion fallbacks.
+
+Until the final brand identity is approved:
+
+- `ARDAŞ` is a replaceable text-wordmark component, not a final logo asset,
+- `#0057B8` is a provisional accessible accent token, not an approved brand color,
+- the Helvetica/Arial-compatible system stack is a replaceable font token, not
+  the approved corporate typeface.
+
+The public shell remains server-first. Only the mobile focus-managed menu and
+pathname-aware locale switch require client JavaScript. Dealer Portal UI receives
+the existing server-side `SiteSetting → environment → disabled` resolution and
+never contains a configured URL. The development showcase is unlinked, `noindex`,
+and returns 404 in production.
