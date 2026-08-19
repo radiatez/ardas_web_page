@@ -23,7 +23,7 @@ describeWithDatabase("generated PostgreSQL migration", () => {
     expect(result.rows[0]?.server_version).toMatch(/^18\./);
   });
 
-  it("creates the complete Milestone 5 table set on a clean database", async () => {
+  it("creates the complete Milestone 6 table set on a clean database", async () => {
     const result = await pool.query<{ table_name: string }>(
       `select table_name
          from information_schema.tables
@@ -42,6 +42,8 @@ describeWithDatabase("generated PostgreSQL migration", () => {
         "career_application",
         "career_application_note",
         "contact_submission",
+        "contact_submission_note",
+        "content_draft",
         "content_revision",
         "department",
         "department_locale",

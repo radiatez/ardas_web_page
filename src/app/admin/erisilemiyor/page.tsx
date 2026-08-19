@@ -1,0 +1,1 @@
+export default function AdminAccessDeniedPage() { return <main className="admin-panel"><span className="admin-kicker">Erişim reddedildi</span><h1>Bu modül için yetkiniz yok.</h1><p>Rol adı değil, server-side permission kaydı güvenlik sınırı olarak uygulanır. Production ortamında MFA ayrıca zorunludur.</p></main>; }

@@ -660,3 +660,62 @@ notification-failure persistence, record-ID-only payloads, quarantine cleanup,
 pending/error/infected denial, clean promotion, public scan-status minimization,
 real PostgreSQL constraints/migrations, logging redaction, accessibility, HTTP
 behavior, lint, typecheck, full tests, build and dependency audit.
+
+### ADR-016 — Separate CMS Working Copies and Permission-Scoped Admin Shell
+
+Date: 2026-08-19
+Status: Accepted
+
+#### Context
+
+Localized publication rows hold the public snapshot. Reusing the same row as an
+editor draft would temporarily unpublish live content and make scheduled changes
+replace the active version too early. Admin UI also combines ordinary public
+content with contact PII and public media, so visual navigation cannot be the
+security boundary.
+
+#### Decision
+
+- Store the mutable per-entity/per-locale working copy in `ContentDraft`; retain
+  `ContentRevision` as immutable history and the locale row as the active public
+  snapshot.
+- Validate the bounded `schemaVersion: 1` block contract on save. Preview reads
+  the working copy through an Auth0-protected permission check, renders the real
+  public composition and is `noindex`/disallowed in robots.
+- Publish applies the working copy transactionally. Rollback creates a new draft
+  and revision. Scheduled page publication is executed by a secret-authenticated
+  internal worker serialized with a PostgreSQL advisory transaction lock.
+- Make the Turkish admin shell permission-aware, but repeat authorization in
+  every server service. Keep contact list projections minimal, isolate public
+  media from protected/quarantine storage, and retain the non-secret SiteSetting
+  allowlist.
+- Require an explicit approval reference before legal content can publish; do
+  not author or infer legal copy.
+
+#### Alternatives Considered
+
+- Change `PageLocale.publish_status` to draft on every save: rejected because an
+  ordinary edit would take the current page offline.
+- Store raw HTML or arbitrary page-builder components: rejected because it
+  expands XSS, accessibility and visual-consistency risk.
+- Trust hidden admin navigation or client role names: rejected because URLs and
+  APIs remain directly callable and roles are not the security boundary.
+- Put public images and CV objects in one admin library: rejected because it
+  would cross the protected-file permission boundary.
+
+#### Consequences
+
+- Working-copy cleanup and scheduler monitoring become operational concerns;
+  production invocation/alerts remain a deployment gate.
+- Content editors can publish directly as approved for v1 without sacrificing
+  revision/rollback traceability.
+- Provider secrets and final legal copy/retention durations remain outside this
+  milestone and retain their existing launch gates.
+
+#### Validation
+
+Validate draft/live separation, authorized preview, direct and scheduled publish,
+rollback-as-new-draft, locale independence, redirect validation, Contact Manager
+positive/negative access, public-only media queries, audit minimization, real
+PostgreSQL migration/reproducibility, accessibility, lint, typecheck, tests,
+production build and dependency audit.

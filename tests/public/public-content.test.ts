@@ -117,6 +117,7 @@ describe("Milestone 4 public content contract", () => {
     const page = {
       ...getDevelopmentPage("corporate", "tr"),
       source: "cms" as const,
+      allowIndexing: true,
       availableLocales: ["tr"] as const,
     };
     const metadata = buildPublicPageMetadata(page);

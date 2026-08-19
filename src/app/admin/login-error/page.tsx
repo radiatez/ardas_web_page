@@ -1,0 +1,1 @@
+export default function AdminLoginErrorPage() { return <main className="admin-panel"><span className="admin-kicker">Kimlik doğrulama</span><h1>Oturum açılamadı.</h1><p>Auth0 oturumu, aktif yerel kullanıcı eşlemesi ve production MFA politikasını kontrol edin.</p></main>; }

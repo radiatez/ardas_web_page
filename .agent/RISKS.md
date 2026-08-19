@@ -9,7 +9,7 @@
 | R-005 | TR/EN added too late | High | Low | i18n in architecture milestone | Mitigated |
 | R-006 | Dealer Portal redirected to malicious host | High | Low | HTTPS validation + allowlist option + Super Admin + audit | Mitigated |
 | R-007 | PII leaks into logs | High | Medium | Structured redaction + tests | Mitigated in application; provider scrubbing pending |
-| R-008 | Content change overwrites approved version | Medium | Medium | revision/preview/rollback/audit | Open |
+| R-008 | Content change overwrites approved version | Medium | Medium | Separate working copy + immutable revisions + protected preview + rollback-as-new-draft + audit | Mitigated in code |
 | R-009 | Migration breaks production | High | Low | staging validation + backup + rollback/forward-fix | Open |
 | R-010 | Backups cannot restore | High | Medium | restore testing | Open |
 | R-011 | Heavy hero media hurts mobile CWV | Medium | Medium | Next Image responsive delivery + focal crops; final media budgets/CWV monitoring remain required | Partially mitigated; final media pending |
@@ -30,5 +30,6 @@
 | R-026 | Managed database restore history is insufficient or provider-coupled | High | Low | Neon PITR plus encrypted logical exports and periodic `pg_restore` rehearsal | Open |
 | R-027 | Monitoring or email payloads duplicate candidate/contact PII | High | Medium | Record-ID-only SES notifications and operational events, expanded credential/free-text redaction, strict Sentry scrubbing | Mitigated in application; Sentry/SES validation pending |
 | R-028 | Static CSP needs inline script/style compatibility for the current Next.js runtime | High | Low | Restrictive default/object/frame/connect policy now; migrate to nonce/hash CSP when dynamic admin rendering is introduced | Open |
-| R-029 | CMS emits an unsupported or malformed public content block | Medium | Medium | Versioned allowlist parser safely drops unknown fields; Milestone 6 must add authoring validation and preview regression tests | Partially mitigated; CMS validation pending |
+| R-029 | CMS emits an unsupported or malformed public content block | Medium | Medium | Versioned allowlist parser + server authoring validation + protected real-component preview + regression tests | Mitigated in code |
 | R-030 | Generated demo imagery is mistaken for approved/licensed production photography | Medium | Low | Local/test-only manifest, no production fallback, explicit README/decision record and mandatory replacement gate | Mitigated in code; final approved photography TBD |
+| R-031 | Scheduled content is not applied or fails silently | High | Medium | Idempotent internal worker, PostgreSQL advisory transaction lock, PII-safe failure event; production scheduler and alert provisioning required | Mitigated in code; production invocation/alerting pending |

@@ -51,24 +51,25 @@ export function buildPublicPageMetadata(page: PublicPageDocument): Metadata {
       },
     },
     robots:
-      page.source === "cms"
+      page.source === "cms" && page.allowIndexing !== false
         ? { index: true, follow: true }
         : { index: false, follow: false, noarchive: true },
     openGraph: {
       type: "website",
-      title: page.seoTitle ?? page.title,
-      description: page.seoDescription,
+      title: page.ogTitle ?? page.seoTitle ?? page.title,
+      description: page.ogDescription ?? page.seoDescription,
       url: canonical,
       locale: socialLocales[page.locale],
       alternateLocale: page.availableLocales
         .filter((locale) => locale !== page.locale)
         .map((locale) => socialLocales[locale]),
       siteName: "ARDAŞ",
+      images: page.ogImage ? [page.ogImage] : undefined,
     },
     twitter: {
       card: "summary",
-      title: page.seoTitle ?? page.title,
-      description: page.seoDescription,
+      title: page.ogTitle ?? page.seoTitle ?? page.title,
+      description: page.ogDescription ?? page.seoDescription,
     },
   };
 }

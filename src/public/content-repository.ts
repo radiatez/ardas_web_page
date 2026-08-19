@@ -146,6 +146,10 @@ async function loadPage(
       contentJson: pageLocales.contentJson,
       seoTitle: pageLocales.seoTitle,
       seoDescription: pageLocales.seoDescription,
+      ogTitle: pageLocales.ogTitle,
+      ogDescription: pageLocales.ogDescription,
+      ogMediaId: pageLocales.ogMediaId,
+      allowIndexing: pageLocales.allowIndexing,
       publishStatus: pageLocales.publishStatus,
       publishedAt: pageLocales.publishedAt,
       scheduledArchiveAt: pageLocales.scheduledArchiveAt,
@@ -177,6 +181,10 @@ async function loadPage(
     title: selected.title,
     seoTitle: selected.seoTitle ?? undefined,
     seoDescription: selected.seoDescription ?? undefined,
+    ogTitle: selected.ogTitle ?? undefined,
+    ogDescription: selected.ogDescription ?? undefined,
+    ogMediaId: selected.ogMediaId ?? undefined,
+    allowIndexing: selected.allowIndexing,
     content: parsePublicPageContent(selected.contentJson, selected.title),
     source: "cms",
     availableLocales,
@@ -393,7 +401,7 @@ function getBlockMediaIds(page: PublicPageDocument): readonly string[] {
     page.content.hero,
     ...Object.values(page.content.sections),
     ...page.content.legalBlocks,
-  ].flatMap((block) => (block.mediaId ? [block.mediaId] : []));
+  ].flatMap((block) => (block.mediaId ? [block.mediaId] : [])).concat(page.ogMediaId ? [page.ogMediaId] : []);
 }
 
 export async function loadPublishedPageBundle(
@@ -421,7 +429,17 @@ export async function loadPublishedPageBundle(
     ]);
 
   return {
-    page,
+    page: page.ogMediaId && blockMediaMap.has(page.ogMediaId)
+      ? {
+          ...page,
+          ogImage: {
+            url: blockMediaMap.get(page.ogMediaId)!.src,
+            width: blockMediaMap.get(page.ogMediaId)!.width,
+            height: blockMediaMap.get(page.ogMediaId)!.height,
+            alt: blockMediaMap.get(page.ogMediaId)!.mediaLocale.altText ?? undefined,
+          },
+        }
+      : page,
     blockMedia: Object.fromEntries(blockMediaMap),
     brands: brandItems,
     productGroups: productGroupItems,

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import type { Route } from "next";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import {
   LegalPageShell,
@@ -13,6 +14,8 @@ import { isLocale } from "@/i18n/config";
 import { getRouteByPath } from "@/i18n/routes";
 import { getCachedPublicPageBundle } from "@/public/content-repository";
 import { buildPublicPageMetadata } from "@/public/metadata";
+import { resolveActiveSlugRedirect } from "@/admin/cms";
+import { getRuntimeDatabase } from "@/db/runtime";
 
 type CatchAllPageProps = {
   params: Promise<{ locale: string; segments: string[] }>;
@@ -47,7 +50,19 @@ export async function generateMetadata(
 
 export default async function CatchAllPage(props: CatchAllPageProps) {
   const route = await resolvePublicRoute(props);
-  if (!route) notFound();
+  if (!route) {
+    const { locale, segments } = await props.params;
+    if (isLocale(locale)) {
+      try {
+        const { db } = getRuntimeDatabase();
+        const redirect = await resolveActiveSlugRedirect(db, `/${locale}/${segments.join("/")}`);
+        if (redirect?.status === 301) permanentRedirect(redirect.newPath as Route);
+      } catch (error) {
+        if (typeof error === "object" && error && "digest" in error) throw error;
+      }
+    }
+    notFound();
+  }
   const bundle = await getCachedPublicPageBundle(route.routeKey, route.locale);
   if (!bundle) notFound();
 

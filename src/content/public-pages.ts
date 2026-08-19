@@ -49,6 +49,11 @@ export type PublicPageDocument = {
   title: string;
   seoTitle?: string;
   seoDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogMediaId?: string;
+  ogImage?: { url: string; width: number; height: number; alt?: string };
+  allowIndexing?: boolean;
   content: PublicPageContent;
   source: PublicPageSource;
   availableLocales: readonly Locale[];
@@ -56,7 +61,7 @@ export type PublicPageDocument = {
 
 type PlaceholderPage = Omit<
   PublicPageDocument,
-  "slug" | "source" | "availableLocales"
+  "slug" | "source" | "availableLocales" | "allowIndexing" | "ogImage"
 >;
 
 const uuidPattern =
@@ -676,6 +681,7 @@ export function getDevelopmentPage(
     ...page,
     slug: "",
     source: "placeholder",
+    allowIndexing: false,
     availableLocales: ["tr", "en"],
   };
 }

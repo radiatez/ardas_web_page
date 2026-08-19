@@ -295,6 +295,12 @@ export const pageLocales = pgTable(
       .notNull(),
     seoTitle: varchar("seo_title", { length: 255 }),
     seoDescription: text("seo_description"),
+    ogTitle: varchar("og_title", { length: 255 }),
+    ogDescription: text("og_description"),
+    ogMediaId: uuid("og_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    allowIndexing: boolean("allow_indexing").default(true).notNull(),
     ...publicationColumns(),
   },
   (table) => [
@@ -332,6 +338,29 @@ export const contentRevisions = pgTable(
       table.revisionNo,
     ),
     check("content_revision_number_positive", sql`${table.revisionNo} > 0`),
+  ],
+);
+
+export const contentDrafts = pgTable(
+  "content_draft",
+  {
+    entityType: varchar("entity_type", { length: 80 }).notNull(),
+    entityId: uuid("entity_id").notNull(),
+    locale: localeEnum("locale").notNull(),
+    snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+    updatedBy: uuid("updated_by").references(() => adminUsers.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.entityType, table.entityId, table.locale],
+      name: "content_draft_primary_key",
+    }),
+    index("content_draft_updated_idx").on(table.updatedAt),
   ],
 );
 
@@ -731,6 +760,33 @@ export const contactSubmissions = pgTable(
     check(
       "contact_submission_required_unless_anonymized",
       sql`${table.anonymizedAt} IS NOT NULL OR (${table.name} IS NOT NULL AND ${table.emailNormalized} IS NOT NULL AND ${table.subject} IS NOT NULL AND ${table.message} IS NOT NULL)`,
+    ),
+  ],
+);
+
+export const contactSubmissionNotes = pgTable(
+  "contact_submission_note",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    contactSubmissionId: uuid("contact_submission_id")
+      .notNull()
+      .references(() => contactSubmissions.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdBy: uuid("created_by").references(() => adminUsers.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("contact_submission_note_submission_idx").on(
+      table.contactSubmissionId,
+      table.createdAt,
+    ),
+    check(
+      "contact_submission_note_body_not_blank",
+      sql`length(btrim(${table.body})) > 0`,
     ),
   ],
 );

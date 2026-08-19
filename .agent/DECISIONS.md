@@ -412,3 +412,40 @@ presentation contract with stable demo IDs, TR/EN alt text, decorative semantics
 and focal points. It is loaded only through the existing development-content
 gate; staging/production still require published CMS media resolved from secure
 public storage. Final approved photography replaces these files before launch.
+
+## D-038 — Milestone 6 CMS Working Copy and Publication Boundary
+**Status:** Accepted
+
+Published localized rows remain the public source while an editor works. A
+generic `ContentDraft` stores the current locale working-copy snapshot separately
+from the published `PageLocale` or collection locale row; `ContentRevision`
+continues as immutable history. Preview reads the working copy only after
+server-side permission checks and is served from an Auth0-protected, `noindex`
+route using the real public component composition.
+
+Save does not take an existing publication offline. Direct publish atomically
+applies the validated working copy; rollback creates a new draft/revision rather
+than rewriting history. Scheduled page publication keeps the current public
+snapshot live until the internal `CRON_SECRET`-authenticated worker applies the
+working copy under a PostgreSQL advisory transaction lock. Scheduled provider
+invocation/alerting remains a deployment gate.
+
+## D-039 — Milestone 6 Admin Data-Minimization Boundary
+**Status:** Accepted
+
+The Turkish `/admin` shell is Auth0/session backed and permission-aware; roles
+remain grant groupings only. Mutation services repeat server-side atomic
+permission checks and same-origin validation. Production MFA remains automatic
+for every admin permission check.
+
+- Contact inbox lists only date, name, subject, locale and status. Full contact
+  PII/message/provenance requires `Contact:view`; Viewer and Content Editor are
+  denied. Notes, status and due-retention actions are separately permissioned
+  and audited without message/note bodies.
+- Media administration queries and mutates `storage_class = public` only.
+  Protected/quarantine CV objects never enter the media library.
+- Site settings accept only the existing non-secret allowlist. General content
+  values are size/type checked and secret-like nested keys are rejected; Dealer
+  Portal continues through its Super Admin-only HTTPS validator.
+- Legal-page publish/schedule requires an explicit approved-copy reference;
+  actual legal wording and approval references remain TBD business inputs.

@@ -27,6 +27,8 @@ export async function proxy(request: NextRequest) {
       pathname === "/admin" ||
       pathname.startsWith("/admin/") ||
       pathname.startsWith("/api/admin/") ||
+      pathname === "/preview" ||
+      pathname.startsWith("/preview/") ||
       pathname === "/auth" ||
       pathname.startsWith("/auth/");
     if (protectedPath) {

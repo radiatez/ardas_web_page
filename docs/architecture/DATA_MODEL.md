@@ -69,6 +69,10 @@ title
 body/content_json
 seo_title
 seo_description
+og_title
+og_description
+og_media_id nullable
+allow_indexing
 publish_status
 published_at
 scheduled_publish_at
@@ -87,6 +91,21 @@ snapshot
 created_by
 created_at
 ```
+
+### ContentDraft
+
+```text
+entity_type
+entity_id
+locale
+snapshot
+updated_by
+updated_at
+```
+
+`ContentDraft` is the mutable working copy. It does not replace or hide the
+currently published locale row. Publish applies it atomically; rollback writes a
+new working copy and revision.
 
 ### SlugRedirect
 
@@ -344,6 +363,19 @@ retention_hold_until nullable
 anonymized_at nullable
 ```
 
+### ContactSubmissionNote
+
+```text
+id
+contact_submission_id
+body
+created_by
+created_at
+```
+
+Internal notes inherit the Contact permission boundary, are removed by contact
+retention anonymization and are never copied into audit metadata.
+
 ### SubmissionNotification
 
 Durable notification outbox. PostgreSQL submission records remain authoritative;
@@ -476,6 +508,7 @@ erDiagram
 
     Page ||--o{ PageLocale : localized
     Page ||--o{ ContentRevision : revisions
+    Page ||--o{ ContentDraft : working_copy
     Page ||--o{ SlugRedirect : redirects
 
     Brand ||--o{ BrandLocale : localized
@@ -499,6 +532,8 @@ erDiagram
     Media ||--o{ Brand : logo
     Media ||--o{ ProductGroup : image
     Media ||--o{ Location : image
+
+    ContactSubmission ||--o{ ContactSubmissionNote : internal_notes
 
     AdminUser ||--o{ AuditEvent : actor
 ```
@@ -537,3 +572,15 @@ erDiagram
 - A CV media row is unique to one application. GuardDuty provider event IDs are
   unique, and non-clean files cannot satisfy the protected-storage constraint.
 - Audit rows are protected by a PostgreSQL trigger that rejects update/delete.
+
+## Milestone 6 Implementation Notes
+
+- Public localized rows and mutable working copies are separate, so editing and
+  scheduling do not remove the current publication.
+- `PageLocale` now stores Open Graph fields and an explicit indexing flag; OG
+  media remains constrained to the public media model.
+- `ContactSubmissionNote` provides permission-scoped internal notes and cascades
+  with the parent record; due-retention anonymization deletes notes first.
+- `ContentDraft` is generic across page, collection and public-media locale
+  working copies. It contains public/editorial data only, never contact/candidate
+  PII or secrets.
